@@ -79,18 +79,7 @@
     <property name="title">
      <string>Settings</string>
     </property>
-    <widget class="QMenu" name="menuFont_size">
-     <property name="title">
-      <string>Font size</string>
-     </property>
-     <addaction name="action7"/>
-     <addaction name="action8"/>
-     <addaction name="action10"/>
-     <addaction name="action12"/>
-     <addaction name="action14"/>
-    </widget>
-    <addaction name="menuFont_size"/>
-    <addaction name="actionHistoryDepth"/>
+    <addaction name="actionSettings"/>
     <addaction name="separator"/>
     <addaction name="actionSaveSettings"/>
    </widget>
@@ -218,9 +207,9 @@
     <string>100000</string>
    </property>
   </action>
-  <action name="actionHistoryDepth">
+  <action name="actionSettings">
    <property name="text">
-    <string>Update frequency and history depth ...</string>
+    <string>Settings...</string>
    </property>
   </action>
  </widget>

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './ui/main.ui'
+# Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Tue Apr  6 22:04:32 2010
+# Created: Sun Apr 11 16:08:25 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,8 +41,6 @@ class Ui_MainWindow(object):
         self.menuProcess.setObjectName("menuProcess")
         self.menuSettings = QtGui.QMenu(self.menubar)
         self.menuSettings.setObjectName("menuSettings")
-        self.menuFont_size = QtGui.QMenu(self.menuSettings)
-        self.menuFont_size.setObjectName("menuFont_size")
         self.menuYourFeedback = QtGui.QMenu(self.menubar)
         self.menuYourFeedback.setObjectName("menuYourFeedback")
         MainWindow.setMenuBar(self.menubar)
@@ -93,8 +91,8 @@ class Ui_MainWindow(object):
         self.action10000.setObjectName("action10000")
         self.action100000 = QtGui.QAction(MainWindow)
         self.action100000.setObjectName("action100000")
-        self.actionHistoryDepth = QtGui.QAction(MainWindow)
-        self.actionHistoryDepth.setObjectName("actionHistoryDepth")
+        self.actionSettings = QtGui.QAction(MainWindow)
+        self.actionSettings.setObjectName("actionSettings")
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
         self.menuProcess.addAction(self.actionSet_affinity)
         self.menuProcess.addAction(self.actionSet_priority)
@@ -104,13 +102,7 @@ class Ui_MainWindow(object):
         self.menuProcess.addAction(self.actionSuspend_process)
         self.menuProcess.addSeparator()
         self.menuProcess.addAction(self.actionProperties)
-        self.menuFont_size.addAction(self.action7)
-        self.menuFont_size.addAction(self.action8)
-        self.menuFont_size.addAction(self.action10)
-        self.menuFont_size.addAction(self.action12)
-        self.menuFont_size.addAction(self.action14)
-        self.menuSettings.addAction(self.menuFont_size.menuAction())
-        self.menuSettings.addAction(self.actionHistoryDepth)
+        self.menuSettings.addAction(self.actionSettings)
         self.menuSettings.addSeparator()
         self.menuSettings.addAction(self.actionSaveSettings)
         self.menuYourFeedback.addAction(self.actionSent_your_feedback)
@@ -131,7 +123,6 @@ class Ui_MainWindow(object):
         self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.menuProcess.setTitle(QtGui.QApplication.translate("MainWindow", "Process", None, QtGui.QApplication.UnicodeUTF8))
         self.menuSettings.setTitle(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
-        self.menuFont_size.setTitle(QtGui.QApplication.translate("MainWindow", "Font size", None, QtGui.QApplication.UnicodeUTF8))
         self.menuYourFeedback.setTitle(QtGui.QApplication.translate("MainWindow", "Your feedback", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_affinity.setText(QtGui.QApplication.translate("MainWindow", "Set affinity", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_priority.setText(QtGui.QApplication.translate("MainWindow", "Set priority", None, QtGui.QApplication.UnicodeUTF8))
@@ -155,7 +146,7 @@ class Ui_MainWindow(object):
         self.action1000.setText(QtGui.QApplication.translate("MainWindow", "1000", None, QtGui.QApplication.UnicodeUTF8))
         self.action10000.setText(QtGui.QApplication.translate("MainWindow", "10000", None, QtGui.QApplication.UnicodeUTF8))
         self.action100000.setText(QtGui.QApplication.translate("MainWindow", "100000", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionHistoryDepth.setText(QtGui.QApplication.translate("MainWindow", "Update frequency and history depth ...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
 
 
 if __name__ == "__main__":

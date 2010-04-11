@@ -5,7 +5,7 @@ import os
 import singleprocess
 import configobj
 import feedback
-import timesettings
+import settings as settingsMenu
 
 from PyQt4 import QtCore, QtGui
 import sys
@@ -37,7 +37,6 @@ def performMenuAction(action):
   global procList
   global onlyUser
   global settings
-  fontsize = None
   if action is mainUi.actionKill_process:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
     process = selectedItem.data(1,0).toString()
@@ -62,30 +61,21 @@ def performMenuAction(action):
       singleProcessUiList[process].makeVisible()
     else:
       singleProcessUiList[process] = singleprocess.singleUi(process, procList[int(process)]["cmdline"], procList[int(process)]["name"], reader, int(settings["historySampleCount"]))
-      
-  elif action is mainUi.action7:
-    fontsize = 7
-  elif action is mainUi.action8:
-    fontsize = 8
-  elif action is mainUi.action10:
-    fontsize = 10
-  elif action is mainUi.action12:
-    fontsize = 12
-  elif action is mainUi.action14:
-    fontsize = 14
   elif action is mainUi.actionSaveSettings:
     saveSettings()
   elif action is mainUi.actionSent_your_feedback:
     data = "kernelversion: "+ procutils.readFullFile("/proc/version") + "\n"
     data += "Distro" + procutils.readFullFile("/etc/issue") + "\n"
     feedback.doFeedBack(data)
-  elif action is mainUi.actionHistoryDepth:
-    msec, depth = timesettings.doTimeSetings(int(settings["updateTimer"]),int(settings["historySampleCount"]))
+  elif action is mainUi.actionSettings:
+    msec, depth, fontSize = settingsMenu.doSettings(int(settings["updateTimer"]),\
+                                                       int(settings["historySampleCount"]), \
+                                                       int(settings["fontSize"]))
     settings["updateTimer"] = int(msec)
     settings["historySampleCount"] = int(depth)
+    settings["fontSize"] = int(fontSize)
     
-  if fontsize is not None:
-    setFontSize(fontsize)
+    setFontSize(fontSize)
 
 def setFontSize(fontSize):
   global settings
@@ -97,7 +87,6 @@ def setFontSize(fontSize):
   mainUi.menuView.setFont(font)
   mainUi.menuProcess.setFont(font)
   mainUi.menuSettings.setFont(font)
-  mainUi.menuFont_size.setFont(font)
   mainUi.menubar.setFont(font)
   mainUi.processTreeWidget.setFont(font)
   

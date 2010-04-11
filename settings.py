@@ -1,5 +1,5 @@
 from PyQt4 import QtCore, QtGui
-import ui.historydepth
+import ui.settings as settingsMenu
 
 
 global ui
@@ -20,10 +20,10 @@ def onChange():
     ui.lineEditHours.setText("?")
   
 
-def doTimeSetings(millisecWait,depth):
+def doSettings(millisecWait, depth, fontSize):
   global ui
   Dialog = QtGui.QDialog()
-  settings = ui.historydepth.Ui_Dialog()
+  settings = settingsMenu.Ui_Dialog()
   settings.setupUi(Dialog)
   ui = settings
   Dialog.setModal(True)
@@ -31,8 +31,10 @@ def doTimeSetings(millisecWait,depth):
   QtCore.QObject.connect(settings.lineEditTimesSecond,  QtCore.SIGNAL('textChanged (const QString&)'), onChange)
   ui.lineEditTimesSecond.setText(str(float(1000.0 / (millisecWait * 1.0))))
   ui.lineEditNfSamples.setText(str(depth))
+  ui.lineEditFontSize.setText(str(fontSize))
   Dialog.exec_()
   
   millisecWait = int(1000.0 / float(str(ui.lineEditTimesSecond.displayText())))
   depth = int(str(ui.lineEditNfSamples.displayText()))
-  return(millisecWait, depth)
+  fontSize = int(str(ui.lineEditFontSize.displayText()))
+  return(millisecWait, depth, fontSize)
