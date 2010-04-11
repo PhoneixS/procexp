@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>518</width>
+    <height>358</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Linux Process Explorer</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QTreeWidget" name="processTreeWidget">
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
+        </property>
+        <property name="columnCount">
+         <number>0</number>
+        </property>
+        <attribute name="headerCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="headerDefaultSectionSize">
+         <number>50</number>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>518</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionShow_process_from_all_users"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuProcess">
+    <property name="title">
+     <string>Process</string>
+    </property>
+    <addaction name="actionSet_affinity"/>
+    <addaction name="actionSet_priority"/>
+    <addaction name="separator"/>
+    <addaction name="actionKill_process"/>
+    <addaction name="actionKill_process_tree"/>
+    <addaction name="actionSuspend_process"/>
+    <addaction name="separator"/>
+    <addaction name="actionProperties"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <widget class="QMenu" name="menuFont_size">
+     <property name="title">
+      <string>Font size</string>
+     </property>
+     <addaction name="action7"/>
+     <addaction name="action8"/>
+     <addaction name="action10"/>
+     <addaction name="action12"/>
+     <addaction name="action14"/>
+    </widget>
+    <addaction name="menuFont_size"/>
+    <addaction name="actionHistoryDepth"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuYourFeedback">
+    <property name="title">
+     <string>Your feedback</string>
+    </property>
+    <addaction name="actionSent_your_feedback"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuOptions"/>
+   <addaction name="menuView"/>
+   <addaction name="menuProcess"/>
+   <addaction name="menuSettings"/>
+   <addaction name="menuYourFeedback"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSet_affinity">
+   <property name="text">
+    <string>Set affinity</string>
+   </property>
+  </action>
+  <action name="actionSet_priority">
+   <property name="text">
+    <string>Set priority</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>----</string>
+   </property>
+  </action>
+  <action name="actionKill_process">
+   <property name="text">
+    <string>Kill process</string>
+   </property>
+  </action>
+  <action name="actionKill_process_tree">
+   <property name="text">
+    <string>Kill process tree</string>
+   </property>
+  </action>
+  <action name="actionSuspend_process">
+   <property name="text">
+    <string>Suspend process</string>
+   </property>
+  </action>
+  <action name="actionProperties">
+   <property name="text">
+    <string>Properies</string>
+   </property>
+  </action>
+  <action name="actionShow_process_from_all_users">
+   <property name="text">
+    <string>Show process from all users</string>
+   </property>
+  </action>
+  <action name="action8">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action9">
+   <property name="text">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="action7">
+   <property name="text">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="action8">
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="action10">
+   <property name="text">
+    <string>10</string>
+   </property>
+  </action>
+  <action name="action12">
+   <property name="text">
+    <string>12</string>
+   </property>
+  </action>
+  <action name="action14">
+   <property name="text">
+    <string>14</string>
+   </property>
+  </action>
+  <action name="actionSaveSettings">
+   <property name="text">
+    <string>Save current settings</string>
+   </property>
+  </action>
+  <action name="actionSent_your_feedback">
+   <property name="text">
+    <string>Sent your feedback</string>
+   </property>
+  </action>
+  <action name="action10_2">
+   <property name="text">
+    <string>10</string>
+   </property>
+  </action>
+  <action name="action100">
+   <property name="text">
+    <string>100</string>
+   </property>
+  </action>
+  <action name="action1000">
+   <property name="text">
+    <string>1000</string>
+   </property>
+  </action>
+  <action name="action10000">
+   <property name="text">
+    <string>10000</string>
+   </property>
+  </action>
+  <action name="action100000">
+   <property name="text">
+    <string>100000</string>
+   </property>
+  </action>
+  <action name="actionHistoryDepth">
+   <property name="text">
+    <string>Update frequency and history depth ...</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
