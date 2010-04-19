@@ -155,7 +155,7 @@ class Ui_MainWindow(object):
         self.action12.setText(QtGui.QApplication.translate("MainWindow", "12", None, QtGui.QApplication.UnicodeUTF8))
         self.action14.setText(QtGui.QApplication.translate("MainWindow", "14", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSaveSettings.setText(QtGui.QApplication.translate("MainWindow", "Save current settings", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionSent_your_feedback.setText(QtGui.QApplication.translate("MainWindow", "Sent your feedback", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSent_your_feedback.setText(QtGui.QApplication.translate("MainWindow", "Send your feedback", None, QtGui.QApplication.UnicodeUTF8))
         self.action10_2.setText(QtGui.QApplication.translate("MainWindow", "10", None, QtGui.QApplication.UnicodeUTF8))
         self.action100.setText(QtGui.QApplication.translate("MainWindow", "100", None, QtGui.QApplication.UnicodeUTF8))
         self.action1000.setText(QtGui.QApplication.translate("MainWindow", "1000", None, QtGui.QApplication.UnicodeUTF8))

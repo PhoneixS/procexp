@@ -219,7 +219,7 @@ def prepareUI(mainUi):
   mainUi.qwtPlotOverallCpuHist.enableAxis(0, False )
   mainUi.qwtPlotOverallCpuHist.enableAxis(2, False )
   
-  mainUi.qwtPlotOverallCpuHist.setAxisScale(0,0,100,20)
+  mainUi.qwtPlotOverallCpuHist.setAxisScale(0,10,100,20)
   
   
 def clearTree():

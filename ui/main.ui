@@ -231,7 +231,7 @@
   </action>
   <action name="actionSent_your_feedback">
    <property name="text">
-    <string>Sent your feedback</string>
+    <string>Send your feedback</string>
    </property>
   </action>
   <action name="action10_2">
