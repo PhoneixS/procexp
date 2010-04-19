@@ -8,6 +8,8 @@ import feedback
 import settings as settingsMenu
 
 from PyQt4 import QtCore, QtGui
+import PyQt4.Qwt5 as Qwt
+
 import sys
 
 timer = None
@@ -19,6 +21,14 @@ onlyUser = True
 greenTopLevelItems = {}
 redTopLevelItems = {}
 singleProcessUiList = {}
+curveCpuHist = None
+curveCpuHistExt = None
+curveCpuKernelHist = None
+curveCpuKernelHistExt = None
+curveCpuPlotGrid = None
+cpuUsageHistory = None
+cpuUsageKernelHistory = None
+
 
 firstUpdate = True
 
@@ -122,6 +132,11 @@ def loadSettings():
       pass
     else:
       settings[item] = defaultSettings[item]
+      
+  global cpuUsageHistory
+  global cpuUsageKernelHistory
+  cpuUsageHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageKernelHistory = [0] * int(settings["historySampleCount"])
 
 def saveSettings():
 
@@ -156,6 +171,55 @@ def prepareUI(mainUi):
   QtCore.QObject.connect(mainUi.menuOptions,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuSettings, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuYourFeedback, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  
+  #prepare the plot
+  global curveCpuHist
+  global curveCpuHistExt
+  global curveCpuKernelHist
+  global curveCpuKernelHistExt
+  global curveCpuPlotGrid
+  
+  curveCpuHist = Qwt.QwtPlotCurve("CPU History")
+  pen = QtGui.QPen(QtGui.QColor(0,255,0))
+  pen.setWidth(2)
+  
+  #work around to get better plotting.
+  curveCpuHistExt = Qwt.QwtPlotCurve("CPU History extra")
+  curveCpuHistExt.setPen(QtGui.QPen(QtGui.QColor(0,255,0)))
+  curveCpuHistExt.attach(mainUi.qwtPlotOverallCpuHist)
+  
+  
+  curveCpuHist.setPen(pen)
+  curveCpuHist.setBrush(QtGui.QColor(0,170,0))
+  curveCpuHist.attach(mainUi.qwtPlotOverallCpuHist)
+  
+  #Curve for kernel usage
+  curveCpuKernelHist = Qwt.QwtPlotCurve("CPU Kernel History")
+  pen = QtGui.QPen(QtGui.QColor(255,0,0))
+  pen.setWidth(1)
+  curveCpuKernelHist.setPen(pen)
+  curveCpuKernelHist.setBrush(QtGui.QColor(170,0,0))
+  curveCpuKernelHist.attach(mainUi.qwtPlotOverallCpuHist)
+  
+  #work around to get better plotting.
+  curveCpuKernelHistExt = Qwt.QwtPlotCurve("CPU Kernel History extra")
+  curveCpuKernelHistExt.setPen(QtGui.QPen(QtGui.QColor(255,0,0)))
+  curveCpuKernelHistExt.attach(mainUi.qwtPlotOverallCpuHist)
+  
+  
+  #self.__procDetails__.qwtPlotCpuHist.setAxisScale(0,0,self.__depth__,10)    
+  
+  curveCpuPlotGrid= Qwt.QwtPlotGrid()
+  curveCpuPlotGrid.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
+  curveCpuPlotGrid.setMinPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
+  curveCpuPlotGrid.enableXMin(True)
+  curveCpuPlotGrid.attach(mainUi.qwtPlotOverallCpuHist)  
+  
+  mainUi.qwtPlotOverallCpuHist.setCanvasBackground(QtGui.QColor(0,0,0))
+  mainUi.qwtPlotOverallCpuHist.enableAxis(0, False )
+  mainUi.qwtPlotOverallCpuHist.enableAxis(2, False )
+  
+  mainUi.qwtPlotOverallCpuHist.setAxisScale(0,0,100,20)
   
   
 def clearTree():
@@ -300,14 +364,32 @@ def updateUI():
   
   for ui in singleProcessUiList:
     singleProcessUiList[ui].update()
-
+    
+  #update the cpu graph
+  try:
+    global cpuUsageHistory
+    global cpuUsageKernelHistory
+    global curveCpuHist
+    global curveCpuHistExt
+    global curveCpuKernelHist
+    global curveCpuKernelHistExt
+    global curveCpuPlotGrid
+    cpuUsageHistory.append(reader.overallUserCpuUsage)
+    cpuUsageHistory = cpuUsageHistory[1:]
+    cpuUsageKernelHistory.append(reader.overallKernelCpuUsage)
+    cpuUsageKernelHistory = cpuUsageKernelHistory[1:]
+    curveCpuHist.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
+    curveCpuHistExt.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
+    curveCpuKernelHist.setData(range(int(settings["historySampleCount"])), cpuUsageKernelHistory)
+    curveCpuKernelHistExt.setData(range(int(settings["historySampleCount"])), cpuUsageKernelHistory)
+    
+    mainUi.qwtPlotOverallCpuHist.replot()
+    
+  except:
+    import traceback
+    print traceback.format_exc()
+  
   firstUpdate = False
-  
-  
-  
-  
-  
-  
   
 app = QtGui.QApplication(sys.argv)
 app.setStyle("Windows")

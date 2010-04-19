@@ -19,6 +19,8 @@ class procreader(object):
     self.__uidFilter__ = None
     self.__updateTimer__ = timerValue
     self.__historyCount__ = historyCount
+    self.overallCpuUsage = 0
+    self.overallKernelUsage = 0
  
   def __initReader__(self):
     self.__processList__ = {}
@@ -26,10 +28,49 @@ class procreader(object):
     self.__newProcesses__ = None
     self.__prevJiffies__ = None
     self.__deltaJiffies__ = None
+    self.__prevUserMode__ = None
+    self.__prevUserNiceMode__ = None
+    self.__prevSystemMode__ = None
+    self.__prevIdleMode__ = None
+    self.__deltaUserMode__ = None
+    self.__deltaUserNiceMode__ = None
+    self.__deltaSystemMode__ = None
+    self.__deltaIdleMode__ = None
 
   def __getGlobalJiffies__(self):
     jiffyStr = procutils.readFullFile('/proc/stat').split("\n")[0]
-    newjiffies = int(jiffyStr.split()[1]) + int(jiffyStr.split()[2]) + int(jiffyStr.split()[3]) + int(jiffyStr.split()[4]) 
+    userMode = int(jiffyStr.split()[1])
+    userNiceMode = int(jiffyStr.split()[2])
+    systemMode = int(jiffyStr.split()[3])
+    idleMode = int(jiffyStr.split()[4]) 
+    
+    newjiffies = userMode + userNiceMode + systemMode + idleMode
+     
+    if self.__deltaUserMode__ == None:
+      self.__prevUserMode__ = userMode
+      self.__prevUserNiceMode__ = userNiceMode
+      self.__prevSystemMode__ = systemMode
+      self.__prevIdleMode__ = idleMode
+      self.__deltaUserMode__ = 1
+      self.__deltaUserNiceMode__ = 1
+      self.__deltaSystemMode__ = 1
+      self.__deltaIdleMode__ = 1
+    else:
+      self.__deltaUserMode__ = userMode - self.__prevUserMode__
+      self.__deltaUserNiceMode__ = userNiceMode - self.__prevUserNiceMode__
+      self.__deltaSystemMode__ = systemMode - self.__prevSystemMode__
+      self.__deltaIdleMode__ = idleMode - self.__prevIdleMode__
+      self.__prevUserMode__ = userMode
+      self.__prevUserNiceMode__ = userNiceMode
+      self.__prevSystemMode__ = systemMode
+      self.__prevIdleMode__ = idleMode
+      
+    self.overallUserCpuUsage = round((((self.__deltaUserMode__ + self.__deltaUserNiceMode__)*1.0 / 
+       (self.__deltaUserMode__ + self.__deltaUserNiceMode__ + self.__deltaSystemMode__ + self.__deltaIdleMode__)*1.0))*100, 1)
+    self.overallKernelCpuUsage = round(((self.__deltaSystemMode__*1.0 / 
+       (self.__deltaUserMode__ + self.__deltaUserNiceMode__ + self.__deltaSystemMode__ + self.__deltaIdleMode__)*1.0))*100, 1)
+
+    
     if self.__deltaJiffies__ == None:
       self.__prevJiffies__ = newjiffies
       self.__deltaJiffies__ = 1

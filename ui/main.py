@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main.ui'
+# Form implementation generated from reading ui file './ui/main.ui'
 #
-# Created: Sun Apr 11 16:08:25 2010
+# Created: Sun Apr 18 21:03:08 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -15,18 +15,33 @@ class Ui_MainWindow(object):
         MainWindow.resize(518, 358)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout_2 = QtGui.QGridLayout(self.centralwidget)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setMargin(0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.frame = QtGui.QFrame(self.centralwidget)
+        self.frame.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtGui.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.horizontalLayout = QtGui.QHBoxLayout(self.frame)
+        self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.qwtPlotOverallCpuHist = Qwt5.QwtPlot(self.frame)
+        self.qwtPlotOverallCpuHist.setMinimumSize(QtCore.QSize(150, 0))
+        self.qwtPlotOverallCpuHist.setMaximumSize(QtCore.QSize(150, 50))
+        self.qwtPlotOverallCpuHist.setObjectName("qwtPlotOverallCpuHist")
+        self.horizontalLayout.addWidget(self.qwtPlotOverallCpuHist)
+        self.verticalLayout.addWidget(self.frame)
         self.processTreeWidget = QtGui.QTreeWidget(self.centralwidget)
         self.processTreeWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.processTreeWidget.setColumnCount(0)
         self.processTreeWidget.setObjectName("processTreeWidget")
         self.processTreeWidget.header().setCascadingSectionResizes(True)
         self.processTreeWidget.header().setDefaultSectionSize(50)
-        self.horizontalLayout.addWidget(self.processTreeWidget)
-        self.gridLayout_2.addLayout(self.horizontalLayout, 0, 0, 1, 1)
+        self.verticalLayout.addWidget(self.processTreeWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 518, 23))
@@ -148,6 +163,7 @@ class Ui_MainWindow(object):
         self.action100000.setText(QtGui.QApplication.translate("MainWindow", "100000", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
 
+from PyQt4 import Qwt5
 
 if __name__ == "__main__":
     import sys
