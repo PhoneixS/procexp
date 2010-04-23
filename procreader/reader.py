@@ -19,8 +19,6 @@ class procreader(object):
     self.__uidFilter__ = None
     self.__updateTimer__ = timerValue
     self.__historyCount__ = historyCount
-    self.overallCpuUsage = 0
-    self.overallKernelUsage = 0
  
   def __initReader__(self):
     self.__processList__ = {}
@@ -32,11 +30,22 @@ class procreader(object):
     self.__prevUserNiceMode__ = None
     self.__prevSystemMode__ = None
     self.__prevIdleMode__ = None
+    self.__prevIoWait__ = None
+    self.__prevIrqMode__ = None
+    self.__prevSoftIrqMode__ = None
+    
+    self.__deltaUserMode__ = None
     self.__deltaUserMode__ = None
     self.__deltaUserNiceMode__ = None
     self.__deltaSystemMode__ = None
     self.__deltaIdleMode__ = None
-
+    self.__deltaIoWait__ = None
+    self.__deltaIrqMode__ = None
+    self.__deltaSoftIrqMode__ = None
+    
+    self.__overallUserCpuUsage__ = 0
+    self.__overallSystemCpuUsage__  = 0
+    
   def __getGlobalJiffies__(self):
     jiffyStr = procutils.readFullFile('/proc/stat').split("\n")[0]
     userMode = int(jiffyStr.split()[1])
@@ -44,31 +53,68 @@ class procreader(object):
     systemMode = int(jiffyStr.split()[3])
     idleMode = int(jiffyStr.split()[4]) 
     
-    newjiffies = userMode + userNiceMode + systemMode + idleMode
+    ioWait = int(jiffyStr.split()[5])
+    irqMode = int(jiffyStr.split()[6])
+    softIrqMode = int(jiffyStr.split()[7])
+    
+    newjiffies = userMode + userNiceMode + systemMode + idleMode + ioWait + irqMode + softIrqMode
      
     if self.__deltaUserMode__ == None:
       self.__prevUserMode__ = userMode
       self.__prevUserNiceMode__ = userNiceMode
       self.__prevSystemMode__ = systemMode
       self.__prevIdleMode__ = idleMode
+      self.__prevIoWait__ = ioWait
+      self.__prevIrqMode__ = irqMode
+      self.__prevSoftIrqMode__ = softIrqMode
+      
       self.__deltaUserMode__ = 1
       self.__deltaUserNiceMode__ = 1
       self.__deltaSystemMode__ = 1
       self.__deltaIdleMode__ = 1
+      self.__deltaIoWait__ = 1
+      self.__deltaIrqMode__ = 1
+      self.__deltaSoftIrqMode__ = 1
+      
     else:
       self.__deltaUserMode__ = userMode - self.__prevUserMode__
       self.__deltaUserNiceMode__ = userNiceMode - self.__prevUserNiceMode__
       self.__deltaSystemMode__ = systemMode - self.__prevSystemMode__
       self.__deltaIdleMode__ = idleMode - self.__prevIdleMode__
+      self.__deltaIoWait__ = ioWait - self.__prevIoWait__
+      self.__deltaIrqMode__ = irqMode - self.__prevIrqMode__
+      self.__deltaSoftIrqMode__ = softIrqMode - self.__prevSoftIrqMode__
+      
+      
       self.__prevUserMode__ = userMode
       self.__prevUserNiceMode__ = userNiceMode
       self.__prevSystemMode__ = systemMode
       self.__prevIdleMode__ = idleMode
+      self.__prevIoWait__ = ioWait
+      self.__prevIrqMode__ = irqMode
+      self.__prevSoftIrqMode__ = softIrqMode
       
-    self.overallUserCpuUsage = round((((self.__deltaUserMode__ + self.__deltaUserNiceMode__)*1.0 / 
-       (self.__deltaUserMode__ + self.__deltaUserNiceMode__ + self.__deltaSystemMode__ + self.__deltaIdleMode__)*1.0))*100, 1)
-    self.overallKernelCpuUsage = round(((self.__deltaSystemMode__*1.0 / 
-       (self.__deltaUserMode__ + self.__deltaUserNiceMode__ + self.__deltaSystemMode__ + self.__deltaIdleMode__)*1.0))*100, 1)
+    
+    
+    total = float(self.__deltaUserMode__ + 
+            self.__deltaUserNiceMode__ + 
+            self.__deltaSystemMode__ + 
+            self.__deltaIdleMode__ +
+            self.__deltaIoWait__ +
+            self.__deltaIrqMode__ +
+            self.__deltaSoftIrqMode__)
+    
+    
+    
+    
+    self.__overallUserCpuUsage__    = round((self.__deltaUserMode__*1.0 / total)*100, 1) if total > 0 else 0
+    self.__overallSystemCpuUsage__  = round((self.__deltaSystemMode__*1.0 / total)*100, 1) if total > 0 else 0
+    self.__overallNiceCpuUsage__    = round((self.__deltaUserNiceMode__*1.0 / total)*100, 1) if total > 0 else 0
+    
+    self.__overallIoWaitCpuUsage__  = round((self.__deltaIoWait__*1.0 / total)*100, 1) if total > 0 else 0
+    self.__overallIrqCpuUsage__     = round((self.__deltaIrqMode__*1.0 / total)*100, 1) if total > 0 else 0
+    self.__overallSoftIrqCpuUsage__ = round((self.__deltaSoftIrqMode__*1.0 / total)*100, 1) if total > 0 else 0
+    
 
     
     if self.__deltaJiffies__ == None:
@@ -78,6 +124,24 @@ class procreader(object):
       self.__deltaJiffies__ = newjiffies - self.__prevJiffies__
       self.__prevJiffies__ = newjiffies    
   
+  def overallUserCpuUsage(self):
+    return self.__overallUserCpuUsage__
+
+  def overallKernelCpuUsage(self):
+    return self.__overallSystemCpuUsage__
+  
+  def overallNiceCpuUsage(self):
+    return self.__overallNiceCpuUsage__
+
+  def overallIoWaitCpuUsage(self):
+    return self.__overallIoWaitCpuUsage__
+  
+  def overallIrqCpuUsage(self):
+    return self.__overallIrqCpuUsage__
+
+  def overallCpuUsage(self):
+    return self.__overallSoftIrqCpuUsage__
+    
   def setFilterUID(self,uid):
     self.__uidFilter__ = uid
     self.__initReader__()
@@ -337,8 +401,8 @@ class procreader(object):
         except:
           pass
     return allFds, allUDP
-          
-  def getProcessInfo(self):
+  
+  def doReadProcessInfo(self):
     self.__getGlobalJiffies__()
     self.__getAllProcesses__()
     self.__getProcessCpuDetails__()
@@ -346,6 +410,8 @@ class procreader(object):
     self.__getProcessDetails__()
     self.__getAllSocketInfo__()
     self.__getAllUDPInfo__()
+    
+  def getProcessInfo(self):
     return self.__processList__, self.__closedProcesses__, self.__newProcesses__
 
   def hasProcess(self, process):

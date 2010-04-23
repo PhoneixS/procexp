@@ -295,6 +295,7 @@ def updateUI():
   global treeProcesses, greenTopLevelItems, redTopLevelItems
   global mainUi
   global firstUpdate
+  reader.doReadProcessInfo()
   procList, closedProc, newProc = reader.getProcessInfo()
   
   flat = False
@@ -374,9 +375,9 @@ def updateUI():
     global curveCpuKernelHist
     global curveCpuKernelHistExt
     global curveCpuPlotGrid
-    cpuUsageHistory.append(reader.overallUserCpuUsage)
+    cpuUsageHistory.append(reader.overallUserCpuUsage())
     cpuUsageHistory = cpuUsageHistory[1:]
-    cpuUsageKernelHistory.append(reader.overallKernelCpuUsage)
+    cpuUsageKernelHistory.append(reader.overallKernelCpuUsage())
     cpuUsageKernelHistory = cpuUsageKernelHistory[1:]
     curveCpuHist.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
     curveCpuHistExt.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
