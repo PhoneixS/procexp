@@ -107,13 +107,10 @@ class procreader(object):
     
     
     
-    self.__overallUserCpuUsage__    = round((self.__deltaUserMode__*1.0 / total)*100, 1) if total > 0 else 0
-    self.__overallSystemCpuUsage__  = round((self.__deltaSystemMode__*1.0 / total)*100, 1) if total > 0 else 0
-    self.__overallNiceCpuUsage__    = round((self.__deltaUserNiceMode__*1.0 / total)*100, 1) if total > 0 else 0
-    
+    self.__overallUserCpuUsage__    = round(((self.__deltaUserMode__ + self.__deltaUserNiceMode__)*1.0 / total)*100, 1) if total > 0 else 0
+    self.__overallSystemCpuUsage__  = round((self.__deltaSystemMode__ *1.0 / total)*100, 1) if total > 0 else 0
     self.__overallIoWaitCpuUsage__  = round((self.__deltaIoWait__*1.0 / total)*100, 1) if total > 0 else 0
-    self.__overallIrqCpuUsage__     = round((self.__deltaIrqMode__*1.0 / total)*100, 1) if total > 0 else 0
-    self.__overallSoftIrqCpuUsage__ = round((self.__deltaSoftIrqMode__*1.0 / total)*100, 1) if total > 0 else 0
+    self.__overallIrqCpuUsage__     = round(((self.__deltaIrqMode__ + self.__deltaSoftIrqMode__) *1.0 / total)*100, 1) if total > 0 else 0
     
 
     
@@ -126,21 +123,13 @@ class procreader(object):
   
   def overallUserCpuUsage(self):
     return self.__overallUserCpuUsage__
-
-  def overallKernelCpuUsage(self):
+  def overallSystemCpuUsage(self):
     return self.__overallSystemCpuUsage__
-  
-  def overallNiceCpuUsage(self):
-    return self.__overallNiceCpuUsage__
-
   def overallIoWaitCpuUsage(self):
     return self.__overallIoWaitCpuUsage__
-  
   def overallIrqCpuUsage(self):
     return self.__overallIrqCpuUsage__
 
-  def overallCpuUsage(self):
-    return self.__overallSoftIrqCpuUsage__
     
   def setFilterUID(self,uid):
     self.__uidFilter__ = uid

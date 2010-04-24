@@ -22,10 +22,15 @@ greenTopLevelItems = {}
 redTopLevelItems = {}
 singleProcessUiList = {}
 curveCpuHist = None
-curveCpuKernelHist = None
+curveCpuSystemHist = None
+curveIoWaitHist = None
+curveIrqHist = None
+
 curveCpuPlotGrid = None
 cpuUsageHistory = None
-cpuUsageKernelHistory = None
+cpuUsageSystemHistory = None
+cpuUsageIoWaitHistory = None
+cpuUsageIrqHistory = None
 
 
 firstUpdate = True
@@ -151,9 +156,15 @@ def loadSettings():
       settings[item] = defaultSettings[item]
       
   global cpuUsageHistory
-  global cpuUsageKernelHistory
+  global cpuUsageSystemHistory
+  global cpuUsageIoWaitHistory
+  global cpuUsageIrqHistory 
+  
   cpuUsageHistory = [0] * int(settings["historySampleCount"])
-  cpuUsageKernelHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageSystemHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageIoWaitHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageIrqHistory = [0] * int(settings["historySampleCount"])
+
 
 def saveSettings():
 
@@ -192,15 +203,25 @@ def prepareUI(mainUi):
   
   #prepare the plot
   global curveCpuHist
-  global curveCpuKernelHist
+  global curveCpuSystemHist
+  global curveIoWaitHist
+  global curveIrqHist
   global curveCpuPlotGrid
   
   curveCpuHist = niceCurve("CPU History", 
-                           1, QtGui.QColor(0,255,0),QtGui.QColor(0,170,0), 
+                           1 , QtGui.QColor(0,255,0),QtGui.QColor(0,170,0), 
                            mainUi.qwtPlotOverallCpuHist)
   
-  curveCpuKernelHist = niceCurve("CPU Kernel History", 
+  curveCpuSystemHist = niceCurve("CPU Kernel History", 
                            1, QtGui.QColor(255,0,0),QtGui.QColor(170,0,0), 
+                           mainUi.qwtPlotOverallCpuHist)
+                           
+  curveIoWaitHist = niceCurve("CPU IO wait history", 
+                           1, QtGui.QColor(0,0,255),QtGui.QColor(0,0,127), 
+                           mainUi.qwtPlotOverallCpuHist)
+  
+  curveIrqHist = niceCurve("CPU irq history", 
+                           1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
                            mainUi.qwtPlotOverallCpuHist)
   
   
@@ -364,16 +385,44 @@ def updateUI():
   #update the cpu graph
   try:
     global cpuUsageHistory
-    global cpuUsageKernelHistory
+    global cpuUsageSystemHistory
+    global cpuUsageIoWaitHistory
+    global cpuUsageIrqHistory
+    
     global curveCpuHist
-    global curveCpuKernelHist
+    global curveCpuSystemHist
+    global curveIrqHist
+    global curveIoWaitHist
     global curveCpuPlotGrid
-    cpuUsageHistory.append(reader.overallUserCpuUsage())
+    
+    cpuUsageHistory.append(reader.overallUserCpuUsage()+
+                           reader.overallSystemCpuUsage()+
+                           reader.overallIoWaitCpuUsage()+
+                           reader.overallIrqCpuUsage())
     cpuUsageHistory = cpuUsageHistory[1:]
-    cpuUsageKernelHistory.append(reader.overallKernelCpuUsage())
-    cpuUsageKernelHistory = cpuUsageKernelHistory[1:]
+    
+    
+    cpuUsageSystemHistory.append(reader.overallSystemCpuUsage()+
+                                 reader.overallIoWaitCpuUsage()+
+                                 reader.overallIrqCpuUsage())
+    cpuUsageSystemHistory = cpuUsageSystemHistory[1:]
+    
+    
+    cpuUsageIoWaitHistory.append(reader.overallIoWaitCpuUsage() + 
+                                 reader.overallIrqCpuUsage())
+    cpuUsageIoWaitHistory = cpuUsageIoWaitHistory[1:]
+    
+    
+    cpuUsageIrqHistory.append(reader.overallIrqCpuUsage())
+    cpuUsageIrqHistory = cpuUsageIrqHistory[1:]
+    
+
+
+                                 
     curveCpuHist.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
-    curveCpuKernelHist.setData(range(int(settings["historySampleCount"])), cpuUsageKernelHistory)
+    curveCpuSystemHist.setData(range(int(settings["historySampleCount"])), cpuUsageSystemHistory)
+    curveIoWaitHist.setData(range(int(settings["historySampleCount"])), cpuUsageIoWaitHistory)
+    curveIrqHist.setData(range(int(settings["historySampleCount"])), cpuUsageIrqHistory)
     mainUi.qwtPlotOverallCpuHist.replot()
     
   except:
