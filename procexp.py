@@ -22,9 +22,7 @@ greenTopLevelItems = {}
 redTopLevelItems = {}
 singleProcessUiList = {}
 curveCpuHist = None
-curveCpuHistExt = None
 curveCpuKernelHist = None
-curveCpuKernelHistExt = None
 curveCpuPlotGrid = None
 cpuUsageHistory = None
 cpuUsageKernelHistory = None
@@ -42,6 +40,25 @@ defaultSettings = \
  "updateTimer": 1000,
  "historySampleCount": 200
 }
+
+
+class niceCurve(object):
+  def __init__(self, name, penWidth, lineColor, fillColor, plot):
+    self.__curve__ = Qwt.QwtPlotCurve(name)
+    pen = QtGui.QPen(lineColor)
+    pen.setWidth(penWidth)
+    self.__curve__.setPen(pen)
+    self.__curve__.setBrush(fillColor)
+    self.__curve__.attach(plot)
+    
+    #work around to get nicer plotting.
+    self.__curveExt__ = Qwt.QwtPlotCurve(name+" extra")
+    self.__curveExt__.setPen(QtGui.QPen(lineColor))
+    self.__curveExt__.attach(plot)
+  def setData(self, x, y):
+    self.__curve__.setData(x, y)
+    self.__curveExt__.setData(x,y)
+  
 
 def performMenuAction(action):
   global procList
@@ -157,6 +174,7 @@ def onContextMenu(point):
   global mainUi
   mainUi.menuProcess.exec_(mainUi.processTreeWidget.mapToGlobal(point))
   
+  
 def prepareUI(mainUi):
   global timer
   mainUi.processTreeWidget.setColumnCount(8)
@@ -174,40 +192,17 @@ def prepareUI(mainUi):
   
   #prepare the plot
   global curveCpuHist
-  global curveCpuHistExt
   global curveCpuKernelHist
-  global curveCpuKernelHistExt
   global curveCpuPlotGrid
   
-  curveCpuHist = Qwt.QwtPlotCurve("CPU History")
-  pen = QtGui.QPen(QtGui.QColor(0,255,0))
-  pen.setWidth(2)
+  curveCpuHist = niceCurve("CPU History", 
+                           1, QtGui.QColor(0,255,0),QtGui.QColor(0,170,0), 
+                           mainUi.qwtPlotOverallCpuHist)
   
-  #work around to get better plotting.
-  curveCpuHistExt = Qwt.QwtPlotCurve("CPU History extra")
-  curveCpuHistExt.setPen(QtGui.QPen(QtGui.QColor(0,255,0)))
-  curveCpuHistExt.attach(mainUi.qwtPlotOverallCpuHist)
+  curveCpuKernelHist = niceCurve("CPU Kernel History", 
+                           1, QtGui.QColor(255,0,0),QtGui.QColor(170,0,0), 
+                           mainUi.qwtPlotOverallCpuHist)
   
-  
-  curveCpuHist.setPen(pen)
-  curveCpuHist.setBrush(QtGui.QColor(0,170,0))
-  curveCpuHist.attach(mainUi.qwtPlotOverallCpuHist)
-  
-  #Curve for kernel usage
-  curveCpuKernelHist = Qwt.QwtPlotCurve("CPU Kernel History")
-  pen = QtGui.QPen(QtGui.QColor(255,0,0))
-  pen.setWidth(1)
-  curveCpuKernelHist.setPen(pen)
-  curveCpuKernelHist.setBrush(QtGui.QColor(170,0,0))
-  curveCpuKernelHist.attach(mainUi.qwtPlotOverallCpuHist)
-  
-  #work around to get better plotting.
-  curveCpuKernelHistExt = Qwt.QwtPlotCurve("CPU Kernel History extra")
-  curveCpuKernelHistExt.setPen(QtGui.QPen(QtGui.QColor(255,0,0)))
-  curveCpuKernelHistExt.attach(mainUi.qwtPlotOverallCpuHist)
-  
-  
-  #self.__procDetails__.qwtPlotCpuHist.setAxisScale(0,0,self.__depth__,10)    
   
   curveCpuPlotGrid= Qwt.QwtPlotGrid()
   curveCpuPlotGrid.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
@@ -371,19 +366,14 @@ def updateUI():
     global cpuUsageHistory
     global cpuUsageKernelHistory
     global curveCpuHist
-    global curveCpuHistExt
     global curveCpuKernelHist
-    global curveCpuKernelHistExt
     global curveCpuPlotGrid
     cpuUsageHistory.append(reader.overallUserCpuUsage())
     cpuUsageHistory = cpuUsageHistory[1:]
     cpuUsageKernelHistory.append(reader.overallKernelCpuUsage())
     cpuUsageKernelHistory = cpuUsageKernelHistory[1:]
     curveCpuHist.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
-    curveCpuHistExt.setData(range(int(settings["historySampleCount"])), cpuUsageHistory)
     curveCpuKernelHist.setData(range(int(settings["historySampleCount"])), cpuUsageKernelHistory)
-    curveCpuKernelHistExt.setData(range(int(settings["historySampleCount"])), cpuUsageKernelHistory)
-    
     mainUi.qwtPlotOverallCpuHist.replot()
     
   except:
