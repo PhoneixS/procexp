@@ -6,6 +6,7 @@ import singleprocess
 import configobj
 import feedback
 import settings as settingsMenu
+import plotobjects
 
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
@@ -45,25 +46,6 @@ defaultSettings = \
  "updateTimer": 1000,
  "historySampleCount": 200
 }
-
-
-class niceCurve(object):
-  def __init__(self, name, penWidth, lineColor, fillColor, plot):
-    self.__curve__ = Qwt.QwtPlotCurve(name)
-    pen = QtGui.QPen(lineColor)
-    pen.setWidth(penWidth)
-    self.__curve__.setPen(pen)
-    self.__curve__.setBrush(fillColor)
-    self.__curve__.attach(plot)
-    
-    #work around to get nicer plotting.
-    self.__curveExt__ = Qwt.QwtPlotCurve(name+" extra")
-    self.__curveExt__.setPen(QtGui.QPen(lineColor))
-    self.__curveExt__.attach(plot)
-  def setData(self, x, y):
-    self.__curve__.setData(x, y)
-    self.__curveExt__.setData(x,y)
-  
 
 def performMenuAction(action):
   global procList
@@ -208,35 +190,23 @@ def prepareUI(mainUi):
   global curveIrqHist
   global curveCpuPlotGrid
   
-  curveCpuHist = niceCurve("CPU History", 
+  curveCpuHist = plotobjects.niceCurve("CPU History", 
                            1 , QtGui.QColor(0,255,0),QtGui.QColor(0,170,0), 
                            mainUi.qwtPlotOverallCpuHist)
   
-  curveCpuSystemHist = niceCurve("CPU Kernel History", 
+  curveCpuSystemHist = plotobjects.niceCurve("CPU Kernel History", 
                            1, QtGui.QColor(255,0,0),QtGui.QColor(170,0,0), 
                            mainUi.qwtPlotOverallCpuHist)
                            
-  curveIoWaitHist = niceCurve("CPU IO wait history", 
+  curveIoWaitHist = plotobjects.niceCurve("CPU IO wait history", 
                            1, QtGui.QColor(0,0,255),QtGui.QColor(0,0,127), 
                            mainUi.qwtPlotOverallCpuHist)
   
-  curveIrqHist = niceCurve("CPU irq history", 
+  curveIrqHist = plotobjects.niceCurve("CPU irq history", 
                            1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
                            mainUi.qwtPlotOverallCpuHist)
   
-  
-  curveCpuPlotGrid= Qwt.QwtPlotGrid()
-  curveCpuPlotGrid.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
-  curveCpuPlotGrid.setMinPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
-  curveCpuPlotGrid.enableXMin(True)
-  curveCpuPlotGrid.attach(mainUi.qwtPlotOverallCpuHist)  
-  
-  mainUi.qwtPlotOverallCpuHist.setCanvasBackground(QtGui.QColor(0,0,0))
-  mainUi.qwtPlotOverallCpuHist.enableAxis(0, False )
-  mainUi.qwtPlotOverallCpuHist.enableAxis(2, False )
-  
-  mainUi.qwtPlotOverallCpuHist.setAxisScale(0,10,100,20)
-  
+  plot = plotobjects.cpuPlot(mainUi.qwtPlotOverallCpuHist)
   
 def clearTree():
   global mainUi
