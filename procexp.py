@@ -3,6 +3,7 @@ import ui.main
 import procutils
 import os
 import singleprocess
+import systemoverview
 import configobj
 import feedback
 import settings as settingsMenu
@@ -32,7 +33,7 @@ cpuUsageHistory = None
 cpuUsageSystemHistory = None
 cpuUsageIoWaitHistory = None
 cpuUsageIrqHistory = None
-
+systemOverviewUi = None
 
 firstUpdate = True
 
@@ -51,6 +52,7 @@ def performMenuAction(action):
   global procList
   global onlyUser
   global settings
+  global systemOverviewUi
   if action is mainUi.actionKill_process:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
     process = selectedItem.data(1,0).toString()
@@ -90,6 +92,8 @@ def performMenuAction(action):
     settings["fontSize"] = int(fontSize)
     
     setFontSize(fontSize)
+  elif action is mainUi.actionSystem_information:
+    systemOverviewUi.show()
 
 def setFontSize(fontSize):
   global settings
@@ -182,6 +186,7 @@ def prepareUI(mainUi):
   QtCore.QObject.connect(mainUi.menuOptions,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuSettings, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuYourFeedback, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuView, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   
   #prepare the plot
   global curveCpuHist
@@ -352,6 +357,9 @@ def updateUI():
   for ui in singleProcessUiList:
     singleProcessUiList[ui].update()
     
+  #update CPU plots
+  systemOverviewUi.update()
+    
   #update the cpu graph
   try:
     global cpuUsageHistory
@@ -417,6 +425,9 @@ MainWindow.show()
 reader = procreader.reader.procreader(int(settings["updateTimer"]), int(settings["historySampleCount"]))
 if onlyUser:
   reader.setFilterUID(os.geteuid())
+
+systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), int(settings["historySampleCount"]), reader)
+  
 updateUI()
 sys.exit(app.exec_())
 

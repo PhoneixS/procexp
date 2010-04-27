@@ -13,19 +13,9 @@ UNKNOWN = "---"
 
 g_passwd = None
 
-class procreader(object):
-  def __init__(self, timerValue, historyCount):
-    self.__initReader__()
-    self.__uidFilter__ = None
-    self.__updateTimer__ = timerValue
-    self.__historyCount__ = historyCount
- 
-  def __initReader__(self):
-    self.__processList__ = {}
-    self.__closedProcesses__ = None
-    self.__newProcesses__ = None
-    self.__prevJiffies__ = None
-    self.__deltaJiffies__ = None
+class cpuhistoryreader(object):
+  def __init__(self, cpu):
+    self.__cpu__ = cpu
     self.__prevUserMode__ = None
     self.__prevUserNiceMode__ = None
     self.__prevSystemMode__ = None
@@ -33,7 +23,6 @@ class procreader(object):
     self.__prevIoWait__ = None
     self.__prevIrqMode__ = None
     self.__prevSoftIrqMode__ = None
-    
     self.__deltaUserMode__ = None
     self.__deltaUserMode__ = None
     self.__deltaUserNiceMode__ = None
@@ -42,12 +31,10 @@ class procreader(object):
     self.__deltaIoWait__ = None
     self.__deltaIrqMode__ = None
     self.__deltaSoftIrqMode__ = None
+    self.__newjiffies = None
     
-    self.__overallUserCpuUsage__ = 0
-    self.__overallSystemCpuUsage__  = 0
-    
-  def __getGlobalJiffies__(self):
-    jiffyStr = procutils.readFullFile('/proc/stat').split("\n")[0]
+  def update(self):
+    jiffyStr = procutils.readFullFile('/proc/stat').split("\n")[self.__cpu__+1]
     userMode = int(jiffyStr.split()[1])
     userNiceMode = int(jiffyStr.split()[2])
     systemMode = int(jiffyStr.split()[3])
@@ -57,7 +44,7 @@ class procreader(object):
     irqMode = int(jiffyStr.split()[6])
     softIrqMode = int(jiffyStr.split()[7])
     
-    newjiffies = userMode + userNiceMode + systemMode + idleMode + ioWait + irqMode + softIrqMode
+    self.__newjiffies = userMode + userNiceMode + systemMode + idleMode + ioWait + irqMode + softIrqMode
      
     if self.__deltaUserMode__ == None:
       self.__prevUserMode__ = userMode
@@ -104,23 +91,11 @@ class procreader(object):
             self.__deltaIrqMode__ +
             self.__deltaSoftIrqMode__)
     
-    
-    
-    
     self.__overallUserCpuUsage__    = round(((self.__deltaUserMode__ + self.__deltaUserNiceMode__)*1.0 / total)*100, 1) if total > 0 else 0
     self.__overallSystemCpuUsage__  = round((self.__deltaSystemMode__ *1.0 / total)*100, 1) if total > 0 else 0
     self.__overallIoWaitCpuUsage__  = round((self.__deltaIoWait__*1.0 / total)*100, 1) if total > 0 else 0
     self.__overallIrqCpuUsage__     = round(((self.__deltaIrqMode__ + self.__deltaSoftIrqMode__) *1.0 / total)*100, 1) if total > 0 else 0
-    
-
-    
-    if self.__deltaJiffies__ == None:
-      self.__prevJiffies__ = newjiffies
-      self.__deltaJiffies__ = 1
-    else:
-      self.__deltaJiffies__ = newjiffies - self.__prevJiffies__
-      self.__prevJiffies__ = newjiffies    
-  
+      
   def overallUserCpuUsage(self):
     return self.__overallUserCpuUsage__
   def overallSystemCpuUsage(self):
@@ -129,6 +104,65 @@ class procreader(object):
     return self.__overallIoWaitCpuUsage__
   def overallIrqCpuUsage(self):
     return self.__overallIrqCpuUsage__
+  def newjiffies(self):
+    return self.__newjiffies
+ 
+class procreader(object):
+  def __init__(self, timerValue, historyCount):
+    self.__initReader__()
+    self.__uidFilter__ = None
+    self.__updateTimer__ = timerValue
+    self.__historyCount__ = historyCount
+    self.__allcpu__ = cpuhistoryreader(0)
+    
+    cpuinfo = procutils.readFullFile("/proc/cpuinfo").split("\n")
+    self.__cpuCount__ = 0
+    self.__cpuArray__ = []
+    for line in cpuinfo:
+      if line.startswith("processor"):
+        self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__))
+        self.__cpuCount__ += 1
+ 
+  def __initReader__(self):
+    self.__processList__ = {}
+    self.__closedProcesses__ = None
+    self.__newProcesses__ = None
+    self.__prevJiffies__ = None
+    self.__deltaJiffies__ = None
+    
+    self.__overallUserCpuUsage__ = 0
+    self.__overallSystemCpuUsage__  = 0
+    
+  def __getGlobalJiffies__(self):
+    newjiffies = self.__allcpu__.newjiffies()
+    if self.__deltaJiffies__ == None:
+      self.__prevJiffies__ = newjiffies
+      self.__deltaJiffies__ = 1
+    else:
+      self.__deltaJiffies__ = newjiffies - self.__prevJiffies__
+      self.__prevJiffies__ = newjiffies    
+  
+  def __updateCPUs(self):
+    self.__allcpu__.update()
+    for cpu in self.__cpuArray__:
+      cpu.update()
+      
+  
+  def overallUserCpuUsage(self):
+    return self.__allcpu__.overallUserCpuUsage()
+  def overallSystemCpuUsage(self):
+    return self.__allcpu__.overallSystemCpuUsage()
+  def overallIoWaitCpuUsage(self):
+    return self.__allcpu__.overallIoWaitCpuUsage()
+  def overallIrqCpuUsage(self):
+    return self.__allcpu__.overallIrqCpuUsage()
+    
+  def getSingleCpuUsage(self, cpu):
+    data = (self.__cpuArray__[cpu].overallUserCpuUsage(),
+           self.__cpuArray__[cpu].overallSystemCpuUsage(),
+           self.__cpuArray__[cpu].overallIoWaitCpuUsage(),
+           self.__cpuArray__[cpu].overallIrqCpuUsage())
+    return data
 
     
   def setFilterUID(self,uid):
@@ -392,6 +426,7 @@ class procreader(object):
     return allFds, allUDP
   
   def doReadProcessInfo(self):
+    self.__updateCPUs()
     self.__getGlobalJiffies__()
     self.__getAllProcesses__()
     self.__getProcessCpuDetails__()
@@ -417,3 +452,5 @@ class procreader(object):
     return self.__processList__[int(process)]["env"]
   def getHistoryDepth(self, process):
     return self.__processList__[int(process)]["history"].HistoryDepth
+  def getCpuCount(self):
+    return self.__cpuCount__

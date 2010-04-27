@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './ui/main.ui'
+# Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Sun Apr 18 21:03:08 2010
+# Created: Tue Apr 27 20:22:52 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -108,7 +108,10 @@ class Ui_MainWindow(object):
         self.action100000.setObjectName("action100000")
         self.actionSettings = QtGui.QAction(MainWindow)
         self.actionSettings.setObjectName("actionSettings")
+        self.actionSystem_information = QtGui.QAction(MainWindow)
+        self.actionSystem_information.setObjectName("actionSystem_information")
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
+        self.menuView.addAction(self.actionSystem_information)
         self.menuProcess.addAction(self.actionSet_affinity)
         self.menuProcess.addAction(self.actionSet_priority)
         self.menuProcess.addSeparator()
@@ -162,6 +165,7 @@ class Ui_MainWindow(object):
         self.action10000.setText(QtGui.QApplication.translate("MainWindow", "10000", None, QtGui.QApplication.UnicodeUTF8))
         self.action100000.setText(QtGui.QApplication.translate("MainWindow", "100000", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSystem_information.setText(QtGui.QApplication.translate("MainWindow", "System Information...", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4 import Qwt5
 
