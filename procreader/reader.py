@@ -113,7 +113,7 @@ class procreader(object):
     self.__uidFilter__ = None
     self.__updateTimer__ = timerValue
     self.__historyCount__ = historyCount
-    self.__allcpu__ = cpuhistoryreader(0)
+    self.__allcpu__ = cpuhistoryreader(-1)
     
     cpuinfo = procutils.readFullFile("/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
