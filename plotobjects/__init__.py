@@ -32,5 +32,5 @@ class cpuPlot(object):
     self.__plot__.setCanvasBackground(QtGui.QColor(0,0,0))
     self.__plot__.enableAxis(0, False )
     self.__plot__.enableAxis(2, False )
-    self.__plot__.setAxisScale(0,10,100,20)    
+    self.__plot__.setAxisScale(0,0,100,20)    
   
