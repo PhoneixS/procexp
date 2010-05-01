@@ -7,6 +7,36 @@ import PyQt4.Qwt5 as Qwt
 import ui.systeminformation
 import plotobjects
 
+
+class memoryPlotObject(object):
+  def __init__(self, plot, depth, reader):
+    self.__curveMemHist__ = plotobjects.niceCurve("Memory History", 
+                             1 ,QtGui.QColor(217,137,123), QtGui.QColor(180,70,50), 
+                             plot)
+    self.__depth__ = depth
+    self.__reader__ = reader
+    self.__first__ = False
+    self.__plot__ = plot
+    #adapt the memory plot
+    
+    self.__memoryUsageHistory__ = [0] * int(self.__depth__)
+    
+  def update(self, values):
+    
+    
+    
+    if self.__first__ == False:
+      self.first = True
+      scale = plotobjects.scaleObject()
+      scale.min = 0
+      scale.max = values[0]
+      self.__adaptedmemoryplot = plotobjects.procExpPlot(self.__plot__, scale)
+    
+    self.__memoryUsageHistory__.append(values[0]-values[1])
+    self.__memoryUsageHistory__ = self.__memoryUsageHistory__[1:]
+    self.__curveMemHist__.setData(range(self.__depth__), self.__memoryUsageHistory__)
+    self.__plot__.replot()
+                             
 class cpuPlotObject(object):
   def __init__(self, plot, depth, reader, cpu):
     self.__curveCpuHist__ = plotobjects.niceCurve("CPU History", 
@@ -25,7 +55,7 @@ class cpuPlotObject(object):
                              1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
                              plot)
     
-    self.__adaptedplot__ = plotobjects.cpuPlot(plot)  
+    self.__adaptedplot__ = plotobjects.procExpPlot(plot)  
     self.__plot__ = plot
 
     self.__depth__ = depth
@@ -118,7 +148,10 @@ class systemOverviewUi(object):
                                                          self.__depth__,
                                                          self.__reader__,
                                                          cpu))
-  
+                                                         
+    self.__memPlot__ = memoryPlotObject(self.__ui__.qwtPlotMemoryHist,
+                                                         self.__depth__,
+                                                         self.__reader__)
   def show(self):
     self.__dialog__.show()
     self.__dialog__.setVisible(True)    
@@ -127,4 +160,13 @@ class systemOverviewUi(object):
     for plot in xrange(32):
       if plot+1 <= self.__cpuCount__:
         self.__cpuPlotArray__[plot][2].update()
+    memvalues = self.__reader__.getMemoryUsage()
+    
+    self.__ui__.memUsed.setText(str(memvalues[0]-memvalues[1]))
+    self.__ui__.memTotal.setText(str(memvalues[0]))
+    self.__ui__.memAvailable.setText(str(memvalues[1]))
+    self.__ui__.memBuffers.setText(str(memvalues[2]))
+    self.__ui__.memCached.setText(str(memvalues[3]))
+    
+    self.__memPlot__.update(memvalues)
     

@@ -55,13 +55,13 @@ class cpuhistoryreader(object):
       self.__prevIrqMode__ = irqMode
       self.__prevSoftIrqMode__ = softIrqMode
       
-      self.__deltaUserMode__ = 1
-      self.__deltaUserNiceMode__ = 1
-      self.__deltaSystemMode__ = 1
-      self.__deltaIdleMode__ = 1
-      self.__deltaIoWait__ = 1
-      self.__deltaIrqMode__ = 1
-      self.__deltaSoftIrqMode__ = 1
+      self.__deltaUserMode__ = 0
+      self.__deltaUserNiceMode__ = 0
+      self.__deltaSystemMode__ = 0
+      self.__deltaIdleMode__ = 0
+      self.__deltaIoWait__ = 0
+      self.__deltaIrqMode__ = 0
+      self.__deltaSoftIrqMode__ = 0
       
     else:
       self.__deltaUserMode__ = userMode - self.__prevUserMode__
@@ -400,6 +400,14 @@ class procreader(object):
       if len(udp) > 1:
         self.__allUDP__[udp.split()[9]] = udp.split()
 
+  def __getMemoryInfo(self):
+    mem = procutils.readFullFile("/proc/meminfo").split("\n")
+    self.__totalMemKb   = int(mem[0].split()[1])
+    self.__actualMemKb  = int(mem[1].split()[1])
+    self.__buffersMemKb = int(mem[2].split()[1])
+    self.__cachedMemKb  = int(mem[3].split()[1])
+    
+
   def getAllProcessSockets(self,process):
     
     allFds = {}
@@ -434,6 +442,8 @@ class procreader(object):
     self.__getProcessDetails__()
     self.__getAllSocketInfo__()
     self.__getAllUDPInfo__()
+    self.__getMemoryInfo()
+    
     
   def getProcessInfo(self):
     return self.__processList__, self.__closedProcesses__, self.__newProcesses__
@@ -454,3 +464,5 @@ class procreader(object):
     return self.__processList__[int(process)]["history"].HistoryDepth
   def getCpuCount(self):
     return self.__cpuCount__
+  def getMemoryUsage(self):
+    return self.__totalMemKb, self.__actualMemKb, self.__buffersMemKb, self.__cachedMemKb

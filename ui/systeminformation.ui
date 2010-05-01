@@ -6,23 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>252</height>
+    <width>388</width>
+    <height>441</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>System Information</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>CPU Usage History</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="margin">
+       <number>2</number>
+      </property>
       <item row="0" column="0">
        <widget class="QwtPlot" name="qwtPlotCpuHist_01">
         <property name="sizePolicy">
@@ -39,8 +45,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -61,8 +67,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -83,8 +89,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -105,8 +111,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -127,8 +133,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -149,8 +155,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -171,8 +177,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -193,8 +199,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -215,8 +221,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -237,8 +243,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -259,8 +265,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -281,8 +287,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -303,8 +309,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -325,8 +331,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -347,8 +353,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -369,8 +375,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -391,8 +397,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -413,8 +419,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -435,8 +441,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -457,8 +463,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -479,8 +485,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -501,8 +507,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -523,8 +529,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -545,8 +551,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -567,8 +573,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -589,8 +595,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -611,8 +617,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -633,8 +639,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -655,8 +661,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -677,8 +683,8 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
@@ -699,14 +705,48 @@
         </property>
         <property name="sizeIncrement">
          <size>
-          <width>5</width>
-          <height>5</height>
+          <width>2</width>
+          <height>2</height>
          </size>
         </property>
        </widget>
       </item>
       <item row="3" column="7">
        <widget class="QwtPlot" name="qwtPlotCpuHist_32">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>2</width>
+          <height>2</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Physical Memory History</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="margin">
+       <number>2</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QwtPlot" name="qwtPlotMemoryHist">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -730,7 +770,175 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Physical Memory (K)</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Total</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="memTotal">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>60</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Used</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="memUsed">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Available</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="memAvailable">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Buffers</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="memBuffers">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Cached</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLabel" name="memCached">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_4">
+       <property name="title">
+        <string>GroupBox</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="sizeIncrement">
       <size>

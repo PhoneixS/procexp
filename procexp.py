@@ -211,7 +211,7 @@ def prepareUI(mainUi):
                            1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
                            mainUi.qwtPlotOverallCpuHist)
   
-  plot = plotobjects.cpuPlot(mainUi.qwtPlotOverallCpuHist)
+  plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist)
   
 def clearTree():
   global mainUi

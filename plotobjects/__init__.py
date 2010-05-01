@@ -1,6 +1,8 @@
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 
+class scaleObject:
+  pass
 
 class niceCurve(object):
   def __init__(self, name, penWidth, lineColor, fillColor, plot):
@@ -21,8 +23,8 @@ class niceCurve(object):
 
 
 
-class cpuPlot(object):
-  def __init__(self, qwtPlot):
+class procExpPlot(object):
+  def __init__(self, qwtPlot, scale=None):
     self.__plot__ = qwtPlot
     self.__curveCpuPlotGrid= Qwt.QwtPlotGrid()
     self.__curveCpuPlotGrid.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
@@ -32,5 +34,8 @@ class cpuPlot(object):
     self.__plot__.setCanvasBackground(QtGui.QColor(0,0,0))
     self.__plot__.enableAxis(0, False )
     self.__plot__.enableAxis(2, False )
-    self.__plot__.setAxisScale(0,0,100,20)    
+    if scale is None:
+      self.__plot__.setAxisScale(0,0,100,20)    
+    else:
+      self.__plot__.setAxisScale(0, scale.min, scale.max, (scale.max - scale.min) / 10.0)
   
