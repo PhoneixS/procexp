@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/systeminformation.ui'
 #
-# Created: Sat May  1 16:36:39 2010
+# Created: Sat May  1 16:59:58 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -362,14 +362,13 @@ class Ui_Dialog(object):
         self.qwtPlotMemoryHist.setObjectName("qwtPlotMemoryHist")
         self.gridLayout_3.addWidget(self.qwtPlotMemoryHist, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
-        self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
         self.groupBox_3 = QtGui.QGroupBox(Dialog)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
         self.groupBox_3.setSizePolicy(sizePolicy)
+        self.groupBox_3.setMaximumSize(QtCore.QSize(16777215, 130))
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox_3)
         self.gridLayout_2.setObjectName("gridLayout_2")
@@ -419,11 +418,7 @@ class Ui_Dialog(object):
         self.memCached.setMinimumSize(QtCore.QSize(40, 10))
         self.memCached.setObjectName("memCached")
         self.gridLayout_2.addWidget(self.memCached, 4, 1, 1, 1)
-        self.horizontalLayout.addWidget(self.groupBox_3)
-        self.groupBox_4 = QtGui.QGroupBox(Dialog)
-        self.groupBox_4.setObjectName("groupBox_4")
-        self.horizontalLayout.addWidget(self.groupBox_4)
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addWidget(self.groupBox_3)
         self.buttonBox = QtGui.QDialogButtonBox(Dialog)
         self.buttonBox.setSizeIncrement(QtCore.QSize(0, 0))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -451,7 +446,6 @@ class Ui_Dialog(object):
         self.memBuffers.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("Dialog", "Cached", None, QtGui.QApplication.UnicodeUTF8))
         self.memCached.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox_4.setTitle(QtGui.QApplication.translate("Dialog", "GroupBox", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4 import Qwt5
 
