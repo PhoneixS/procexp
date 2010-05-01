@@ -168,5 +168,11 @@ class systemOverviewUi(object):
     self.__ui__.memBuffers.setText(str(memvalues[2]))
     self.__ui__.memCached.setText(str(memvalues[3]))
     
+    avg = self.__reader__.getLoadAvg()
+    self.__ui__.last1minUtil.setText(str(avg[0][0]))
+    self.__ui__.last5minUtil.setText(str(avg[0][1]))
+    self.__ui__.last10minUtil.setText(str(avg[0][2]))
+    self.__ui__.lastpid.setText(str(avg[3]))
+    self.__ui__.procs.setText(str(avg[1]))
     self.__memPlot__.update(memvalues)
     

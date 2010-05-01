@@ -406,7 +406,13 @@ class procreader(object):
     self.__actualMemKb  = int(mem[1].split()[1])
     self.__buffersMemKb = int(mem[2].split()[1])
     self.__cachedMemKb  = int(mem[3].split()[1])
-    
+  
+  def __getAverageLoad(self):
+    load = procutils.readFullFile("/proc/loadavg").split()
+    self.__loadavg__ = (load[0],load[1],load[2])
+    self.__noofprocs__ = load[3].split("/")[1]
+    self.__noofrunningprocs__ = load[3].split("/")[0]
+    self.__lastpid__ = load[4]
 
   def getAllProcessSockets(self,process):
     
@@ -443,7 +449,7 @@ class procreader(object):
     self.__getAllSocketInfo__()
     self.__getAllUDPInfo__()
     self.__getMemoryInfo()
-    
+    self.__getAverageLoad()
     
   def getProcessInfo(self):
     return self.__processList__, self.__closedProcesses__, self.__newProcesses__
@@ -466,3 +472,6 @@ class procreader(object):
     return self.__cpuCount__
   def getMemoryUsage(self):
     return self.__totalMemKb, self.__actualMemKb, self.__buffersMemKb, self.__cachedMemKb
+  def getLoadAvg(self):
+    return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
+
