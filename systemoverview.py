@@ -157,9 +157,9 @@ class systemOverviewUi(object):
     self.__dialog__.setVisible(True)    
     
   def update(self):
-    #for plot in xrange(32):
-    #  if plot+1 <= self.__cpuCount__:
-    #    self.__cpuPlotArray__[plot][2].update()
+    for plot in xrange(32):
+      if plot+1 <= self.__cpuCount__:
+        self.__cpuPlotArray__[plot][2].update()
     memvalues = self.__reader__.getMemoryUsage()
     
     self.__ui__.memUsed.setText(str(memvalues[0]-memvalues[1]))
