@@ -173,6 +173,6 @@ class systemOverviewUi(object):
     self.__ui__.last5minUtil.setText(str(avg[0][1]))
     self.__ui__.last10minUtil.setText(str(avg[0][2]))
     self.__ui__.lastpid.setText(str(avg[3]))
-    self.__ui__.procs.setText(str(avg[1]))
+    self.__ui__.procs.setText(str(avg[2])+"/"+str(avg[1]))
     self.__memPlot__.update(memvalues)
     
