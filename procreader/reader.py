@@ -117,12 +117,16 @@ class procreader(object):
     
     cpuinfo = procutils.readFullFile("/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
+    self.__networkCardCount__=0
     self.__cpuArray__ = []
+    self.__networkCardArray__ = []
     for line in cpuinfo:
       if line.startswith("processor"):
         self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__))
         self.__cpuCount__ += 1
- 
+    
+    #network cards
+    self.__networkCardCount__ = len(procutils.readFullFile('/proc/net/dev').split("\n"))-3
   def __initReader__(self):
     self.__processList__ = {}
     self.__closedProcesses__ = None
@@ -146,7 +150,10 @@ class procreader(object):
     self.__allcpu__.update()
     for cpu in self.__cpuArray__:
       cpu.update()
-      
+
+  def __updateNetworkCards(self):
+    for card in self.__networkCardArray__:
+      card.update()
   
   def overallUserCpuUsage(self):
     return self.__allcpu__.overallUserCpuUsage()
@@ -413,7 +420,14 @@ class procreader(object):
     self.__noofprocs__ = load[3].split("/")[1]
     self.__noofrunningprocs__ = load[3].split("/")[0]
     self.__lastpid__ = load[4]
+    
+    
+  def getNetworkCardCount(self):
+    return self.__networkCardCount__
 
+  def getNetworkCardUsage(self, card):
+    return 0,20
+    
   def getAllProcessSockets(self,process):
     
     allFds = {}
@@ -440,6 +454,7 @@ class procreader(object):
     return allFds, allUDP
   
   def doReadProcessInfo(self):
+    self.__updateCPUs()
     self.__updateCPUs()
     self.__getGlobalJiffies__()
     self.__getAllProcesses__()

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Tue Apr 27 20:22:52 2010
+# Created: Thu May  6 22:38:11 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,7 +44,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.processTreeWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 518, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 518, 25))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -110,8 +110,11 @@ class Ui_MainWindow(object):
         self.actionSettings.setObjectName("actionSettings")
         self.actionSystem_information = QtGui.QAction(MainWindow)
         self.actionSystem_information.setObjectName("actionSystem_information")
+        self.actionNetwork_Information = QtGui.QAction(MainWindow)
+        self.actionNetwork_Information.setObjectName("actionNetwork_Information")
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
         self.menuView.addAction(self.actionSystem_information)
+        self.menuView.addAction(self.actionNetwork_Information)
         self.menuProcess.addAction(self.actionSet_affinity)
         self.menuProcess.addAction(self.actionSet_priority)
         self.menuProcess.addSeparator()
@@ -166,6 +169,7 @@ class Ui_MainWindow(object):
         self.action100000.setText(QtGui.QApplication.translate("MainWindow", "100000", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSystem_information.setText(QtGui.QApplication.translate("MainWindow", "System Information...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionNetwork_Information.setText(QtGui.QApplication.translate("MainWindow", "Network Information...", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4 import Qwt5
 

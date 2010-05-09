@@ -8,7 +8,7 @@ import configobj
 import feedback
 import settings as settingsMenu
 import plotobjects
-
+import networkoverview
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 
@@ -34,6 +34,7 @@ cpuUsageSystemHistory = None
 cpuUsageIoWaitHistory = None
 cpuUsageIrqHistory = None
 systemOverviewUi = None
+networkOverviewUi = None
 
 firstUpdate = True
 
@@ -53,6 +54,7 @@ def performMenuAction(action):
   global onlyUser
   global settings
   global systemOverviewUi
+  global networkOverviewUi
   if action is mainUi.actionKill_process:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
     process = selectedItem.data(1,0).toString()
@@ -94,6 +96,8 @@ def performMenuAction(action):
     setFontSize(fontSize)
   elif action is mainUi.actionSystem_information:
     systemOverviewUi.show()
+  elif action is mainUi.actionNetwork_Information:
+    networkOverviewUi.show()
 
 def setFontSize(fontSize):
   global settings
@@ -359,6 +363,9 @@ def updateUI():
     
   #update CPU plots
   systemOverviewUi.update()
+  
+  #network plots
+  networkOverviewUi.update()
     
   #update the cpu graph
   try:
@@ -427,6 +434,7 @@ if onlyUser:
   reader.setFilterUID(os.geteuid())
 
 systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), int(settings["historySampleCount"]), reader)
+networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCardCount(), int(settings["historySampleCount"]), reader)
   
 updateUI()
 sys.exit(app.exec_())
