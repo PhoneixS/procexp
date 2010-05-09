@@ -117,16 +117,21 @@ class procreader(object):
     
     cpuinfo = procutils.readFullFile("/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
-    self.__networkCardCount__=0
+    self.__networkCards__= {}
     self.__cpuArray__ = []
-    self.__networkCardArray__ = []
+    self.__prevTimeStamp__ = None
     for line in cpuinfo:
       if line.startswith("processor"):
         self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__))
         self.__cpuCount__ += 1
     
     #network cards
-    self.__networkCardCount__ = len(procutils.readFullFile('/proc/net/dev').split("\n"))-3
+    data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
+    for line in data:
+      cardName = line.split(":")[0]
+      if len(cardName) > 0:
+        self.__networkCards__[cardName] = [0, 0, 0, 0]  #in/s out/s previn, prevout]
+
   def __initReader__(self):
     self.__processList__ = {}
     self.__closedProcesses__ = None
@@ -151,9 +156,6 @@ class procreader(object):
     for cpu in self.__cpuArray__:
       cpu.update()
 
-  def __updateNetworkCards(self):
-    for card in self.__networkCardArray__:
-      card.update()
   
   def overallUserCpuUsage(self):
     return self.__allcpu__.overallUserCpuUsage()
@@ -422,11 +424,11 @@ class procreader(object):
     self.__lastpid__ = load[4]
     
     
-  def getNetworkCardCount(self):
-    return self.__networkCardCount__
+  def getNetworkCards(self):
+    return self.__networkCards__
 
-  def getNetworkCardUsage(self, card):
-    return 0,20
+  def getNetworkCardUsage(self, cardName):
+    return self.__networkCards__[cardName][0], self.__networkCards__[cardName][1]
     
   def getAllProcessSockets(self,process):
     
@@ -452,9 +454,24 @@ class procreader(object):
         except:
           pass
     return allFds, allUDP
+    
+  def __getNetworkCardUsage(self):
+    data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
+    actTime = time.time()
+    for line in data:
+      cardName = line.split(":")[0]
+      if len(cardName) > 0:
+        splittedLine = line.split()
+        recv = int(splittedLine[1])
+        sent = int(splittedLine[9])
+        #print cardName, recv, sent, self.__networkCards__[cardName]
+        if self.__prevTimeStamp__ != None:
+          self.__networkCards__[cardName][0] = (recv - self.__networkCards__[cardName][2]) / (actTime - self.__prevTimeStamp__)
+          self.__networkCards__[cardName][1] = (sent - self.__networkCards__[cardName][3]) / (actTime - self.__prevTimeStamp__)
+          self.__networkCards__[cardName][2] = recv
+          self.__networkCards__[cardName][3] = sent
   
   def doReadProcessInfo(self):
-    self.__updateCPUs()
     self.__updateCPUs()
     self.__getGlobalJiffies__()
     self.__getAllProcesses__()
@@ -465,6 +482,9 @@ class procreader(object):
     self.__getAllUDPInfo__()
     self.__getMemoryInfo()
     self.__getAverageLoad()
+    self.__getNetworkCardUsage()
+    #keep line below as last command
+    self.__prevTimeStamp__ = time.time()
     
   def getProcessInfo(self):
     return self.__processList__, self.__closedProcesses__, self.__newProcesses__

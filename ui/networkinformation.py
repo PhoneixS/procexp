@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'networkinformation.ui'
+# Form implementation generated from reading ui file './ui/networkinformation.ui'
 #
-# Created: Sun May  9 20:49:14 2010
+# Created: Sun May  9 21:14:06 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -177,13 +177,13 @@ class Ui_Dialog(object):
         self.qwtPlotNetworkCardHistory_08.setObjectName("qwtPlotNetworkCardHistory_08")
         self.verticalLayout_11.addWidget(self.qwtPlotNetworkCardHistory_08)
         self.gridLayout.addWidget(self.groupBoxNetworkCard_08, 1, 0, 1, 1)
-        self.groupBoxNetworkCard_2 = QtGui.QGroupBox(self.groupBox)
-        self.groupBoxNetworkCard_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.groupBoxNetworkCard_2.setObjectName("groupBoxNetworkCard_2")
-        self.verticalLayout_13 = QtGui.QVBoxLayout(self.groupBoxNetworkCard_2)
+        self.groupBoxNetworkCard_09 = QtGui.QGroupBox(self.groupBox)
+        self.groupBoxNetworkCard_09.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.groupBoxNetworkCard_09.setObjectName("groupBoxNetworkCard_09")
+        self.verticalLayout_13 = QtGui.QVBoxLayout(self.groupBoxNetworkCard_09)
         self.verticalLayout_13.setContentsMargins(0, 2, 0, 0)
         self.verticalLayout_13.setObjectName("verticalLayout_13")
-        self.qwtPlotNetworkCardHistory_09 = Qwt5.QwtPlot(self.groupBoxNetworkCard_2)
+        self.qwtPlotNetworkCardHistory_09 = Qwt5.QwtPlot(self.groupBoxNetworkCard_09)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -193,7 +193,7 @@ class Ui_Dialog(object):
         self.qwtPlotNetworkCardHistory_09.setSizeIncrement(QtCore.QSize(2, 2))
         self.qwtPlotNetworkCardHistory_09.setObjectName("qwtPlotNetworkCardHistory_09")
         self.verticalLayout_13.addWidget(self.qwtPlotNetworkCardHistory_09)
-        self.gridLayout.addWidget(self.groupBoxNetworkCard_2, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.groupBoxNetworkCard_09, 1, 1, 1, 1)
         self.groupBoxNetworkCard_10 = QtGui.QGroupBox(self.groupBox)
         self.groupBoxNetworkCard_10.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.groupBoxNetworkCard_10.setObjectName("groupBoxNetworkCard_10")
@@ -731,7 +731,7 @@ class Ui_Dialog(object):
         self.groupBoxNetworkCard_06.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_07.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_08.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBoxNetworkCard_2.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBoxNetworkCard_09.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_10.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_11.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_12.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))

@@ -35,7 +35,8 @@ class procExpPlot(object):
     self.__plot__.enableAxis(0, False )
     self.__plot__.enableAxis(2, False )
     if scale is None:
-      self.__plot__.setAxisScale(0,0,100,20)    
+      #self.__plot__.setAxisScale(0,0,100,20)    
+      pass
     else:
       self.__plot__.setAxisScale(0, scale.min, scale.max, (scale.max - scale.min) / 10.0)
   

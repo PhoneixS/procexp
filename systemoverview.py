@@ -22,9 +22,6 @@ class memoryPlotObject(object):
     self.__memoryUsageHistory__ = [0] * int(self.__depth__)
     
   def update(self, values):
-    
-    
-    
     if self.__first__ == False:
       self.__first__ = True
       scale = plotobjects.scaleObject()
@@ -55,7 +52,11 @@ class cpuPlotObject(object):
                              1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
                              plot)
     
-    self.__adaptedplot__ = plotobjects.procExpPlot(plot)  
+    scale = plotobjects.scaleObject()
+    scale.min = 0
+    scale.max = 100
+
+    self.__adaptedplot__ = plotobjects.procExpPlot(plot, scale)  
     self.__plot__ = plot
 
     self.__depth__ = depth
@@ -67,7 +68,6 @@ class cpuPlotObject(object):
     self.__cpuUsageIrqHistory__ = [0] * int(self.__depth__)
   def update(self):
     values = self.__reader__.getSingleCpuUsage(self.__cpu__)
-    
     self.__cpuUsageHistory__.append(values[0]+values[1]+values[2]+values[3])
     self.__cpuUsageHistory__ = self.__cpuUsageHistory__[1:]
     

@@ -434,7 +434,7 @@ if onlyUser:
   reader.setFilterUID(os.geteuid())
 
 systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), int(settings["historySampleCount"]), reader)
-networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCardCount(), int(settings["historySampleCount"]), reader)
+networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCards(), int(settings["historySampleCount"]), reader)
   
 updateUI()
 sys.exit(app.exec_())
