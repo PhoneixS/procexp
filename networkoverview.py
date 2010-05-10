@@ -104,7 +104,11 @@ class networkOverviewUi(object):
                                                          self.__depth__,
                                                          self.__reader__,
                                                          cardName))
-        self.__netPlotArray[idx][0].setTitle(cardName)
+        speed = self.__networkCards__[cardName]["speed"]
+        if speed is None:
+          self.__netPlotArray[idx][0].setTitle(cardName+" / " + "??" + " Mb/s")
+        else:
+          self.__netPlotArray[idx][0].setTitle(cardName+" / " + str(speed) + " Mb/s")
       idx +=1
       
   def show(self):

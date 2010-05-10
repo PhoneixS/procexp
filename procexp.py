@@ -214,8 +214,11 @@ def prepareUI(mainUi):
   curveIrqHist = plotobjects.niceCurve("CPU irq history", 
                            1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
                            mainUi.qwtPlotOverallCpuHist)
-  
-  plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist)
+
+  scale = plotobjects.scaleObject()
+  scale.min = 0
+  scale.max = 100
+  plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale)
   
 def clearTree():
   global mainUi

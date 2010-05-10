@@ -7,6 +7,7 @@ import procutils
 import copy
 import singleprocess
 import binascii
+import subprocess
 
 UNKNOWN = "---"
 
@@ -128,9 +129,30 @@ class procreader(object):
     #network cards
     data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
     for line in data:
-      cardName = line.split(":")[0]
+      cardName = line.split(":")[0].strip()
       if len(cardName) > 0:
-        self.__networkCards__[cardName] = [0, 0, 0, 0]  #in/s out/s previn, prevout]
+        self.__networkCards__[cardName] = {"actual":[0, 0, 0, 0],  #in/s out/s previn, prevout]
+                                           "speed":None}
+    #try to find speeds if ethtool is available and accessible
+    print "network card speed detection results"
+    print "------------------------------------"
+    
+    for card in self.__networkCards__:
+      try:
+        ethtool = subprocess.Popen(["ethtool", card], stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+        data = ethtool.communicate()
+        speed = None
+        if data[0] is not None:
+          for line in data[0].split("\n"):
+            if line.find("Speed") != -1: 
+              speed = int(line.split(":")[1].split("Mb/s")[0])
+      except:
+        pass
+      if speed is not None:
+        print "  ethernet device", card, "has speed", speed, "Mb/s according to ethtool"
+        self.__networkCards__[card]["speed"] = speed
+      else:
+        print "  ethernet device", card, "has unknown speed"
 
   def __initReader__(self):
     self.__processList__ = {}
@@ -428,7 +450,7 @@ class procreader(object):
     return self.__networkCards__
 
   def getNetworkCardUsage(self, cardName):
-    return self.__networkCards__[cardName][0], self.__networkCards__[cardName][1]
+    return self.__networkCards__[cardName]["actual"][0], self.__networkCards__[cardName]["actual"][1]
     
   def getAllProcessSockets(self,process):
     
@@ -459,17 +481,20 @@ class procreader(object):
     data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
     actTime = time.time()
     for line in data:
-      cardName = line.split(":")[0]
+      cardName = line.split(":")[0].strip()
       if len(cardName) > 0:
         splittedLine = line.split()
         recv = int(splittedLine[1])
         sent = int(splittedLine[9])
         #print cardName, recv, sent, self.__networkCards__[cardName]
         if self.__prevTimeStamp__ != None:
-          self.__networkCards__[cardName][0] = (recv - self.__networkCards__[cardName][2]) / (actTime - self.__prevTimeStamp__)
-          self.__networkCards__[cardName][1] = (sent - self.__networkCards__[cardName][3]) / (actTime - self.__prevTimeStamp__)
-          self.__networkCards__[cardName][2] = recv
-          self.__networkCards__[cardName][3] = sent
+          if self.__networkCards__[cardName]["actual"][2] == 0:
+            pass
+          else:
+            self.__networkCards__[cardName]["actual"][0] = (recv - self.__networkCards__[cardName]["actual"][2]) / (actTime - self.__prevTimeStamp__)
+            self.__networkCards__[cardName]["actual"][1] = (sent - self.__networkCards__[cardName]["actual"][3]) / (actTime - self.__prevTimeStamp__)
+          self.__networkCards__[cardName]["actual"][2] = recv
+          self.__networkCards__[cardName]["actual"][3] = sent
   
   def doReadProcessInfo(self):
     self.__updateCPUs()
