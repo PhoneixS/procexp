@@ -9,12 +9,12 @@ import plotobjects
 
 
 class networkPlotObject(object):
-  def __init__(self, plot, depth, reader, card):
+  def __init__(self, plot, depth, reader, card, scale):
     self.__curveNetInHist__ = plotobjects.niceCurve("Network In History", 
-                             1 ,QtGui.QColor(217,137,123), QtGui.QColor(180,70,50), 
+                             1 ,QtGui.QColor(241,254,1), QtGui.QColor(181,190,1), 
                              plot)
     self.__curveNetOutHist__ = plotobjects.niceCurve("Network Out History", 
-                             1, QtGui.QColor(0,0,255),QtGui.QColor(0,0,127), 
+                             1, QtGui.QColor(28,255,255),QtGui.QColor(0,168,168), 
                              plot)
                              
     self.__depth__ = depth
@@ -22,19 +22,15 @@ class networkPlotObject(object):
     self.__first__ = False
     self.__plot__ = plot
     self.__card__ = card
+    
     #adapt the network plot
+    self.__adaptednetworkplot = plotobjects.procExpPlot(self.__plot__, scale)
     
     self.__networkInUsageHistory__ = [0] * int(self.__depth__)
     self.__networkOutUsageHistory__ = [0] * int(self.__depth__)
     
   def update(self):
     values = self.__reader__.getNetworkCardUsage(self.__card__)
-    if self.__first__ == False:
-      self.__first__ = True
-      #scale = plotobjects.scaleObject()
-      #scale.min = 0
-      #scale.max = values[0]
-      self.__adaptednetworkplot = plotobjects.procExpPlot(self.__plot__, None)
     
     #print self.__networkInUsageHistory__
     self.__networkInUsageHistory__.append(values[0])
@@ -100,15 +96,26 @@ class networkOverviewUi(object):
     idx = 0
     for cardName in self.__networkCards__:
       if self.__netPlotArray[idx][2] == True:
+        
+        speed = self.__networkCards__[cardName]["speed"]
+        if speed is not None:
+          scale = plotobjects.scaleObject()
+          scale.min = 0
+          scale.max = (speed / 8.0) * 1024.0 * 1024.0 * 0.8 #Speed in Mbit/s, rule of thumb 80% achievable of max theoretical bandwidth..
+        else:
+          scale = None #leads to autoscaling in graphs...
+
+          
         self.__netPlotArray[idx].append(networkPlotObject(self.__netPlotArray[idx][1],
                                                          self.__depth__,
                                                          self.__reader__,
-                                                         cardName))
-        speed = self.__networkCards__[cardName]["speed"]
+                                                         cardName,
+                                                         scale))
+        
         if speed is None:
-          self.__netPlotArray[idx][0].setTitle(cardName+" / " + "??" + " Mb/s")
+          self.__netPlotArray[idx][0].setTitle(cardName+" / " + "??" + " MB/s")
         else:
-          self.__netPlotArray[idx][0].setTitle(cardName+" / " + str(speed) + " Mb/s")
+          self.__netPlotArray[idx][0].setTitle(cardName+", ~" + str(round(scale.max / (1024.0*1024.0))) + " MB/s")
       idx +=1
       
   def show(self):

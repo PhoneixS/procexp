@@ -483,16 +483,22 @@ class procreader(object):
     for line in data:
       cardName = line.split(":")[0].strip()
       if len(cardName) > 0:
-        splittedLine = line.split()
-        recv = int(splittedLine[1])
-        sent = int(splittedLine[9])
-        #print cardName, recv, sent, self.__networkCards__[cardName]
+        splittedLine = line.split(":")[1].split()
+        recv = int(splittedLine[0])
+        sent = int(splittedLine[8])
+        recv+=sent #first figure is total usage, in and out
+
         if self.__prevTimeStamp__ != None:
           if self.__networkCards__[cardName]["actual"][2] == 0:
             pass
           else:
             self.__networkCards__[cardName]["actual"][0] = (recv - self.__networkCards__[cardName]["actual"][2]) / (actTime - self.__prevTimeStamp__)
             self.__networkCards__[cardName]["actual"][1] = (sent - self.__networkCards__[cardName]["actual"][3]) / (actTime - self.__prevTimeStamp__)
+          if self.__networkCards__[cardName]["actual"][0] <0:
+            self.__networkCards__[cardName]["actual"][0] = 0
+          if self.__networkCards__[cardName]["actual"][1] <0:
+            self.__networkCards__[cardName]["actual"][1] = 0
+            
           self.__networkCards__[cardName]["actual"][2] = recv
           self.__networkCards__[cardName]["actual"][3] = sent
   
