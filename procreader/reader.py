@@ -147,7 +147,7 @@ class procreader(object):
             if line.find("Speed") != -1: 
               speed = int(line.split(":")[1].split("Mb/s")[0])
       except:
-        pass
+        speed = None
       if speed is not None:
         print "  ethernet device", card, "has speed", speed, "Mb/s according to ethtool"
         self.__networkCards__[card]["speed"] = speed
