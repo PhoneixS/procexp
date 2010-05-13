@@ -451,6 +451,9 @@ class procreader(object):
 
   def getNetworkCardUsage(self, cardName):
     return self.__networkCards__[cardName]["actual"][0], self.__networkCards__[cardName]["actual"][1]
+  
+  def getNetworkCardData(self, cardName):
+    return self.__networkCards__[cardName]
     
   def getAllProcessSockets(self,process):
     
@@ -501,6 +504,18 @@ class procreader(object):
             
           self.__networkCards__[cardName]["actual"][2] = recv
           self.__networkCards__[cardName]["actual"][3] = sent
+        
+        self.__networkCards__[cardName]["recerrors"]  = int(splittedLine[2])
+        self.__networkCards__[cardName]["recdrops"]   = int(splittedLine[3])
+        self.__networkCards__[cardName]["senderrors"] = int(splittedLine[10])
+        self.__networkCards__[cardName]["senddrops"]  = int(splittedLine[11])
+        self.__networkCards__[cardName]["sendcoll"]   = int(splittedLine[13])
+        self.__networkCards__[cardName]["recbytes"]   = int(splittedLine[0])        
+        self.__networkCards__[cardName]["recpackets"]   = int(splittedLine[1])        
+        self.__networkCards__[cardName]["sendbytes"]   = int(splittedLine[8])        
+        self.__networkCards__[cardName]["sendpackets"]   = int(splittedLine[9])        
+        
+          
   
   def doReadProcessInfo(self):
     self.__updateCPUs()

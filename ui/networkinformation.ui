@@ -1524,17 +1524,90 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="tab_5">
+       <widget class="QWidget" name="tabOverview">
         <attribute name="title">
          <string>Overview</string>
         </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_6">
-        <attribute name="title">
-         <string>lo</string>
-        </attribute>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>20</y>
+           <width>60</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Errors</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>60</y>
+           <width>60</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Collisions</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_3">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>40</y>
+           <width>60</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Drops</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="labelTotalError">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>20</y>
+           <width>60</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="labelTotalDrops">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>40</y>
+           <width>60</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="labelTotalCollisions">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>60</y>
+           <width>60</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </item>

@@ -83,6 +83,7 @@ class networkOverviewUi(object):
     self.__netPlotArray += [[self.__ui__.groupBoxNetworkCard_29, self.__ui__.qwtPlotNetworkCardHistory_29]]
     self.__netPlotArray += [[self.__ui__.groupBoxNetworkCard_30, self.__ui__.qwtPlotNetworkCardHistory_30]]
     self.__netPlotArray += [[self.__ui__.groupBoxNetworkCard_31, self.__ui__.qwtPlotNetworkCardHistory_31]]
+    self.__tabs__ = {}
 
     
     
@@ -118,6 +119,55 @@ class networkOverviewUi(object):
           self.__netPlotArray[idx][0].setTitle(cardName+", ~" + str(round(scale.max / (1024.0*1024.0))) + " MB/s")
       idx +=1
       
+    #create tab per network card
+    for card in self.__networkCards__:
+      tab = QtGui.QWidget()
+      self.__tabs__[card] = [tab, 
+                              [QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), 
+                               QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), 
+                               QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab)],
+                              [QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), 
+                               QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), 
+                               QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab), QtGui.QLabel(tab)]] 
+      self.__ui__.tabWidget.addTab(tab, "")
+      self.__ui__.tabWidget.setTabText(self.__ui__.tabWidget.indexOf(tab), card)
+      ymargin=20
+      y = 10
+      xoffs = 20
+      for label in self.__tabs__[card][1][0:6]:
+        label.setGeometry(QtCore.QRect(20, y, 130, 18))
+        y += ymargin
+      y=10
+      for label in self.__tabs__[card][1][6:13]:
+        label.setGeometry(QtCore.QRect(320, y, 130, 18))
+        y += ymargin
+      self.__tabs__[card][1][0].setText("Rec Errors")
+      self.__tabs__[card][1][1].setText("Rec Drops")
+      self.__tabs__[card][1][2].setText("Send Errors")
+      self.__tabs__[card][1][3].setText("Send Drops")
+      self.__tabs__[card][1][4].setText("Send Coll")
+      self.__tabs__[card][1][5].setText("Rec bytes")
+      self.__tabs__[card][1][6].setText("Send bytes")
+      self.__tabs__[card][1][7].setText("Rec packets")
+      self.__tabs__[card][1][8].setText("Send packets")
+      self.__tabs__[card][1][9].setText("Rec bytes/s")
+      self.__tabs__[card][1][10].setText("Send bytes/s")
+      self.__tabs__[card][1][11].setText("Avg rec packet size")
+      self.__tabs__[card][1][12].setText("Avg snd packet size")
+      
+      y = 10
+      for label in self.__tabs__[card][2][0:6]:
+        label.setGeometry(QtCore.QRect(170, y, 80, 18))
+        y += ymargin
+        label.setText("0")
+      y=10
+      for label in self.__tabs__[card][2][6:13]:
+        label.setGeometry(QtCore.QRect(470, y, 80, 18))
+        y += ymargin
+        label.setText("0")
+      
+
+      
   def show(self):
     self.__dialog__.show()
     self.__dialog__.setVisible(True)    
@@ -126,4 +176,26 @@ class networkOverviewUi(object):
     for plot in xrange(32):
       if plot+1 <= len(self.__networkCards__):
         self.__netPlotArray[plot][3].update()
+    
+    for card in self.__networkCards__:
+      networkStat = self.__reader__.getNetworkCardData(card)
+      
+      self.__tabs__[card][2][0].setText(str(networkStat["recerrors"]))
+      self.__tabs__[card][2][1].setText(str(networkStat["recdrops"]))
+      self.__tabs__[card][2][2].setText(str(networkStat["senderrors"]))
+      self.__tabs__[card][2][3].setText(str(networkStat["senddrops"]))
+      self.__tabs__[card][2][4].setText(str(networkStat["sendcoll"]))
+      self.__tabs__[card][2][5].setText(str(networkStat["recbytes"]))
+      self.__tabs__[card][2][6].setText(str(networkStat["sendbytes"]))
+      self.__tabs__[card][2][7].setText(str(networkStat["recpackets"]))
+      self.__tabs__[card][2][8].setText(str(networkStat["sendpackets"]))
+      try:
+        self.__tabs__[card][2][11].setText(str(int(networkStat["recbytes"] / (networkStat["recpackets"]*1.0))))
+      except:
+        self.__tabs__[card][2][11].setText("0")
+      try:
+        self.__tabs__[card][2][12].setText(str(int(networkStat["sendbytes"] / (networkStat["sendpackets"]*1.0))))
+      except:
+        self.__tabs__[card][2][12].setText("0")
+        
     

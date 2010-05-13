@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'networkinformation.ui'
 #
-# Created: Wed May 12 22:39:07 2010
+# Created: Thu May 13 21:03:35 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -580,12 +580,27 @@ class Ui_Dialog(object):
         self.tabWidget.setMinimumSize(QtCore.QSize(0, 200))
         self.tabWidget.setMaximumSize(QtCore.QSize(16777215, 150))
         self.tabWidget.setObjectName("tabWidget")
-        self.tab_5 = QtGui.QWidget()
-        self.tab_5.setObjectName("tab_5")
-        self.tabWidget.addTab(self.tab_5, "")
-        self.tab_6 = QtGui.QWidget()
-        self.tab_6.setObjectName("tab_6")
-        self.tabWidget.addTab(self.tab_6, "")
+        self.tabOverview = QtGui.QWidget()
+        self.tabOverview.setObjectName("tabOverview")
+        self.label = QtGui.QLabel(self.tabOverview)
+        self.label.setGeometry(QtCore.QRect(20, 20, 60, 18))
+        self.label.setObjectName("label")
+        self.label_2 = QtGui.QLabel(self.tabOverview)
+        self.label_2.setGeometry(QtCore.QRect(20, 60, 60, 18))
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtGui.QLabel(self.tabOverview)
+        self.label_3.setGeometry(QtCore.QRect(20, 40, 60, 18))
+        self.label_3.setObjectName("label_3")
+        self.labelTotalError = QtGui.QLabel(self.tabOverview)
+        self.labelTotalError.setGeometry(QtCore.QRect(90, 20, 60, 18))
+        self.labelTotalError.setObjectName("labelTotalError")
+        self.labelTotalDrops = QtGui.QLabel(self.tabOverview)
+        self.labelTotalDrops.setGeometry(QtCore.QRect(90, 40, 60, 18))
+        self.labelTotalDrops.setObjectName("labelTotalDrops")
+        self.labelTotalCollisions = QtGui.QLabel(self.tabOverview)
+        self.labelTotalCollisions.setGeometry(QtCore.QRect(90, 60, 60, 18))
+        self.labelTotalCollisions.setObjectName("labelTotalCollisions")
+        self.tabWidget.addTab(self.tabOverview, "")
         self.verticalLayout_33.addWidget(self.tabWidget)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setContentsMargins(-1, 25, -1, -1)
@@ -603,7 +618,7 @@ class Ui_Dialog(object):
         self.verticalLayout_35.addLayout(self.verticalLayout_33)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), Dialog.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -643,17 +658,12 @@ class Ui_Dialog(object):
         self.groupBoxNetworkCard_29.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_30.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBoxNetworkCard_31.setTitle(QtGui.QApplication.translate("Dialog", "eth0", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QtGui.QApplication.translate("Dialog", "Overview", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QtGui.QApplication.translate("Dialog", "lo", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("Dialog", "Errors", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("Dialog", "Collisions", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_3.setText(QtGui.QApplication.translate("Dialog", "Drops", None, QtGui.QApplication.UnicodeUTF8))
+        self.labelTotalError.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
+        self.labelTotalDrops.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
+        self.labelTotalCollisions.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabOverview), QtGui.QApplication.translate("Dialog", "Overview", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4 import Qwt5
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
-
