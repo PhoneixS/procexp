@@ -180,14 +180,22 @@ class networkOverviewUi(object):
       if plot+1 <= len(self.__networkCards__):
         self.__netPlotArray[plot][3].update()
     
+    totalerrors = 0
+    totalcoll = 0
+    totaldrop = 0
+    
     for card in self.__networkCards__:
       networkStat = self.__reader__.getNetworkCardData(card)
       
       self.__tabs__[card][2][0].setText(str(networkStat["recerrors"]))
+      totalerrors += networkStat["recerrors"]
       self.__tabs__[card][2][1].setText(str(networkStat["recdrops"]))
+      totaldrop += networkStat["recdrops"]
       self.__tabs__[card][2][2].setText(str(networkStat["senderrors"]))
       self.__tabs__[card][2][3].setText(str(networkStat["senddrops"]))
+      totaldrop += networkStat["senddrops"]
       self.__tabs__[card][2][4].setText(str(networkStat["sendcoll"]))
+      totalcoll += networkStat["sendcoll"]
       self.__tabs__[card][2][5].setText(procutils.humanReadable(networkStat["recbytes"]))
       self.__tabs__[card][2][6].setText(procutils.humanReadable(networkStat["sendbytes"]))
       self.__tabs__[card][2][7].setText(str(networkStat["recpackets"]))
@@ -204,4 +212,8 @@ class networkOverviewUi(object):
       usage = self.__reader__.getNetworkCardUsage(card)
       self.__tabs__[card][2][9].setText(procutils.humanReadable(usage[0])+ "/s")
       self.__tabs__[card][2][10].setText(procutils.humanReadable(usage[1])+ "/s")
+    
+    self.__ui__.labelTotalDrops.setText(str(totaldrop))
+    self.__ui__.labelTotalCollisions.setText(str(totalcoll))
+    self.__ui__.labelTotalError.setText(str(totalerrors))
     
