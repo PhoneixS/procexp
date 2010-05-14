@@ -111,6 +111,11 @@ def setFontSize(fontSize):
   mainUi.menuSettings.setFont(font)
   mainUi.menubar.setFont(font)
   mainUi.processTreeWidget.setFont(font)
+  if systemOverviewUi is not None:
+    systemOverviewUi.setFontSize(fontSize)
+  if networkOverviewUi is not None:
+    networkOverviewUi.setFontSize(fontSize)
+  
   
 def loadSettings():
   global settings
@@ -438,7 +443,10 @@ if onlyUser:
 
 systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), int(settings["historySampleCount"]), reader)
 networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCards(), int(settings["historySampleCount"]), reader)
-  
+
+systemOverviewUi.setFontSize(int(settings["fontSize"]))
+networkOverviewUi.setFontSize(int(settings["fontSize"]))
+
 updateUI()
 sys.exit(app.exec_())
 

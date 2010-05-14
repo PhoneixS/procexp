@@ -156,6 +156,12 @@ class systemOverviewUi(object):
     self.__dialog__.show()
     self.__dialog__.setVisible(True)    
     
+  def setFontSize(self, fontSize):
+    font = QtGui.QFont()
+    font.setPointSize(fontSize)
+    self.__dialog__.setFont(font)
+    
+    
   def update(self):
     for plot in xrange(32):
       if plot+1 <= self.__cpuCount__:

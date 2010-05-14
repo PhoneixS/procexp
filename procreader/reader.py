@@ -153,7 +153,8 @@ class procreader(object):
         self.__networkCards__[card]["speed"] = speed
       else:
         print "  ethernet device", card, "has unknown speed"
-
+        print "  network graph scaling is set to autoscale"
+        print "  For better resuts, allow rights to ethtool, and/or run as root"
   def __initReader__(self):
     self.__processList__ = {}
     self.__closedProcesses__ = None
@@ -489,7 +490,6 @@ class procreader(object):
         splittedLine = line.split(":")[1].split()
         recv = int(splittedLine[0])
         sent = int(splittedLine[8])
-        recv+=sent #first figure is total usage, in and out
 
         if self.__prevTimeStamp__ != None:
           if self.__networkCards__[cardName]["actual"][2] == 0:

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'networkinformation.ui'
 #
-# Created: Thu May 13 21:03:35 2010
+# Created: Fri May 14 15:27:00 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -577,7 +577,7 @@ class Ui_Dialog(object):
         self.verticalLayout_33 = QtGui.QVBoxLayout()
         self.verticalLayout_33.setObjectName("verticalLayout_33")
         self.tabWidget = QtGui.QTabWidget(Dialog)
-        self.tabWidget.setMinimumSize(QtCore.QSize(0, 200))
+        self.tabWidget.setMinimumSize(QtCore.QSize(500, 200))
         self.tabWidget.setMaximumSize(QtCore.QSize(16777215, 150))
         self.tabWidget.setObjectName("tabWidget")
         self.tabOverview = QtGui.QWidget()

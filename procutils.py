@@ -68,3 +68,12 @@ def killProcess(process):
   
 def killProcessHard(process):
   os.kill(int(process), signal.SIGKILL)
+
+
+def humanReadable(value):
+  if value < 1000:
+    return str(int(value)) + " B"
+  elif value >= 1000 and value < 1000000:
+    return str(int(value/1000)) + " kB"
+  else:
+    return str(int(value/1000000)) + " MB"

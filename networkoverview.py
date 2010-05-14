@@ -6,7 +6,7 @@ from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 import ui.networkinformation
 import plotobjects
-
+import procutils
 
 class networkPlotObject(object):
   def __init__(self, plot, depth, reader, card, scale):
@@ -33,7 +33,7 @@ class networkPlotObject(object):
     values = self.__reader__.getNetworkCardUsage(self.__card__)
     
     #print self.__networkInUsageHistory__
-    self.__networkInUsageHistory__.append(values[0])
+    self.__networkInUsageHistory__.append(values[0]+values[1])
     self.__networkOutUsageHistory__.append(values[1])
     self.__networkInUsageHistory__ = self.__networkInUsageHistory__[1:]
     self.__networkOutUsageHistory__ = self.__networkOutUsageHistory__[1:]
@@ -85,8 +85,6 @@ class networkOverviewUi(object):
     self.__netPlotArray += [[self.__ui__.groupBoxNetworkCard_31, self.__ui__.qwtPlotNetworkCardHistory_31]]
     self.__tabs__ = {}
 
-    
-    
     for card in xrange(32):
       if card+1 > len(self.__networkCards__):
         self.__netPlotArray[card][0].setVisible(False)
@@ -134,12 +132,12 @@ class networkOverviewUi(object):
       ymargin=20
       y = 10
       xoffs = 20
-      for label in self.__tabs__[card][1][0:6]:
+      for label in self.__tabs__[card][1][0:7]:
         label.setGeometry(QtCore.QRect(20, y, 130, 18))
         y += ymargin
       y=10
-      for label in self.__tabs__[card][1][6:13]:
-        label.setGeometry(QtCore.QRect(320, y, 130, 18))
+      for label in self.__tabs__[card][1][7:13]:
+        label.setGeometry(QtCore.QRect(280, y, 130, 18))
         y += ymargin
       self.__tabs__[card][1][0].setText("Rec Errors")
       self.__tabs__[card][1][1].setText("Rec Drops")
@@ -156,13 +154,13 @@ class networkOverviewUi(object):
       self.__tabs__[card][1][12].setText("Avg snd packet size")
       
       y = 10
-      for label in self.__tabs__[card][2][0:6]:
-        label.setGeometry(QtCore.QRect(170, y, 80, 18))
+      for label in self.__tabs__[card][2][0:7]:
+        label.setGeometry(QtCore.QRect(150, y, 80, 18))
         y += ymargin
         label.setText("0")
       y=10
-      for label in self.__tabs__[card][2][6:13]:
-        label.setGeometry(QtCore.QRect(470, y, 80, 18))
+      for label in self.__tabs__[card][2][7:13]:
+        label.setGeometry(QtCore.QRect(410, y, 80, 18))
         y += ymargin
         label.setText("0")
       
@@ -171,7 +169,12 @@ class networkOverviewUi(object):
   def show(self):
     self.__dialog__.show()
     self.__dialog__.setVisible(True)    
-    
+
+  def setFontSize(self, fontSize):
+    font = QtGui.QFont()
+    font.setPointSize(fontSize)
+    self.__dialog__.setFont(font)
+
   def update(self):
     for plot in xrange(32):
       if plot+1 <= len(self.__networkCards__):
@@ -185,8 +188,8 @@ class networkOverviewUi(object):
       self.__tabs__[card][2][2].setText(str(networkStat["senderrors"]))
       self.__tabs__[card][2][3].setText(str(networkStat["senddrops"]))
       self.__tabs__[card][2][4].setText(str(networkStat["sendcoll"]))
-      self.__tabs__[card][2][5].setText(str(networkStat["recbytes"]))
-      self.__tabs__[card][2][6].setText(str(networkStat["sendbytes"]))
+      self.__tabs__[card][2][5].setText(procutils.humanReadable(networkStat["recbytes"]))
+      self.__tabs__[card][2][6].setText(procutils.humanReadable(networkStat["sendbytes"]))
       self.__tabs__[card][2][7].setText(str(networkStat["recpackets"]))
       self.__tabs__[card][2][8].setText(str(networkStat["sendpackets"]))
       try:
@@ -198,4 +201,7 @@ class networkOverviewUi(object):
       except:
         self.__tabs__[card][2][12].setText("0")
         
+      usage = self.__reader__.getNetworkCardUsage(card)
+      self.__tabs__[card][2][9].setText(procutils.humanReadable(usage[0])+ "/s")
+      self.__tabs__[card][2][10].setText(procutils.humanReadable(usage[1])+ "/s")
     
