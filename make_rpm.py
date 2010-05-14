@@ -18,7 +18,7 @@ svnversion = svn.communicate()[0]
 svnversion = svnversion.strip()
 
 projectname   = "process_explorer"
-versionprefix = "0.2"
+versionprefix = "0.3"
 
 
 def createFullPath(thepathlist):
