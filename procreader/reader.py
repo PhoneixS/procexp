@@ -139,10 +139,14 @@ class procreader(object):
     
     ethtoolerror = False
     for card in self.__networkCards__:
+      speed = None
       try:
         ethtool = subprocess.Popen(["ethtool", card], stdout=subprocess.PIPE, stderr=subprocess.PIPE )
         data = ethtool.communicate()
-        speed = None
+      except:
+        ethtoolerror = True
+      
+      try:
         if data[0] is not None:
           for line in data[0].split("\n"):
             if line.find("Speed") != -1: 
@@ -150,9 +154,9 @@ class procreader(object):
       #except subprocess.child_exception:
       #  print "  For better results, allow rights to ethtool, and/or run as root"        
       #  speed = None
-      except OSError:
-        ethtoolerror = True
+      except :
         speed = None
+      
       if speed is not None:
         print "  ethernet device", card, "has speed", speed, "Mb/s according to ethtool"
         self.__networkCards__[card]["speed"] = speed
