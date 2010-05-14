@@ -137,6 +137,7 @@ class procreader(object):
     print "network card speed detection results"
     print "------------------------------------"
     
+    ethtoolerror = False
     for card in self.__networkCards__:
       try:
         ethtool = subprocess.Popen(["ethtool", card], stdout=subprocess.PIPE, stderr=subprocess.PIPE )
@@ -146,15 +147,21 @@ class procreader(object):
           for line in data[0].split("\n"):
             if line.find("Speed") != -1: 
               speed = int(line.split(":")[1].split("Mb/s")[0])
-      except:
+      #except subprocess.child_exception:
+      #  print "  For better results, allow rights to ethtool, and/or run as root"        
+      #  speed = None
+      except OSError:
+        ethtoolerror = True
         speed = None
       if speed is not None:
         print "  ethernet device", card, "has speed", speed, "Mb/s according to ethtool"
         self.__networkCards__[card]["speed"] = speed
       else:
         print "  ethernet device", card, "has unknown speed"
-        print "  network graph scaling is set to autoscale"
-        print "  For better resuts, allow rights to ethtool, and/or run as root"
+        print "  network graph scaling for", card, "is set to autoscale"
+    if ethtoolerror:
+      print "  ** ethtool not found, or access denied. For better results, allow access to ethtool"
+
   def __initReader__(self):
     self.__processList__ = {}
     self.__closedProcesses__ = None
