@@ -289,6 +289,7 @@ class procreader(object):
       
   def __getProcessCpuDetails__(self):
     for process in self.__processList__:
+      procStat = None
       try:
         procStat = procutils.readFullFile("/proc/"+str(process)+"/stat")
         if self.__processList__[process]["cmdline"] == UNKNOWN:
