@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Thu May  6 22:38:11 2010
+# Created: Wed Aug  4 15:01:20 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -112,6 +112,12 @@ class Ui_MainWindow(object):
         self.actionSystem_information.setObjectName("actionSystem_information")
         self.actionNetwork_Information = QtGui.QAction(MainWindow)
         self.actionNetwork_Information.setObjectName("actionNetwork_Information")
+        self.actionClose_this_window = QtGui.QAction(MainWindow)
+        self.actionClose_this_window.setObjectName("actionClose_this_window")
+        self.actionClose_all_and_exit = QtGui.QAction(MainWindow)
+        self.actionClose_all_and_exit.setObjectName("actionClose_all_and_exit")
+        self.menuFile.addAction(self.actionClose_this_window)
+        self.menuFile.addAction(self.actionClose_all_and_exit)
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
         self.menuView.addAction(self.actionSystem_information)
         self.menuView.addAction(self.actionNetwork_Information)
@@ -170,6 +176,8 @@ class Ui_MainWindow(object):
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSystem_information.setText(QtGui.QApplication.translate("MainWindow", "System Information...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNetwork_Information.setText(QtGui.QApplication.translate("MainWindow", "Network Information...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClose_this_window.setText(QtGui.QApplication.translate("MainWindow", "Close this window", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClose_all_and_exit.setText(QtGui.QApplication.translate("MainWindow", "Close all and exit", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4 import Qwt5
 

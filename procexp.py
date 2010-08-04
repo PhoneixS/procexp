@@ -52,6 +52,7 @@ cpuUsageIoWaitHistory = None
 cpuUsageIrqHistory = None
 systemOverviewUi = None
 networkOverviewUi = None
+MainWindow = None
 
 firstUpdate = True
 
@@ -115,6 +116,14 @@ def performMenuAction(action):
     systemOverviewUi.show()
   elif action is mainUi.actionNetwork_Information:
     networkOverviewUi.show()
+  elif action is mainUi.actionClose_this_window:
+    MainWindow.close()
+  elif action is mainUi.actionClose_all_and_exit:
+    for window in singleProcessUiList:
+      singleProcessUiList[window].closeWindow()
+    MainWindow.close()
+  else:
+    print "This action is not yet supported."
 
 def setFontSize(fontSize):
   global settings
@@ -208,6 +217,7 @@ def prepareUI(mainUi):
   timer = QtCore.QTimer(mainUi.processTreeWidget)
   QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), updateUI)
   QtCore.QObject.connect(mainUi.processTreeWidget, QtCore.SIGNAL('customContextMenuRequested(const QPoint&)'), onContextMenu)
+  QtCore.QObject.connect(mainUi.menuFile,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuProcess,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuOptions,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuSettings, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)

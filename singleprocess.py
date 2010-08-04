@@ -233,9 +233,12 @@ class singleUi(object):
     self.update_sockets()
     
   def __del__(self):
-    if self.__tcpStat__ != None:
-      self.__tcpStat__.doStop()
-      self.__tcpStat__.join()
+    try:
+      if self.__tcpStat__ != None:
+        self.__tcpStat__.doStop()
+        self.__tcpStat__.join()
+    except OSError:
+      pass
     
   def __onFilterTextEdit__(self):
     filter = str(self.__procDetails__.filterEdit.text())
@@ -250,6 +253,9 @@ class singleUi(object):
     self.__dialog__.setVisible(False)
   def makeVisible(self):
     self.__dialog__.setVisible(True)
+    
+  def closeWindow(self):
+    self.__dialog__.close()
     
   def update_sockets(self):
     #fill tcp/ip values

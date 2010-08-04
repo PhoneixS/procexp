@@ -102,6 +102,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionClose_this_window"/>
+    <addaction name="actionClose_all_and_exit"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -274,6 +276,16 @@
   <action name="actionNetwork_Information">
    <property name="text">
     <string>Network Information...</string>
+   </property>
+  </action>
+  <action name="actionClose_this_window">
+   <property name="text">
+    <string>Close this window</string>
+   </property>
+  </action>
+  <action name="actionClose_all_and_exit">
+   <property name="text">
+    <string>Close all and exit</string>
    </property>
   </action>
  </widget>
