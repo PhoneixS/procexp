@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Wed Aug  4 15:01:20 2010
+# Created: Wed Aug  4 15:59:57 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -58,6 +58,8 @@ class Ui_MainWindow(object):
         self.menuSettings.setObjectName("menuSettings")
         self.menuYourFeedback = QtGui.QMenu(self.menubar)
         self.menuYourFeedback.setObjectName("menuYourFeedback")
+        self.menuHelp = QtGui.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -116,6 +118,12 @@ class Ui_MainWindow(object):
         self.actionClose_this_window.setObjectName("actionClose_this_window")
         self.actionClose_all_and_exit = QtGui.QAction(MainWindow)
         self.actionClose_all_and_exit.setObjectName("actionClose_all_and_exit")
+        self.actionColor_legend = QtGui.QAction(MainWindow)
+        self.actionColor_legend.setObjectName("actionColor_legend")
+        self.action_2 = QtGui.QAction(MainWindow)
+        self.action_2.setObjectName("action_2")
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setObjectName("actionAbout")
         self.menuFile.addAction(self.actionClose_this_window)
         self.menuFile.addAction(self.actionClose_all_and_exit)
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
@@ -133,12 +141,16 @@ class Ui_MainWindow(object):
         self.menuSettings.addSeparator()
         self.menuSettings.addAction(self.actionSaveSettings)
         self.menuYourFeedback.addAction(self.actionSent_your_feedback)
+        self.menuHelp.addAction(self.actionColor_legend)
+        self.menuHelp.addSeparator()
+        self.menuHelp.addAction(self.actionAbout)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuProcess.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
         self.menubar.addAction(self.menuYourFeedback.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -151,6 +163,7 @@ class Ui_MainWindow(object):
         self.menuProcess.setTitle(QtGui.QApplication.translate("MainWindow", "Process", None, QtGui.QApplication.UnicodeUTF8))
         self.menuSettings.setTitle(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.menuYourFeedback.setTitle(QtGui.QApplication.translate("MainWindow", "Your feedback", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_affinity.setText(QtGui.QApplication.translate("MainWindow", "Set affinity", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_priority.setText(QtGui.QApplication.translate("MainWindow", "Set priority", None, QtGui.QApplication.UnicodeUTF8))
         self.action.setText(QtGui.QApplication.translate("MainWindow", "----", None, QtGui.QApplication.UnicodeUTF8))
@@ -178,6 +191,9 @@ class Ui_MainWindow(object):
         self.actionNetwork_Information.setText(QtGui.QApplication.translate("MainWindow", "Network Information...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose_this_window.setText(QtGui.QApplication.translate("MainWindow", "Close this window", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose_all_and_exit.setText(QtGui.QApplication.translate("MainWindow", "Close all and exit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionColor_legend.setText(QtGui.QApplication.translate("MainWindow", "Color legend", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_2.setText(QtGui.QApplication.translate("MainWindow", "---", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4 import Qwt5
 

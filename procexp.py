@@ -330,10 +330,11 @@ def updateUI():
   
   flat = False
   
-  #color all green processes 'white'
+  #color all green processes with default background
+  defaultBgColor = app.palette().color(QtGui.QPalette.Base)  
   for proc in greenTopLevelItems:
     for column in xrange(greenTopLevelItems[proc].columnCount()):
-      greenTopLevelItems[proc].setBackgroundColor(column, QtGui.QColor(255,255,255))
+      greenTopLevelItems[proc].setBackgroundColor(column, defaultBgColor)
   greenTopLevelItems = {}
  
   #delete all red widgetItems
