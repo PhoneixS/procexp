@@ -15,6 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
+#Thanks to the following developers helping:
+#
+#  Diaa Sami, making the GUI more usable
+#
+
 import procreader.reader
 import ui.main
 import procutils
@@ -205,13 +210,30 @@ def saveSettings():
 def onContextMenu(point):
   global mainUi
   mainUi.menuProcess.exec_(mainUi.processTreeWidget.mapToGlobal(point))
-  
+
+
+treeViewcolumns = ["Process","PID","CPU","Command Line", "User", "Chan","#thread"]
+
+def onHeaderContextMenu(point):
+  menu = QtGui.QMenu()
+  for idx, col in enumerate(treeViewcolumns):
+    action = QtGui.QAction(col, mainUi.processTreeWidget)
+    action.setCheckable(True)
+    action.setChecked(not mainUi.processTreeWidget.isColumnHidden(idx))
+    action.setData(idx)
+    menu.addAction(action)
+  selectedItem = menu.exec_(mainUi.processTreeWidget.mapToGlobal(point))
+  mainUi.processTreeWidget.setColumnHidden(selectedItem.data().toInt()[0], not selectedItem.isChecked())
   
 def prepareUI(mainUi):
   global timer
-  mainUi.processTreeWidget.setColumnCount(8)
   
-  mainUi.processTreeWidget.setHeaderLabels(["Process","PID","CPU","Command Line", "User", "Chan","#thread"])
+  mainUi.processTreeWidget.setColumnCount(len(treeViewcolumns))
+  
+  mainUi.processTreeWidget.setHeaderLabels(treeViewcolumns)
+  mainUi.processTreeWidget.header().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+  mainUi.processTreeWidget.header().customContextMenuRequested.connect(onHeaderContextMenu)
+  
   
   #create a timer
   timer = QtCore.QTimer(mainUi.processTreeWidget)
