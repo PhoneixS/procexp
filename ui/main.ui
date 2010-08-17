@@ -139,12 +139,6 @@
     <addaction name="separator"/>
     <addaction name="actionSaveSettings"/>
    </widget>
-   <widget class="QMenu" name="menuYourFeedback">
-    <property name="title">
-     <string>Your feedback</string>
-    </property>
-    <addaction name="actionSent_your_feedback"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -158,7 +152,6 @@
    <addaction name="menuView"/>
    <addaction name="menuProcess"/>
    <addaction name="menuSettings"/>
-   <addaction name="menuYourFeedback"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Wed Aug  4 15:59:57 2010
+# Created: Tue Aug 17 21:27:40 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -56,8 +56,6 @@ class Ui_MainWindow(object):
         self.menuProcess.setObjectName("menuProcess")
         self.menuSettings = QtGui.QMenu(self.menubar)
         self.menuSettings.setObjectName("menuSettings")
-        self.menuYourFeedback = QtGui.QMenu(self.menubar)
-        self.menuYourFeedback.setObjectName("menuYourFeedback")
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
         MainWindow.setMenuBar(self.menubar)
@@ -140,7 +138,6 @@ class Ui_MainWindow(object):
         self.menuSettings.addAction(self.actionSettings)
         self.menuSettings.addSeparator()
         self.menuSettings.addAction(self.actionSaveSettings)
-        self.menuYourFeedback.addAction(self.actionSent_your_feedback)
         self.menuHelp.addAction(self.actionColor_legend)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
@@ -149,7 +146,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuProcess.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
-        self.menubar.addAction(self.menuYourFeedback.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -162,7 +158,6 @@ class Ui_MainWindow(object):
         self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.menuProcess.setTitle(QtGui.QApplication.translate("MainWindow", "Process", None, QtGui.QApplication.UnicodeUTF8))
         self.menuSettings.setTitle(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
-        self.menuYourFeedback.setTitle(QtGui.QApplication.translate("MainWindow", "Your feedback", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_affinity.setText(QtGui.QApplication.translate("MainWindow", "Set affinity", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_priority.setText(QtGui.QApplication.translate("MainWindow", "Set priority", None, QtGui.QApplication.UnicodeUTF8))

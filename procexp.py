@@ -27,10 +27,10 @@ import os
 import singleprocess
 import systemoverview
 import configobj
-import feedback
 import settings as settingsMenu
 import plotobjects
 import networkoverview
+import colorlegend
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 
@@ -104,10 +104,6 @@ def performMenuAction(action):
       singleProcessUiList[process] = singleprocess.singleUi(process, procList[int(process)]["cmdline"], procList[int(process)]["name"], reader, int(settings["historySampleCount"]))
   elif action is mainUi.actionSaveSettings:
     saveSettings()
-  elif action is mainUi.actionSent_your_feedback:
-    data = "kernelversion: "+ procutils.readFullFile("/proc/version") + "\n"
-    data += "Distro" + procutils.readFullFile("/etc/issue") + "\n"
-    feedback.doFeedBack(data)
   elif action is mainUi.actionSettings:
     msec, depth, fontSize = settingsMenu.doSettings(int(settings["updateTimer"]),\
                                                        int(settings["historySampleCount"]), \
@@ -127,6 +123,8 @@ def performMenuAction(action):
     for window in singleProcessUiList:
       singleProcessUiList[window].closeWindow()
     MainWindow.close()
+  elif action is mainUi.actionColor_legend:
+    colorlegend.doColorHelpLegend()
   else:
     print "This action is not yet supported."
 
@@ -243,8 +241,8 @@ def prepareUI(mainUi):
   QtCore.QObject.connect(mainUi.menuProcess,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuOptions,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuSettings, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
-  QtCore.QObject.connect(mainUi.menuYourFeedback, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   QtCore.QObject.connect(mainUi.menuView, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuHelp, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   
   #prepare the plot
   global curveCpuHist
