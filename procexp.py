@@ -350,8 +350,6 @@ def updateUI():
   reader.doReadProcessInfo()
   procList, closedProc, newProc = reader.getProcessInfo()
   
-  flat = False
-  
   #color all green processes with default background
   defaultBgColor = app.palette().color(QtGui.QPalette.Base)  
   for proc in greenTopLevelItems:
@@ -360,30 +358,19 @@ def updateUI():
   greenTopLevelItems = {}
  
   #delete all red widgetItems
-  if flat:
-    for proc in redTopLevelItems:
-      index = mainUi.processTreeWidget.indexOfTopLevelItem(redTopLevelItems[proc])  
-      mainUi.processTreeWidget.takeTopLevelItem(index)
-  else:
-    for proc in redTopLevelItems:
-      for topLevelIndex in xrange(mainUi.processTreeWidget.topLevelItemCount()):
-        topLevelItem = mainUi.processTreeWidget.topLevelItem(topLevelIndex)
-        delChild(topLevelItem, redTopLevelItems[proc])
-        if topLevelItem == redTopLevelItems[proc]:
-          mainUi.processTreeWidget.takeTopLevelItem(topLevelIndex)
+  for proc in redTopLevelItems:
+    for topLevelIndex in xrange(mainUi.processTreeWidget.topLevelItemCount()):
+      topLevelItem = mainUi.processTreeWidget.topLevelItem(topLevelIndex)
+      delChild(topLevelItem, redTopLevelItems[proc])
+      if topLevelItem == redTopLevelItems[proc]:
+        mainUi.processTreeWidget.takeTopLevelItem(topLevelIndex)
         
   redTopLevelItems = {}
   
   #create new items and mark items to be deleted red
-  if flat:
-    for proc in newProc:
-      treeProcesses[proc] = QtGui.QTreeWidgetItem([])
-      greenTopLevelItems[proc] = treeProcesses[proc]
-      mainUi.processTreeWidget.addTopLevelItem(treeProcesses[proc])    
-  else:
-    #draw tree hierarchy of processes
-    for proc in newProc:
-      widgetItem = addProcessAndParents(proc, procList)
+  #draw tree hierarchy of processes
+  for proc in newProc:
+    widgetItem = addProcessAndParents(proc, procList)
 
   #copy processed to be deleted to the red list
   for proc in closedProc:
@@ -412,9 +399,8 @@ def updateUI():
       for column in xrange(item.columnCount()):
         item.setBackgroundColor(column, QtGui.QColor(0,255,0))
     
-  if flat == False:      
-    if (len(closedProc) > 0) or (len(newProc) > 0):
-      expandAll()
+  if (len(closedProc) > 0) or (len(newProc) > 0):
+    expandAll()
   
   for ui in singleProcessUiList:
     singleProcessUiList[ui].update()
