@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Sun Aug 29 19:30:57 2010
+# Created: Sun Aug 29 20:26:36 2010
 #      by: PyQt4 UI code generator 4.6.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -131,6 +131,11 @@ class Ui_Dialog(object):
         self.verticalLayout_7.addWidget(self.groupBox_7)
         self.groupBox_8 = QtGui.QGroupBox(self.image)
         self.groupBox_8.setObjectName("groupBox_8")
+        self.horizontalLayout_14 = QtGui.QHBoxLayout(self.groupBox_8)
+        self.horizontalLayout_14.setObjectName("horizontalLayout_14")
+        self.libraryTextEdit = QtGui.QTextEdit(self.groupBox_8)
+        self.libraryTextEdit.setObjectName("libraryTextEdit")
+        self.horizontalLayout_14.addWidget(self.libraryTextEdit)
         self.verticalLayout_7.addWidget(self.groupBox_8)
         self.tabWidget.addTab(self.image, "")
         self.performance = QtGui.QWidget()
@@ -292,6 +297,7 @@ class Ui_Dialog(object):
         self.imagePidLabel.setText(QtGui.QApplication.translate("Dialog", "<>", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("Dialog", "PPid", None, QtGui.QApplication.UnicodeUTF8))
         self.imagePPidLabel.setText(QtGui.QApplication.translate("Dialog", "<>", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox_8.setTitle(QtGui.QApplication.translate("Dialog", "Shared objects linked at startup (using ldd)", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.image), QtGui.QApplication.translate("Dialog", "Image", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.performance), QtGui.QApplication.translate("Dialog", "Performance", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_3.setTitle(QtGui.QApplication.translate("Dialog", "CPU usage", None, QtGui.QApplication.UnicodeUTF8))

@@ -25,7 +25,7 @@ import ui.processdetails
 import datetime
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
-
+import subprocess
 
 import procreader.tcpip_stat as tcpip_stat
 
@@ -86,6 +86,7 @@ class singleProcessDetailsAndHistory(object):
     self.cpuUsageKernelHistory = self.cpuUsageKernelHistory[1:]
     self.rssUsageHistory = self.rssUsageHistory[1:]
     self.IOHistory = self.IOHistory[1:]
+
     
     try:
       self.cwd = os.readlink(self.__pathPrefix__ + "cwd")
@@ -130,6 +131,7 @@ class singleProcessDetailsAndHistory(object):
     #process parent pid
     if self.ppid is None:
       self.ppid = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
+      
       
 class singleUi(object):
   def __init__(self, proc, cmdLine, name, reader, depth):
@@ -274,11 +276,11 @@ class singleUi(object):
     text = ""
     for line in data:
       text = text + line + "\n"
-    self.__procDetails__.environmentText.setText(text)
+    self.__procDetails__.environmentText.setPlainText(text)
     QtCore.QObject.connect(self.__procDetails__.filterEdit, QtCore.SIGNAL('textEdited(QString)'), self.__onFilterTextEdit__)
     
     self.update_sockets()
-    
+    self.__lddoutput__ = None
   def __del__(self):
     try:
       if self.__tcpStat__ != None:
@@ -417,3 +419,24 @@ class singleUi(object):
         self.__procDetails__.imagePidLabel.setText(str(self.__proc__))
         self.__procDetails__.imageStartedLabel.setText(self.__reader__.getstartedtime(self.__proc__))
         self.__procDetails__.imagePPidLabel.setText(self.__reader__.getppid(self.__proc__))
+        
+        #update ldd output. Do this here: then it happens only when the user wants to see it
+        #by opening a process properties window
+        
+        
+        if self.__lddoutput__ is None:
+          try:
+            exepath = self.__reader__.getexe(self.__proc__)
+            ldd = subprocess.Popen(["ldd" , exepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output = ldd.communicate()
+            err = output[1]
+            if len(err) >0:
+              self.__lddoutput__ = err
+            else:
+              self.__lddoutput__ = output[0]
+              self.__lddoutput__ = self.__lddoutput__.replace("\t","")
+            self.__procDetails__.libraryTextEdit.setText(self.__lddoutput__)
+            
+          except:
+            self.__lddoutput__  = "--"
+   
