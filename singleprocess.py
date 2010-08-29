@@ -22,7 +22,7 @@
 import procutils
 import os
 import ui.processdetails
-
+import datetime
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 
@@ -59,6 +59,9 @@ class singleProcessDetailsAndHistory(object):
     self.rssUsageHistory = [0] * historyDepth
     self.IOHistory = [0] * historyDepth
     self.HistoryDepth = historyDepth
+    self.cmdline = None
+    self.startedtime = None
+    self.ppid = None
   def __getOpenFileNames__(self):
     alldirs = os.listdir(self.__pathPrefix__ + "fd")
     self.__openFiles__ = {}
@@ -83,7 +86,51 @@ class singleProcessDetailsAndHistory(object):
     self.cpuUsageKernelHistory = self.cpuUsageKernelHistory[1:]
     self.rssUsageHistory = self.rssUsageHistory[1:]
     self.IOHistory = self.IOHistory[1:]
+    
+    try:
+      self.cwd = os.readlink(self.__pathPrefix__ + "cwd")
+    except OSError, val:
+      self.cwd = "<"+val.strerror+">"
+    except :
+      raise
 
+    if self.cmdline == None:
+      #do below only once
+      try:
+        self.cmdline = procutils.readFullFile(self.__pathPrefix__ + "cmdline").replace("\x00"," ")
+      except OSError, val:
+        self.cmdline = "<"+val.strerror+">"
+      except:
+        raise
+    
+    try:
+      self.exe = os.readlink(self.__pathPrefix__ + "exe")
+    except OSError, val:
+      self.exe = "<"+val.strerror+">"
+    except :
+      raise
+    
+    #started time of a process
+    if self.startedtime == None:
+      procstartedtime_seconds = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[21]
+      procstat = procutils.readFullFile("/proc/stat").split("\n")
+      for line in procstat:
+        if line.find("btime") != -1:
+          systemstarted_seconds = line.split(" ")[1]
+      HZ = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
+      epoch = datetime.datetime(month=1,day=1,year=1970)
+      
+      
+      procstarted = epoch + \
+                    datetime.timedelta(seconds=int(systemstarted_seconds)) + \
+                    datetime.timedelta(seconds=int(int(procstartedtime_seconds)/(HZ*1.0)+0.5))
+      
+      self.startedtime = procstarted.strftime("%A, %d. %B %Y %I:%M%p")
+      
+    #process parent pid
+    if self.ppid is None:
+      self.ppid = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
+      
 class singleUi(object):
   def __init__(self, proc, cmdLine, name, reader, depth):
     self.__depth__ = depth
@@ -363,5 +410,10 @@ class singleUi(object):
         self.__procDetails__.labelActualTcpip.setText(str(actual) + " kB/s")
         self.__procDetails__.actualTcpip.setValue(actual)
         
-
+        self.__procDetails__.imagePwdEdit.setText(self.__reader__.getcwd(self.__proc__))
+        self.__procDetails__.imageCommandLineEdit.setText(self.__reader__.getcmdline(self.__proc__))
+        self.__procDetails__.imagePathEdit.setText(self.__reader__.getexe(self.__proc__))
         
+        self.__procDetails__.imagePidLabel.setText(str(self.__proc__))
+        self.__procDetails__.imageStartedLabel.setText(self.__reader__.getstartedtime(self.__proc__))
+        self.__procDetails__.imagePPidLabel.setText(self.__reader__.getppid(self.__proc__))

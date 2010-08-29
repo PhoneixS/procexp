@@ -569,6 +569,16 @@ class procreader(object):
     return self.__processList__.has_key(int(process))
   def getProcessCpuUsageHistory(self, process):
     return self.__processList__[int(process)]["history"].cpuUsageHistory
+  def getcwd(self, process):
+    return self.__processList__[int(process)]["history"].cwd
+  def getexe(self, process):
+    return self.__processList__[int(process)]["history"].exe
+  def getstartedtime(self, process):
+    return self.__processList__[int(process)]["history"].startedtime
+  def getcmdline(self, process):
+    return self.__processList__[int(process)]["history"].cmdline
+  def getppid(self, process):
+    return self.__processList__[int(process)]["history"].ppid
   def getProcessCpuUsageKernelHistory(self, process):
     return self.__processList__[int(process)]["history"].cpuUsageKernelHistory
   def getProcessRssUsageHistory(self, process):
