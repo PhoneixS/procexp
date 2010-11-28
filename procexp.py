@@ -33,7 +33,7 @@ import networkoverview
 import colorlegend
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
-
+import cpuaffinity
 import sys
 
 timer = None
@@ -125,8 +125,11 @@ def performMenuAction(action):
     MainWindow.close()
   elif action is mainUi.actionColor_legend:
     colorlegend.doColorHelpLegend()
+  elif action is mainUi.actionSet_affinity:
+    print "aff"
+    cpuaffinity.doAffinity()
   else:
-    print "This action is not yet supported."
+    print action, "This action is not yet supported."
 
 def setFontSize(fontSize):
   global settings
