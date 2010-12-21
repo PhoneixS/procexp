@@ -376,6 +376,7 @@ def updateUI():
   #copy processed to be deleted to the red list
   for proc in closedProc:
     redTopLevelItems[proc] = treeProcesses[proc]
+    del treeProcesses[proc]
    
       
   #color all deleted processed red 
@@ -390,7 +391,7 @@ def updateUI():
     treeProcesses[proc].setData(2, 0, procList[proc]["cpuUsage"])
     treeProcesses[proc].setData(3, 0, procList[proc]["cmdline"])
     treeProcesses[proc].setData(4, 0, procList[proc]["uid"])
-    treeProcesses[proc].setData(5, 0, procList[proc]["whan"])
+    treeProcesses[proc].setData(5, 0, procList[proc]["wchan"])
     treeProcesses[proc].setData(6, 0, procList[proc]["nfThreads"])
 
   #color all new processes 'green'

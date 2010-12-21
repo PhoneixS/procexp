@@ -336,9 +336,9 @@ class procreader(object):
         
       try:
         wchan = procutils.readFullFile("/proc/"+str(process)+"/wchan")
-        self.__processList__[process]["whan"] = wchan
+        self.__processList__[process]["wchan"] = wchan
       except:
-        self.__processList__[process]["whan"] = UNKNOWN
+        self.__processList__[process]["wchan"] = UNKNOWN
         
           
         
