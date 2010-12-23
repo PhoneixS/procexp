@@ -101,6 +101,8 @@ class singleProcessDetailsAndHistory(object):
         self.cmdline = procutils.readFullFile(self.__pathPrefix__ + "cmdline").replace("\x00"," ")
       except OSError, val:
         self.cmdline = "<"+val.strerror+">"
+      except procutils.FileError:
+        self.cmdline = "---"
       except:
         raise
     
@@ -113,24 +115,32 @@ class singleProcessDetailsAndHistory(object):
     
     #started time of a process
     if self.startedtime == None:
-      procstartedtime_seconds = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[21]
-      procstat = procutils.readFullFile("/proc/stat").split("\n")
-      for line in procstat:
-        if line.find("btime") != -1:
-          systemstarted_seconds = line.split(" ")[1]
-      HZ = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
-      epoch = datetime.datetime(month=1,day=1,year=1970)
+      try:
+        procstartedtime_seconds = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[21]
       
       
-      procstarted = epoch + \
-                    datetime.timedelta(seconds=int(systemstarted_seconds)) + \
-                    datetime.timedelta(seconds=int(int(procstartedtime_seconds)/(HZ*1.0)+0.5))
-      
-      self.startedtime = procstarted.strftime("%A, %d. %B %Y %I:%M%p")
+        procstat = procutils.readFullFile("/proc/stat").split("\n")
+        for line in procstat:
+          if line.find("btime") != -1:
+            systemstarted_seconds = line.split(" ")[1]
+        HZ = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
+        epoch = datetime.datetime(month=1,day=1,year=1970)
+        
+        
+        procstarted = epoch + \
+                      datetime.timedelta(seconds=int(systemstarted_seconds)) + \
+                      datetime.timedelta(seconds=int(int(procstartedtime_seconds)/(HZ*1.0)+0.5))
+        
+        self.startedtime = procstarted.strftime("%A, %d. %B %Y %I:%M%p")
+      except procutils.FileError:
+        self.startedtime = "--"
       
     #process parent pid
     if self.ppid is None:
-      self.ppid = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
+      try:
+        self.ppid = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
+      except procutils.FileError:
+        self.ppid = None
       
       
 class singleUi(object):

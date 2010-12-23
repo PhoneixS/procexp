@@ -307,7 +307,7 @@ def addProcessAndParents(proc, procList):
   treeProcesses[proc] = QtGui.QTreeWidgetItem([])
   greenTopLevelItems[proc] = treeProcesses[proc]
   
-  if procList[proc]["PPID"] > 0: #process has a parent
+  if procList[proc]["PPID"] > 0 and procList.has_key(procList[proc]["PPID"]): #process has a parent
     parent = addProcessAndParents(procList[proc]["PPID"],procList)
     parent.addChild(treeProcesses[proc])
   else: #process has no parent, thus it is toplevel. add it to the treewidget
@@ -376,7 +376,6 @@ def updateUI():
   #copy processed to be deleted to the red list
   for proc in closedProc:
     redTopLevelItems[proc] = treeProcesses[proc]
-    del treeProcesses[proc]
    
       
   #color all deleted processed red 
@@ -393,6 +392,11 @@ def updateUI():
     treeProcesses[proc].setData(4, 0, procList[proc]["uid"])
     treeProcesses[proc].setData(5, 0, procList[proc]["wchan"])
     treeProcesses[proc].setData(6, 0, procList[proc]["nfThreads"])
+
+  for proc in closedProc:
+    del treeProcesses[proc]
+
+
 
   #color all new processes 'green'
   if firstUpdate == False:
