@@ -290,7 +290,6 @@ class procreader(object):
     
     
   def __removeUnknownParents__(self):#useful when filtered on UID
-    
     for process in self.__processList__:
       if self.__processList__[process]["PPID"] > 0:
         if not(self.__processList__.has_key(self.__processList__[process]["PPID"])):

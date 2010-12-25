@@ -373,7 +373,19 @@ def updateUI():
   for proc in newProc:
     widgetItem = addProcessAndParents(proc, procList)
 
-  #copy processed to be deleted to the red list
+
+  #if the process has childs which do still exist, "reparent" the child.
+  for proc in procList:
+    if procList[proc]["PPID"] == 0:
+      item = treeProcesses[proc]
+      if item.parent() is not None:
+        parentItem = item.parent()
+        for idx in xrange(parentItem.childCount()):
+          if item == parentItem.child(idx):
+            parentItem.takeChild(idx)
+        mainUi.processTreeWidget.addTopLevelItem(treeProcesses[proc])
+
+  #copy processed to be deleted to the red list      
   for proc in closedProc:
     redTopLevelItems[proc] = treeProcesses[proc]
    
