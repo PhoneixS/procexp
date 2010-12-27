@@ -380,8 +380,8 @@ class procreader(object):
       else:
         self.__processList__[process]["PPID"] = 1
         
-  def getIOAccounting():
-    pass
+  #def getIOAccounting():
+  #  pass
     #~ Description
     #~ -----------
 
@@ -563,7 +563,6 @@ class procreader(object):
     
   def getProcessInfo(self):
     return self.__processList__, self.__closedProcesses__, self.__newProcesses__
-
   def hasProcess(self, process):
     return self.__processList__.has_key(int(process))
   def getProcessCpuUsageHistory(self, process):
