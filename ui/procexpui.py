@@ -20,7 +20,6 @@
 #  Diaa Sami, making the GUI more usable
 #
 
-import procreader.reader
 import ui.main
 import procutils
 import os
@@ -33,11 +32,12 @@ import networkoverview
 import colorlegend
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
-import cpuaffinity
+import cpuaffinityui
 import sys
-import server
+import copy
+import threading
+import time
   
-timer = None
 reader = None
 treeProcesses = {} #flat dictionary of processes
 toplevelItems = {}
@@ -63,29 +63,20 @@ MainWindow = None
 firstUpdate = True
 
 procList = {}
-
+oldProcList = {}
 #default settings
 settings = {}
-defaultSettings = \
-{"fontSize": 10, 
- "columnWidths": [100,60,40,100,30,30,30,30],
- "updateTimer": 1000,
- "historySampleCount": 200
-}
 
 def performMenuAction(action):
-  global procList
-  global onlyUser
-  global settings
-  global systemOverviewUi
-  global networkOverviewUi
+  """actions of the menu's"""
+  global onlyUser #pylint: disable-msg=W0603
   if action is mainUi.actionKill_process:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
-    process = selectedItem.data(1,0).toString()
+    process = selectedItem.data(1, 0).toString()
     procutils.killProcessHard(process)
   elif action is mainUi.actionKill_process_tree:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
-    process = selectedItem.data(1,0).toString()
+    process = selectedItem.data(1, 0).toString()
     killProcessTree(process, procList)
   elif action is mainUi.actionShow_process_from_all_users:
     if onlyUser:
@@ -98,7 +89,7 @@ def performMenuAction(action):
       onlyUser = True
   elif action is mainUi.actionProperties:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
-    process = str(selectedItem.data(1,0).toString())
+    process = str(selectedItem.data(1, 0).toString())
     if singleProcessUiList.has_key(process):
       singleProcessUiList[process].makeVisible()
     else:
@@ -110,7 +101,7 @@ def performMenuAction(action):
   elif action is mainUi.actionSaveSettings:
     saveSettings()
   elif action is mainUi.actionSettings:
-    msec, depth, fontSize = settingsui.doSettings(int(settings["updateTimer"]),\
+    msec, depth, fontSize = settingsui.doSettings(int(settings["updateTimer"]), \
                                                        int(settings["historySampleCount"]), \
                                                        int(settings["fontSize"]))
     settings["updateTimer"] = int(msec)
@@ -131,13 +122,12 @@ def performMenuAction(action):
   elif action is mainUi.actionColor_legend:
     colorlegend.doColorHelpLegend()
   elif action is mainUi.actionSet_affinity:
-    print "aff"
-    cpuaffinity.doAffinity()
+    cpuaffinityui.doAffinity()
   else:
     print action, "This action is not yet supported."
 
 def setFontSize(fontSize):
-  global settings
+  """set the font size of all GUI's """
   settings["fontSize"] = fontSize
   font = QtGui.QFont()
   font.setPointSize(fontSize)
@@ -153,51 +143,6 @@ def setFontSize(fontSize):
   if networkOverviewUi is not None:
     networkOverviewUi.setFontSize(fontSize)
   
-  
-def loadSettings():
-  global settings
-  settingsPath = os.path.expanduser("~/.procexp/settings")
-  if os.path.exists(settingsPath):
-    f = file(settingsPath,"rb")
-    settingsObj = configobj.ConfigObj(infile=f)
-    settings=settingsObj.dict()
-    
-  #load default settings for undefined settings
-  for item in defaultSettings:
-    if settings.has_key(item):
-      pass
-    else:
-      settings[item] = defaultSettings[item]
-    
-  fontsize = int(settings["fontSize"])
-  setFontSize(fontsize)
-  
-  #set the columnwidths
-  for headerSection in range(mainUi.processTreeWidget.header().count()):
-    try:
-      width = int(settings["columnWidths"][headerSection])
-    except:
-      width = 150
-    mainUi.processTreeWidget.header().resizeSection(headerSection,width)
-    
-  #load default settings for undefined settings
-  for item in defaultSettings:
-    if settings.has_key(item):
-      pass
-    else:
-      settings[item] = defaultSettings[item]
-      
-  global cpuUsageHistory
-  global cpuUsageSystemHistory
-  global cpuUsageIoWaitHistory
-  global cpuUsageIrqHistory 
-  
-  cpuUsageHistory = [0] * int(settings["historySampleCount"])
-  cpuUsageSystemHistory = [0] * int(settings["historySampleCount"])
-  cpuUsageIoWaitHistory = [0] * int(settings["historySampleCount"])
-  cpuUsageIrqHistory = [0] * int(settings["historySampleCount"])
-
-
 def saveSettings():
   """save settings """
   widths = []
@@ -208,19 +153,20 @@ def saveSettings():
   settingsPath = os.path.expanduser("~/.procexp")
   if not(os.path.exists(settingsPath)):
     os.makedirs(settingsPath)
-  f = file(settingsPath + "/settings","wb")
+  f = file(settingsPath + "/settings", "wb")
   cfg = configobj.ConfigObj(settings)
   cfg.write(f)
   f.close()
 
 def onContextMenu(point):
-  global mainUi
+  """onContextMenu"""
   mainUi.menuProcess.exec_(mainUi.processTreeWidget.mapToGlobal(point))
 
 
-treeViewcolumns = ["Process","PID","CPU","Command Line", "User", "Chan","#thread"]
+treeViewcolumns = ["Process", "PID", "CPU", "Command Line",  "User",  "Chan", "#thread"]
  
 def onHeaderContextMenu(point):
+  """onHeaderContextMenu"""
   menu = QtGui.QMenu()
   for idx, col in enumerate(treeViewcolumns):
     action = QtGui.QAction(col, mainUi.processTreeWidget)
@@ -229,91 +175,116 @@ def onHeaderContextMenu(point):
     action.setData(idx)
     menu.addAction(action)
   selectedItem = menu.exec_(mainUi.processTreeWidget.mapToGlobal(point))
-  mainUi.processTreeWidget.setColumnHidden(selectedItem.data().toInt()[0], not selectedItem.isChecked())
+  mainUi.processTreeWidget.setColumnHidden(selectedItem.data().toInt()[0], 
+                                           not selectedItem.isChecked())
+
+
+class Signaller(QtCore.QThread):
+  """an instance This class signals the GUI to update"""
+  def __init__(self):
+    QtCore.QThread.__init__(self, None)
+    self.stop = False
+    self.event = threading.Event()
+    self.emit(QtCore.SIGNAL("updateUI()"))
+  def doSignal(self):
+    """give the UI update signal"""
+    self.event.set()
+  def run(self):
+    """Translate the events into QtGui signals"""
+    while self.stop == False:
+      self.event.wait(0.5)
+      if self.event.isSet():
+        self.event.clear()
+        self.emit(QtCore.SIGNAL("updateUI()"))
+
+g_signaller = None
+
   
-def prepareUI(mainUi):
-  global timer
-  
+def prepareUI():
+  """prepare the UI"""
   mainUi.processTreeWidget.setColumnCount(len(treeViewcolumns))
   
   mainUi.processTreeWidget.setHeaderLabels(treeViewcolumns)
   mainUi.processTreeWidget.header().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
   mainUi.processTreeWidget.header().customContextMenuRequested.connect(onHeaderContextMenu)
   
+  global g_signaller #pylint: disable-msg=W0603
+  g_signaller = Signaller()
+  g_signaller.start()
   
-  #create a timer
-  timer = QtCore.QTimer(mainUi.processTreeWidget)
-  QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), updateUI)
-  QtCore.QObject.connect(mainUi.processTreeWidget, QtCore.SIGNAL('customContextMenuRequested(const QPoint&)'), onContextMenu)
-  QtCore.QObject.connect(mainUi.menuFile,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
-  QtCore.QObject.connect(mainUi.menuProcess,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
-  QtCore.QObject.connect(mainUi.menuOptions,  QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
-  QtCore.QObject.connect(mainUi.menuSettings, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
-  QtCore.QObject.connect(mainUi.menuView, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
-  QtCore.QObject.connect(mainUi.menuHelp, QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(g_signaller, QtCore.SIGNAL("updateUI()"), updateUI)
+  QtCore.QObject.connect(mainUi.processTreeWidget, 
+                         QtCore.SIGNAL('customContextMenuRequested(const QPoint&)'), onContextMenu)
+  QtCore.QObject.connect(mainUi.menuFile,  
+                         QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuProcess,  
+                         QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuOptions,  
+                         QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuSettings, 
+                         QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuView, 
+                         QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
+  QtCore.QObject.connect(mainUi.menuHelp, 
+                         QtCore.SIGNAL('triggered(QAction*)'), performMenuAction)
   
   #prepare the plot
-  global curveCpuHist
-  global curveCpuSystemHist
-  global curveIoWaitHist
-  global curveIrqHist
-  global curveCpuPlotGrid
+  global curveCpuHist #pylint: disable-msg=W0603
+  global curveCpuSystemHist #pylint: disable-msg=W0603
+  global curveIoWaitHist #pylint: disable-msg=W0603
+  global curveIrqHist #pylint: disable-msg=W0603
   
   curveCpuHist = plotobjects.niceCurve("CPU History", 
-                           1 , QtGui.QColor(0,255,0),QtGui.QColor(0,170,0), 
+                           1 , QtGui.QColor(0, 255, 0), QtGui.QColor(0, 170, 0), 
                            mainUi.qwtPlotOverallCpuHist)
   
   curveCpuSystemHist = plotobjects.niceCurve("CPU Kernel History", 
-                           1, QtGui.QColor(255,0,0),QtGui.QColor(170,0,0), 
+                           1, QtGui.QColor(255, 0, 0), QtGui.QColor(170, 0, 0), 
                            mainUi.qwtPlotOverallCpuHist)
                            
   curveIoWaitHist = plotobjects.niceCurve("CPU IO wait history", 
-                           1, QtGui.QColor(0,0,255),QtGui.QColor(0,0,127), 
+                           1, QtGui.QColor(0, 0, 255), QtGui.QColor(0, 0, 127), 
                            mainUi.qwtPlotOverallCpuHist)
   
   curveIrqHist = plotobjects.niceCurve("CPU irq history", 
-                           1, QtGui.QColor(0,255,255),QtGui.QColor(0,127,127), 
+                           1, QtGui.QColor(0, 255, 255), QtGui.QColor(0, 127, 127), 
                            mainUi.qwtPlotOverallCpuHist)
 
   scale = plotobjects.scaleObject()
   scale.min = 0
   scale.max = 100
-  plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale)
+  #plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale)
   
 def clearTree():
-  global mainUi
-  global treeProcesses
-  global toplevelItems
-  global greenTopLevelItems
-  global redTopLevelItems
-  
+  """clear the process tree"""
   mainUi.processTreeWidget.clear()
-  treeProcesses = {}
-  toplevelItems = {}
-  greenTopLevelItems = {}
-  redTopLevelItems = {}
+  treeProcesses.clear()
+  toplevelItems.clear()
+  greenTopLevelItems.clear()
+  redTopLevelItems.clear()
   
-def killProcessTree(proc, procList):
-  killChildsTree(int(str(proc)), procList)
+def killProcessTree(proc, theProcList):
+  """kill all processes which are child of proc, and kill proc also"""
+  killChildsTree(int(str(proc)), theProcList)
   procutils.killProcessHard(int(str(proc)))
 
-def killChildsTree(proc, procList):
-  for aproc in procList:
-    if procList[aproc]["PPID"] == proc:
-      killChildsTree(aproc, procList)
+def killChildsTree(proc, theProcList):
+  """kill all processes which are child of proc"""
+  for aproc in theProcList:
+    if theProcList[aproc]["PPID"] == proc:
+      killChildsTree(aproc, theProcList)
       procutils.killProcess(aproc)
      
-def addProcessAndParents(proc, procList):
-  global mainUi
-  
+def addProcessAndParents(proc, theProcList):
+  """add process and all its parents to the tree"""
   if treeProcesses.has_key(proc):
     return treeProcesses[proc]
     
   treeProcesses[proc] = QtGui.QTreeWidgetItem([])
   greenTopLevelItems[proc] = treeProcesses[proc]
   
-  if procList[proc]["PPID"] > 0 and procList.has_key(procList[proc]["PPID"]): #process has a parent
-    parent = addProcessAndParents(procList[proc]["PPID"],procList)
+  if theProcList[proc]["PPID"] > 0 and theProcList.has_key(theProcList[proc]["PPID"]): #has a parent
+    parent = addProcessAndParents(theProcList[proc]["PPID"], theProcList)
     parent.addChild(treeProcesses[proc])
   else: #process has no parent, thus it is toplevel. add it to the treewidget
     mainUi.processTreeWidget.addTopLevelItem(treeProcesses[proc])    
@@ -322,6 +293,7 @@ def addProcessAndParents(proc, procList):
   return treeProcesses[proc]
   
 def delChild(item, childtodelete):
+  """delete a child"""
   if item != None:
     for index in xrange(item.childCount()):
       thechild = item.child(index)
@@ -332,7 +304,7 @@ def delChild(item, childtodelete):
           delChild(thechild, childtodelete)
           
 def expandChilds(parent):
-  global mainUi
+  """expand all childs"""
   for index in xrange(parent.childCount()):
     thechild = parent.child(index)
     if thechild != None:
@@ -340,29 +312,33 @@ def expandChilds(parent):
       expandChilds(thechild)
     else:
       mainUi.processTreeWidget.expandItem(parent)
-      
 
 def expandAll():
-  global mainUi
+  """expand all in tree"""
   for topLevelIndex in xrange(mainUi.processTreeWidget.topLevelItemCount()):
     item = mainUi.processTreeWidget.topLevelItem(topLevelIndex)
     expandChilds(item)
 
-def updateUI():
-  global procList
-  global treeProcesses, greenTopLevelItems, redTopLevelItems
-  global mainUi
-  global firstUpdate
-  reader.doReadProcessInfo()
-  server.sendData(reader)
-  procList, closedProc, newProc = reader.getProcessInfo()
+def updateUI(): #pylint: disable-msg=R0912
+  """update the UI"""
+  global firstUpdate #pylint: disable-msg=W0603
+  global procList #pylint: disable-msg=W0603
+  
+  newProcList = reader.getProcessInfo()
+  
+  newProcListSet = set([ process for process in newProcList ])
+  procListSet = set([process for process in procList ])
+  
+  newProc = newProcListSet.difference(procListSet)
+  closedProc = procListSet.difference(newProcListSet)
+  procList = newProcList 
   
   #color all green processes with default background
   defaultBgColor = app.palette().color(QtGui.QPalette.Base)  
   for proc in greenTopLevelItems:
     for column in xrange(greenTopLevelItems[proc].columnCount()):
       greenTopLevelItems[proc].setBackgroundColor(column, defaultBgColor)
-  greenTopLevelItems = {}
+  greenTopLevelItems.clear()
  
   #delete all red widgetItems
   for proc in redTopLevelItems:
@@ -372,12 +348,12 @@ def updateUI():
       if topLevelItem == redTopLevelItems[proc]:
         mainUi.processTreeWidget.takeTopLevelItem(topLevelIndex)
         
-  redTopLevelItems = {}
+  redTopLevelItems.clear()
   
   #create new items and mark items to be deleted red
   #draw tree hierarchy of processes
   for proc in newProc:
-    widgetItem = addProcessAndParents(proc, procList)
+    addProcessAndParents(proc, procList)
 
 
   #if the process has childs which do still exist, "reparent" the child.
@@ -399,7 +375,7 @@ def updateUI():
   #color all deleted processed red 
   for proc in redTopLevelItems:
     for column in xrange(redTopLevelItems[proc].columnCount()):
-      redTopLevelItems[proc].setBackgroundColor(column, QtGui.QColor(255,0,0))
+      redTopLevelItems[proc].setBackgroundColor(column, QtGui.QColor(255, 0, 0))
   
   #update status information about the processes  
   for proc in procList:   
@@ -421,7 +397,7 @@ def updateUI():
     for proc in greenTopLevelItems:
       item = greenTopLevelItems[proc]
       for column in xrange(item.columnCount()):
-        item.setBackgroundColor(column, QtGui.QColor(0,255,0))
+        item.setBackgroundColor(column, QtGui.QColor(0, 255, 0))
     
   if (len(closedProc) > 0) or (len(newProc) > 0):
     expandAll()
@@ -484,8 +460,42 @@ def updateUI():
   
   firstUpdate = False
 
+def insertNewReaderUpdate(newReader):
+  if g_signaller is not None:
+    g_signaller.doSignal()
+  global reader
+  reader = copy.deepcopy(newReader)
+  
+def initStorageDepth():
+  """init the storage depth in the GUI"""
+  global cpuUsageHistory  #pylint: disable-msg=W0603
+  global cpuUsageSystemHistory #pylint: disable-msg=W0603
+  global cpuUsageIoWaitHistory #pylint: disable-msg=W0603
+  global cpuUsageIrqHistory  #pylint: disable-msg=W0603
+  
+  cpuUsageHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageSystemHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageIoWaitHistory = [0] * int(settings["historySampleCount"])
+  cpuUsageIrqHistory = [0] * int(settings["historySampleCount"])  
+  
+def setColumnWidths():
+  """set the columnwidths"""
+  for headerSection in range(mainUi.processTreeWidget.header().count()):
+    try:
+      width = int(settings["columnWidths"][headerSection])
+    except:
+      width = 150
+    mainUi.processTreeWidget.header().resizeSection(headerSection, width)
+    
+def applyNewSettings():
+  setFontSize(int(settings["fontSize"]))
+  initStorageDepth()
+  setColumnWidths()
+  
 
-def doMainUi():
+def setupMainUi(newSettings):
+  global settings
+  settings = copy.deepcopy(newSettings)  
   global app  
   app = QtGui.QApplication(sys.argv)
   app.setStyle("Windows")
@@ -495,17 +505,12 @@ def doMainUi():
   mainUi = ui.main.Ui_MainWindow()
   mainUi.setupUi(MainWindow)
   
-  prepareUI(mainUi)
-  loadSettings()
-  
-  timer.start(int(settings["updateTimer"]))  
-  
+  prepareUI()
   MainWindow.show()
-  
-  global reader
-  reader = procreader.reader.procreader(int(settings["updateTimer"]), int(settings["historySampleCount"]))
-  if onlyUser:
-    reader.setFilterUID(os.geteuid())
+  #wait for a fresh reader
+  while reader == None:
+    print "wait for a reader"
+    time.sleep(0.1)
   
   global systemOverviewUi 
   systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), 
@@ -519,14 +524,8 @@ def doMainUi():
   global networkOverviewUi 
   networkOverviewUi.setFontSize(int(settings["fontSize"]))
   
-  updateUI()
+  #updateUI()
   
-  #
-  # Start server for accepting graphical clients
-  #
-  if True:
-    server.doServe()
-  
-  
+def runMainUi():  
   sys.exit(app.exec_())
 

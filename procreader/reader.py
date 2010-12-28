@@ -183,6 +183,11 @@ class procreader(object):
         print "  network graph scaling for", card, "is set to autoscale"
     if ethtoolerror:
       print "  ** ethtool not found, or access denied. For better results, allow access to ethtool"
+      
+  def __repr__(self):
+    s = "procreader instance: #proc=" + str(len(self.__processList__)) + "\n" + \
+        "#processors:" + str(len(self.__cpuArray__))
+    return s 
 
   def __initReader__(self):
     self.__processList__ = {}
@@ -562,7 +567,7 @@ class procreader(object):
     self.__prevTimeStamp__ = time.time()
     
   def getProcessInfo(self):
-    return self.__processList__, self.__closedProcesses__, self.__newProcesses__
+    return self.__processList__
   def hasProcess(self, process):
     return self.__processList__.has_key(int(process))
   def getProcessCpuUsageHistory(self, process):

@@ -19,6 +19,106 @@
 #
 #  Diaa Sami, making the GUI more usable
 #
-
+import os
+import configobj
 import ui.procexpui
-ui.procexpui.doMainUi()
+import utils
+import communication.tcp
+import time
+import server
+import procreader.reader
+from optparse import OptionParser
+
+g_stop = False
+defaultSettings = \
+{"fontSize": 10, 
+ "columnWidths": [100,60,40,100,30,30,30,30],
+ "updateTimer": 1000,
+ "historySampleCount": 200
+}
+
+def produceData():
+  """produce data for clients"""
+  reader = procreader.reader.procreader(int("1000"), int("200"))
+  if True:#onlyUser:
+    reader.setFilterUID(os.geteuid())
+  while True:
+    reader.doReadProcessInfo()
+    server.sendData(reader)
+    print reader
+    time.sleep(1000 / 1000)
+
+@utils.asynchronous(None)
+def getData():
+  """get data from a procexp server"""
+  client = None
+  while g_stop == False and client == None:
+    try:
+      client = communication.tcp.Client(("127.0.0.1", 4000))
+    except communication.tcp.TCPError:
+      time.sleep(0.1)
+      print "wait for server"
+  while g_stop == False:
+    newReader = client.receive()
+    print newReader
+    ui.procexpui.insertNewReaderUpdate(newReader)
+    
+    
+def loadSettings():
+  """load settings"""
+  settings = {}
+  settingsPath = os.path.expanduser("~/.procexp/settings")
+  if os.path.exists(settingsPath):
+    f = file(settingsPath,"rb")
+    settingsObj = configobj.ConfigObj(infile=f)
+    settings=settingsObj.dict()
+    
+  #load default settings for undefined settings
+  for item in defaultSettings:
+    if settings.has_key(item):
+      pass
+    else:
+      settings[item] = defaultSettings[item]
+   
+  #load default settings for undefined settings
+  for item in defaultSettings:
+    if settings.has_key(item):
+      pass
+    else:
+      settings[item] = defaultSettings[item]
+  return settings
+
+def runAsGui():
+  try:
+    ui_settings = loadSettings()
+    getData()    
+    ui.procexpui.setupMainUi(ui_settings)
+    ui.procexpui.applyNewSettings()
+    ui.procexpui.runMainUi()
+  except:
+    import traceback
+    print traceback.format_exc()
+
+
+
+
+def main():
+  """main"""
+  usage = "usage: %prog [options]"
+  parser = OptionParser(usage)
+  
+  parser.add_option("-c", "--client", dest="client", action="store_const", const=True,
+                    help="run as a procexp client")    
+  parser.add_option("-s", "--server", dest="server", action="store_const", const=True,
+                    help="run as a procexp server")    
+                    
+  (options, _args) = parser.parse_args()
+  
+  if options.client:
+    runAsGui()
+  elif options.server:
+    server.doServe()
+    produceData()
+
+if __name__ == "__main__":
+  main()
