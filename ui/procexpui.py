@@ -50,7 +50,7 @@ curveCpuHist = None
 curveCpuSystemHist = None
 curveIoWaitHist = None
 curveIrqHist = None
-
+app = None
 curveCpuPlotGrid = None
 cpuUsageHistory = None
 cpuUsageSystemHistory = None
@@ -402,8 +402,8 @@ def updateUI(): #pylint: disable-msg=R0912
   if (len(closedProc) > 0) or (len(newProc) > 0):
     expandAll()
   
-  for ui in singleProcessUiList:
-    singleProcessUiList[ui].update()
+  for _ui in singleProcessUiList:
+    singleProcessUiList[_ui].update()
     
   #update CPU plots
   systemOverviewUi.update()
@@ -413,37 +413,26 @@ def updateUI(): #pylint: disable-msg=R0912
     
   #update the cpu graph
   try:
-    global cpuUsageHistory
-    global cpuUsageSystemHistory
-    global cpuUsageIoWaitHistory
-    global cpuUsageIrqHistory
-    
-    global curveCpuHist
-    global curveCpuSystemHist
-    global curveIrqHist
-    global curveIoWaitHist
-    global curveCpuPlotGrid
-    
     cpuUsageHistory.append(reader.overallUserCpuUsage()+
                            reader.overallSystemCpuUsage()+
                            reader.overallIoWaitCpuUsage()+
                            reader.overallIrqCpuUsage())
-    cpuUsageHistory = cpuUsageHistory[1:]
+    cpuUsageHistory.pop(0)
     
     
     cpuUsageSystemHistory.append(reader.overallSystemCpuUsage()+
                                  reader.overallIoWaitCpuUsage()+
                                  reader.overallIrqCpuUsage())
-    cpuUsageSystemHistory = cpuUsageSystemHistory[1:]
+    cpuUsageSystemHistory.pop(0)
     
     
     cpuUsageIoWaitHistory.append(reader.overallIoWaitCpuUsage() + 
                                  reader.overallIrqCpuUsage())
-    cpuUsageIoWaitHistory = cpuUsageIoWaitHistory[1:]
+    cpuUsageIoWaitHistory.pop(0)
     
     
     cpuUsageIrqHistory.append(reader.overallIrqCpuUsage())
-    cpuUsageIrqHistory = cpuUsageIrqHistory[1:]
+    cpuUsageIrqHistory.pop(0)
     
 
 
@@ -461,9 +450,10 @@ def updateUI(): #pylint: disable-msg=R0912
   firstUpdate = False
 
 def insertNewReaderUpdate(newReader):
+  """insert a fresh reader object into the GUI and update """
   if g_signaller is not None:
     g_signaller.doSignal()
-  global reader
+  global reader #pylint: disable-msg=W0603
   reader = copy.deepcopy(newReader)
   
 def initStorageDepth():
@@ -488,20 +478,22 @@ def setColumnWidths():
     mainUi.processTreeWidget.header().resizeSection(headerSection, width)
     
 def applyNewSettings():
+  """apply new settings to the GUI """
   setFontSize(int(settings["fontSize"]))
   initStorageDepth()
   setColumnWidths()
   
 
 def setupMainUi(newSettings):
-  global settings
-  settings = copy.deepcopy(newSettings)  
-  global app  
+  """setup the GUI"""
+  global settings #pylint: disable-msg=W0603
+  settings = copy.deepcopy(newSettings)
+  global app #pylint: disable-msg=W0603
   app = QtGui.QApplication(sys.argv)
   app.setStyle("Windows")
-  global MainWindow
+  global MainWindow #pylint: disable-msg=W0603
   MainWindow = QtGui.QMainWindow()
-  global mainUi
+  global mainUi #pylint: disable-msg=W0603
   mainUi = ui.main.Ui_MainWindow()
   mainUi.setupUi(MainWindow)
   
@@ -512,20 +504,21 @@ def setupMainUi(newSettings):
     print "wait for a reader"
     time.sleep(0.1)
   
-  global systemOverviewUi 
+  global systemOverviewUi #pylint: disable-msg=W0603
   systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), 
                                                      int(settings["historySampleCount"]), reader)
-  global networkOverviewUi 
+  global networkOverviewUi #pylint: disable-msg=W0603
   networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCards(), 
                                                         int(settings["historySampleCount"]), reader)
-  global systemOverviewUi 
+  global systemOverviewUi #pylint: disable-msg=W0603
   systemOverviewUi.setFontSize(int(settings["fontSize"]))
   
-  global networkOverviewUi 
+  global networkOverviewUi #pylint: disable-msg=W0603
   networkOverviewUi.setFontSize(int(settings["fontSize"]))
   
   #updateUI()
   
-def runMainUi():  
+def runMainUi():
+  """run the GUI event loop"""  
   sys.exit(app.exec_())
 
