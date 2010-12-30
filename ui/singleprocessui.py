@@ -19,10 +19,8 @@
 #
 # Display process properties and statistics of a single process
 #
-import procutils
-import os
+
 import ui.processdetails
-import datetime
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 import subprocess
@@ -46,106 +44,9 @@ tcpstates = [\
 "TCP_LISTEN",\
 "TCP_CLOSING"]
 
-class singleProcessDetailsAndHistory(object):
-  def __init__(self, pid, historyDepth):
-    self.__pid__ = str(pid)
-    self.__pathPrefix__ = "/proc/"+self.__pid__+"/"
-    self.__pwd__ = UNKNOWN
-    self.__exepath__ = UNKNOWN
-    self.__openFiles__ = {}
-    self.__memMap__ = ""
-    self.cpuUsageHistory = [0] * historyDepth
-    self.cpuUsageKernelHistory = [0] * historyDepth
-    self.rssUsageHistory = [0] * historyDepth
-    self.IOHistory = [0] * historyDepth
-    self.HistoryDepth = historyDepth
-    self.cmdline = None
-    self.startedtime = None
-    self.ppid = None
-  def __getOpenFileNames__(self):
-    alldirs = os.listdir(self.__pathPrefix__ + "fd")
-    self.__openFiles__ = {}
-    for dir in alldirs:
-      self.__openFiles__[dir] = {"path":os.readlink(self.__pathPrefix__ + dir)}
-  def update(self, cpuUsage, cpuUsageKernel, totalRss, IO):
-    if cpuUsage > 100:
-      cpuUsage = 0
-    if cpuUsageKernel > 100:
-      cpuUsageKernel = 0
-    if self.__pwd__ == UNKNOWN:
-      try:
-        self.__pwd__ = os.readlink(self.__pathPrefix__ + "cwd")
-      except:
-        self.__pwd__ = UNKNOWN
-    self.cpuUsageHistory.append(cpuUsage)
-    self.cpuUsageKernelHistory.append(cpuUsageKernel)
-    self.rssUsageHistory.append(totalRss)
-    self.IOHistory.append(IO)
-    
-    self.cpuUsageHistory = self.cpuUsageHistory[1:]
-    self.cpuUsageKernelHistory = self.cpuUsageKernelHistory[1:]
-    self.rssUsageHistory = self.rssUsageHistory[1:]
-    self.IOHistory = self.IOHistory[1:]
-
-    
-    try:
-      self.cwd = os.readlink(self.__pathPrefix__ + "cwd")
-    except OSError, val:
-      self.cwd = "<"+val.strerror+">"
-    except :
-      raise
-
-    if self.cmdline == None:
-      #do below only once
-      try:
-        self.cmdline = procutils.readFullFile(self.__pathPrefix__ + "cmdline").replace("\x00"," ")
-      except OSError, val:
-        self.cmdline = "<"+val.strerror+">"
-      except procutils.FileError:
-        self.cmdline = "---"
-      except:
-        raise
-    
-    try:
-      self.exe = os.readlink(self.__pathPrefix__ + "exe")
-    except OSError, val:
-      self.exe = "<"+val.strerror+">"
-    except :
-      raise
-    
-    #started time of a process
-    if self.startedtime == None:
-      try:
-        procstartedtime_seconds = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[21]
-      
-      
-        procstat = procutils.readFullFile("/proc/stat").split("\n")
-        for line in procstat:
-          if line.find("btime") != -1:
-            systemstarted_seconds = line.split(" ")[1]
-        HZ = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
-        epoch = datetime.datetime(month=1,day=1,year=1970)
-        
-        
-        procstarted = epoch + \
-                      datetime.timedelta(seconds=int(systemstarted_seconds)) + \
-                      datetime.timedelta(seconds=int(int(procstartedtime_seconds)/(HZ*1.0)+0.5))
-        
-        self.startedtime = procstarted.strftime("%A, %d. %B %Y %I:%M%p")
-      except procutils.FileError:
-        self.startedtime = "--"
-      
-    #process parent pid
-    if self.ppid is None:
-      try:
-        self.ppid = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
-      except procutils.FileError:
-        self.ppid = None
-      
-      
 class singleUi(object):
-  def __init__(self, proc, cmdLine, name, reader, depth):
-    self.__depth__ = depth
+  def __init__(self, proc, cmdLine, name, reader):
+    self.__depth__ = reader.getHistoryDepth(proc)
     self.__proc__ = proc
     self.__reader__ = reader
     self.__name__ = name
@@ -369,7 +270,8 @@ class singleUi(object):
       text = text + "  UDP  " + ipfromaddrdec +":"+ str(int(ipfromport,16))+"\n"
     self.__procDetails__.tcpipText.setText(text)
     
-  def update(self):
+  def update(self, reader):
+    self.__reader__ = reader
     if self.__processGone__ == False:
       if not(self.__reader__.hasProcess(self.__proc__)):
         self.__processGone__ = True

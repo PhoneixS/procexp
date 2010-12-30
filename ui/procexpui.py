@@ -21,9 +21,9 @@
 #
 
 import ui.main
-import procutils
+import utils
 import os
-import singleprocess
+import singleprocessui
 import systemoverview
 import configobj
 import settingsui
@@ -73,7 +73,7 @@ def performMenuAction(action):
   if action is mainUi.actionKill_process:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
     process = selectedItem.data(1, 0).toString()
-    procutils.killProcessHard(process)
+    utils.killProcessHard(process)
   elif action is mainUi.actionKill_process_tree:
     selectedItem = mainUi.processTreeWidget.selectedItems()[0]
     process = selectedItem.data(1, 0).toString()
@@ -93,11 +93,11 @@ def performMenuAction(action):
     if singleProcessUiList.has_key(process):
       singleProcessUiList[process].makeVisible()
     else:
-      singleProcessUiList[process] = singleprocess.singleUi(process, 
+      singleProcessUiList[process] = singleprocessui.singleUi(process, 
                                                             procList[int(process)]["cmdline"], 
                                                             procList[int(process)]["name"], 
-                                                            reader, 
-                                                            int(settings["historySampleCount"]))
+                                                            reader) 
+      #int(settings["historySampleCount"]))
   elif action is mainUi.actionSaveSettings:
     saveSettings()
   elif action is mainUi.actionSettings:
@@ -253,7 +253,7 @@ def prepareUI():
   scale = plotobjects.scaleObject()
   scale.min = 0
   scale.max = 100
-  #plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale)
+  plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale)
   
 def clearTree():
   """clear the process tree"""
@@ -266,14 +266,14 @@ def clearTree():
 def killProcessTree(proc, theProcList):
   """kill all processes which are child of proc, and kill proc also"""
   killChildsTree(int(str(proc)), theProcList)
-  procutils.killProcessHard(int(str(proc)))
+  utils.killProcessHard(int(str(proc)))
 
 def killChildsTree(proc, theProcList):
   """kill all processes which are child of proc"""
   for aproc in theProcList:
     if theProcList[aproc]["PPID"] == proc:
       killChildsTree(aproc, theProcList)
-      procutils.killProcess(aproc)
+      utils.killProcess(aproc)
      
 def addProcessAndParents(proc, theProcList):
   """add process and all its parents to the tree"""
@@ -403,7 +403,7 @@ def updateUI(): #pylint: disable-msg=R0912
     expandAll()
   
   for _ui in singleProcessUiList:
-    singleProcessUiList[_ui].update()
+    singleProcessUiList[_ui].update(reader)
     
   #update CPU plots
   systemOverviewUi.update()

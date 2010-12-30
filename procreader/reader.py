@@ -22,14 +22,110 @@
 
 import time
 import os
-import procutils
-import singleprocess
+import utils
 import subprocess
+import datetime
 
 UNKNOWN = "---"
 
 
 g_passwd = None
+
+class singleProcessDetailsAndHistory(object):
+  def __init__(self, pid, historyDepth):
+    self.__pid__ = str(pid)
+    self.__pathPrefix__ = "/proc/"+self.__pid__+"/"
+    self.__pwd__ = UNKNOWN
+    self.__exepath__ = UNKNOWN
+    self.__openFiles__ = {}
+    self.__memMap__ = ""
+    self.cpuUsageHistory = [0] * historyDepth
+    self.cpuUsageKernelHistory = [0] * historyDepth
+    self.rssUsageHistory = [0] * historyDepth
+    self.IOHistory = [0] * historyDepth
+    self.HistoryDepth = historyDepth
+    self.cmdline = None
+    self.startedtime = None
+    self.ppid = None
+  def __getOpenFileNames__(self):
+    alldirs = os.listdir(self.__pathPrefix__ + "fd")
+    self.__openFiles__ = {}
+    for dir in alldirs:
+      self.__openFiles__[dir] = {"path":os.readlink(self.__pathPrefix__ + dir)}
+  def update(self, cpuUsage, cpuUsageKernel, totalRss, IO):
+    if cpuUsage > 100:
+      cpuUsage = 0
+    if cpuUsageKernel > 100:
+      cpuUsageKernel = 0
+    if self.__pwd__ == UNKNOWN:
+      try:
+        self.__pwd__ = os.readlink(self.__pathPrefix__ + "cwd")
+      except:
+        self.__pwd__ = UNKNOWN
+    self.cpuUsageHistory.append(cpuUsage)
+    self.cpuUsageKernelHistory.append(cpuUsageKernel)
+    self.rssUsageHistory.append(totalRss)
+    self.IOHistory.append(IO)
+    
+    self.cpuUsageHistory = self.cpuUsageHistory[1:]
+    self.cpuUsageKernelHistory = self.cpuUsageKernelHistory[1:]
+    self.rssUsageHistory = self.rssUsageHistory[1:]
+    self.IOHistory = self.IOHistory[1:]
+
+    
+    try:
+      self.cwd = os.readlink(self.__pathPrefix__ + "cwd")
+    except OSError, val:
+      self.cwd = "<"+val.strerror+">"
+    except :
+      raise
+
+    if self.cmdline == None:
+      #do below only once
+      try:
+        self.cmdline = utils.readFullFile(self.__pathPrefix__ + "cmdline").replace("\x00"," ")
+      except OSError, val:
+        self.cmdline = "<"+val.strerror+">"
+      except utils.FileError:
+        self.cmdline = "---"
+      except:
+        raise
+    
+    try:
+      self.exe = os.readlink(self.__pathPrefix__ + "exe")
+    except OSError, val:
+      self.exe = "<"+val.strerror+">"
+    except :
+      raise
+    
+    #started time of a process
+    if self.startedtime == None:
+      try:
+        procstartedtime_seconds = utils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[21]
+      
+      
+        procstat = utils.readFullFile("/proc/stat").split("\n")
+        for line in procstat:
+          if line.find("btime") != -1:
+            systemstarted_seconds = line.split(" ")[1]
+        HZ = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
+        epoch = datetime.datetime(month=1,day=1,year=1970)
+        
+        
+        procstarted = epoch + \
+                      datetime.timedelta(seconds=int(systemstarted_seconds)) + \
+                      datetime.timedelta(seconds=int(int(procstartedtime_seconds)/(HZ*1.0)+0.5))
+        
+        self.startedtime = procstarted.strftime("%A, %d. %B %Y %I:%M%p")
+      except utils.FileError:
+        self.startedtime = "--"
+      
+    #process parent pid
+    if self.ppid is None:
+      try:
+        self.ppid = utils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
+      except utils.FileError:
+        self.ppid = None
 
 class _cpuActivityReader(object):
   """class for reading acivity per cpu"""
@@ -58,7 +154,7 @@ class _cpuActivityReader(object):
     
   def update(self):
     """do an update from the /proc filesystem """
-    jiffyStr = procutils.readFullFile('/proc/stat').split("\n")[self.__cpu__+1]
+    jiffyStr = utils.readFullFile('/proc/stat').split("\n")[self.__cpu__+1]
     userMode = int(jiffyStr.split()[1])
     userNiceMode = int(jiffyStr.split()[2])
     systemMode = int(jiffyStr.split()[3])
@@ -171,7 +267,7 @@ class procreader(object): #pylint: disable-msg=R0902
     self.__noofrunningprocs__ = 0
     self.__lastpid__ = 0
          
-    cpuinfo = procutils.readFullFile("/proc/cpuinfo").split("\n")
+    cpuinfo = utils.readFullFile("/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
     self.__networkCards__= {}
     self.__cpuArray__ = []
@@ -182,7 +278,7 @@ class procreader(object): #pylint: disable-msg=R0902
         self.__cpuCount__ += 1
     
     #network cards
-    data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
+    data = utils.readFullFile('/proc/net/dev').split("\n")[2:]
     for line in data:
       cardName = line.split(":")[0].strip()
       if len(cardName) > 0:
@@ -325,12 +421,12 @@ class procreader(object): #pylint: disable-msg=R0902
         "uid":UNKNOWN, \
         "wchan":UNKNOWN, \
         "nfThreads":UNKNOWN, \
-        "history":singleprocess.singleProcessDetailsAndHistory(process, self.__historyCount__)}
+        "history":singleProcessDetailsAndHistory(process, self.__historyCount__)}
 
   def __getUIDName__(self, uid): #pylint: disable-msg=R0201
     global g_passwd #pylint: disable-msg=W0603
     if g_passwd is None:
-      g_passwd = procutils.readFullFile("/etc/passwd").split("\n")
+      g_passwd = utils.readFullFile("/etc/passwd").split("\n")
     name = "???"
     for line in g_passwd:
       try:
@@ -351,7 +447,7 @@ class procreader(object): #pylint: disable-msg=R0902
     for process in self.__processList__:
       if self.__processList__[process]["env"] == UNKNOWN:
         try:
-          env = procutils.readFullFile("/proc/"+str(process)+"/environ").split("\0")
+          env = utils.readFullFile("/proc/"+str(process)+"/environ").split("\0")
         except:
           env = '-'
         self.__processList__[process]["env"] = env
@@ -360,9 +456,9 @@ class procreader(object): #pylint: disable-msg=R0902
     for process in self.__processList__:
       procStat = None
       try:
-        procStat = procutils.readFullFile("/proc/"+str(process)+"/stat")
+        procStat = utils.readFullFile("/proc/"+str(process)+"/stat")
         if self.__processList__[process]["cmdline"] == UNKNOWN:
-          cmdLine = procutils.readFullFile("/proc/"+str(process)+"/cmdline")
+          cmdLine = utils.readFullFile("/proc/"+str(process)+"/cmdline")
           self.__processList__[process]["cmdline"] = cmdLine.replace("\x00"," ")
 
         #get UID of process
@@ -373,10 +469,10 @@ class procreader(object): #pylint: disable-msg=R0902
         pass
       
       try:    
-        statm = procutils.readFullFile("/proc/"+str(process)+"/statm")
+        statm = utils.readFullFile("/proc/"+str(process)+"/statm")
         totalRssMem = int(statm.split(' ')[1])*4 #in 4k pages
 
-        #smaps = procutils.readFullFile("/proc/"+str(process)+"/smaps").split("kB\nRss:")
+        #smaps = utils.readFullFile("/proc/"+str(process)+"/smaps").split("kB\nRss:")
         #totalRssMem = 0
         #for line in smaps:
           #if line.startswith(" "):
@@ -386,7 +482,7 @@ class procreader(object): #pylint: disable-msg=R0902
         totalRssMem = 0
         
       try:
-        wchan = procutils.readFullFile("/proc/"+str(process)+"/wchan")
+        wchan = utils.readFullFile("/proc/"+str(process)+"/wchan")
         self.__processList__[process]["wchan"] = wchan
       except:
         self.__processList__[process]["wchan"] = UNKNOWN
@@ -411,7 +507,7 @@ class procreader(object): #pylint: disable-msg=R0902
           cpuUsageKernel = 0
         #IO accounting
         try:
-          io = procutils.readFullFile("/proc/"+str(process)+"/io").split("\n")
+          io = utils.readFullFile("/proc/"+str(process)+"/io").split("\n")
           iototal = int(io[0].split(": ")[1]) + int(io[1].split(": ")[1])
         except:
           iototal = 0
@@ -508,20 +604,20 @@ class procreader(object): #pylint: disable-msg=R0902
     #~ counters, process A could see an intermediate result.    
   def __getAllSocketInfo__(self):
     self.__allConnections__ = {} #list of connections, organized by inode
-    data = procutils.readFullFile("/proc/net/tcp").split("\n")
+    data = utils.readFullFile("/proc/net/tcp").split("\n")
     for connection in data:
       if len(connection) > 1:
         self.__allConnections__[connection.split()[9]] = connection.split()
   def __getAllUDPInfo__(self):
     self.__allUDP__ = {} #list of connections, organized by inode
-    data = procutils.readFullFile("/proc/net/udp").split("\n")
+    data = utils.readFullFile("/proc/net/udp").split("\n")
     for udp in data:
       if len(udp) > 1:
         self.__allUDP__[udp.split()[9]] = udp.split()
 
   def __getMemoryInfo(self):
     """get memory info"""
-    mem = procutils.readFullFile("/proc/meminfo").split("\n")
+    mem = utils.readFullFile("/proc/meminfo").split("\n")
     self.__totalMemKb   = int(mem[0].split()[1])
     self.__actualMemKb  = int(mem[1].split()[1])
     self.__buffersMemKb = int(mem[2].split()[1])
@@ -529,7 +625,7 @@ class procreader(object): #pylint: disable-msg=R0902
   
   def __getAverageLoad(self):
     """get average load figures"""
-    load = procutils.readFullFile("/proc/loadavg").split()
+    load = utils.readFullFile("/proc/loadavg").split()
     self.__loadavg__ = (load[0], load[1], load[2])
     self.__noofprocs__ = load[3].split("/")[1]
     self.__noofrunningprocs__ = load[3].split("/")[0]
@@ -576,7 +672,7 @@ class procreader(object): #pylint: disable-msg=R0902
     
   def __getNetworkCardUsage(self):
     """get usage of network interfaces"""
-    data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
+    data = utils.readFullFile('/proc/net/dev').split("\n")[2:]
     actTime = time.time()
     for line in data:
       cardName = line.split(":")[0].strip()
@@ -679,4 +775,3 @@ class procreader(object): #pylint: disable-msg=R0902
   def getLoadAvg(self):
     """get load average totals"""
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
-

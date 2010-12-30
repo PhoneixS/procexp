@@ -24,7 +24,7 @@ from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 import ui.networkinformation
 import plotobjects
-import procutils
+import utils
 
 class networkPlotObject(object):
   def __init__(self, plot, depth, reader, card, scale):
@@ -214,8 +214,8 @@ class networkOverviewUi(object):
       totaldrop += networkStat["senddrops"]
       self.__tabs__[card][2][4].setText(str(networkStat["sendcoll"]))
       totalcoll += networkStat["sendcoll"]
-      self.__tabs__[card][2][5].setText(procutils.humanReadable(networkStat["recbytes"]))
-      self.__tabs__[card][2][6].setText(procutils.humanReadable(networkStat["sendbytes"]))
+      self.__tabs__[card][2][5].setText(utils.humanReadable(networkStat["recbytes"]))
+      self.__tabs__[card][2][6].setText(utils.humanReadable(networkStat["sendbytes"]))
       self.__tabs__[card][2][7].setText(str(networkStat["recpackets"]))
       self.__tabs__[card][2][8].setText(str(networkStat["sendpackets"]))
       try:
@@ -228,8 +228,8 @@ class networkOverviewUi(object):
         self.__tabs__[card][2][12].setText("0")
         
       usage = self.__reader__.getNetworkCardUsage(card)
-      self.__tabs__[card][2][9].setText(procutils.humanReadable(usage[0])+ "/s")
-      self.__tabs__[card][2][10].setText(procutils.humanReadable(usage[1])+ "/s")
+      self.__tabs__[card][2][9].setText(utils.humanReadable(usage[0])+ "/s")
+      self.__tabs__[card][2][10].setText(utils.humanReadable(usage[1])+ "/s")
     
     self.__ui__.labelTotalDrops.setText(str(totaldrop))
     self.__ui__.labelTotalCollisions.setText(str(totalcoll))
