@@ -519,6 +519,7 @@ def setupMainUi(newSettings):
   #updateUI()
   
 def runMainUi():
-  """run the GUI event loop"""  
-  sys.exit(app.exec_())
+  """run the GUI event loop"""
+  app.exec_()  
+
 

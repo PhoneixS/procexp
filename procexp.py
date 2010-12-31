@@ -55,16 +55,27 @@ def produceData(theServer):
 def getData():
   """get data from a procexp server"""
   client = None
-  while g_stop == False and client == None:
-    try:
-      client = communication.tcp.Client(("127.0.0.1", 4000))
-    except communication.tcp.TCPError:
-      time.sleep(0.1)
-      print "wait for server"
   while g_stop == False:
-    newReader = client.receive()
-    print newReader
-    ui.procexpui.insertNewReaderUpdate(newReader)
+    print "hallo"
+    print "g_stop=", g_stop
+    print "client=", client
+    while g_stop == False and client == None:
+      try:
+        client = communication.tcp.Client(("127.0.0.1", 4000))
+      except communication.tcp.TCPError:
+        time.sleep(0.1)
+        print "wait for server"
+    while g_stop == False:
+      try:
+        newReader = client.receive()
+        ui.procexpui.insertNewReaderUpdate(newReader)
+      except:
+        import traceback
+        print traceback.format_exc()
+        client = None
+        break
+        
+
      
 def loadSettings():
   """load settings"""
@@ -98,6 +109,8 @@ def runAsGui():
     ui.procexpui.setupMainUi(ui_settings)
     ui.procexpui.applyNewSettings()
     ui.procexpui.runMainUi()
+    global g_stop #pylint: disable-msg=W0603
+    g_stop = True
   except:
     import traceback
     print traceback.format_exc()
