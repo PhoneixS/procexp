@@ -37,17 +37,20 @@ defaultSettings = \
  "historySampleCount": 200
 }
 
-def produceData():
+def produceData(theServer):
   """produce data for clients"""
   reader = procreader.reader.procreader(int("1000"), int("200"))
+  stop = False
   if True:#onlyUser:
     reader.setFilterUID(os.geteuid())
-  while True:
-    reader.doReadProcessInfo()
-    server.sendData(reader)
-    print reader
-    time.sleep(1000 / 1000)
-
+  while stop == False:
+    try:
+      reader.doReadProcessInfo()
+      theServer.sendData(reader)
+      time.sleep(1000 / 1000)
+    except:
+      stop = True
+      
 @utils.asynchronous(None)
 def getData():
   """get data from a procexp server"""
@@ -62,8 +65,7 @@ def getData():
     newReader = client.receive()
     print newReader
     ui.procexpui.insertNewReaderUpdate(newReader)
-    
-    
+     
 def loadSettings():
   """load settings"""
   settings = {}
@@ -89,6 +91,7 @@ def loadSettings():
   return settings
 
 def runAsGui():
+  """run the GUI part of the linux process explorer"""
   try:
     ui_settings = loadSettings()
     getData()    
@@ -117,8 +120,15 @@ def main():
   if options.client:
     runAsGui()
   elif options.server:
-    server.doServe()
-    produceData()
+    import socket
+    PORTNUMBER = 4000
+    address = (socket.gethostname(), PORTNUMBER)
+    procexpserver = server.procexpServer(address)
+    procexpserver.doServe()
+    print "process explorer server started."
+    produceData(procexpserver)
+    print "process explorer server ended."
+    procexpserver.stopServer()
 
 if __name__ == "__main__":
   main()

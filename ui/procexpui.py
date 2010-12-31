@@ -24,7 +24,7 @@ import ui.main
 import utils
 import os
 import singleprocessui
-import systemoverview
+import systemoverviewui
 import configobj
 import settingsui
 import plotobjects
@@ -56,7 +56,7 @@ cpuUsageHistory = None
 cpuUsageSystemHistory = None
 cpuUsageIoWaitHistory = None
 cpuUsageIrqHistory = None
-systemOverviewUi = None
+systemOverviewUiWindow = None
 networkOverviewUi = None
 MainWindow = None
 
@@ -110,7 +110,7 @@ def performMenuAction(action):
     
     setFontSize(fontSize)
   elif action is mainUi.actionSystem_information:
-    systemOverviewUi.show()
+    systemOverviewUiWindow.show()
   elif action is mainUi.actionNetwork_Information:
     networkOverviewUi.show()
   elif action is mainUi.actionClose_this_window:
@@ -138,8 +138,8 @@ def setFontSize(fontSize):
   mainUi.menuSettings.setFont(font)
   mainUi.menubar.setFont(font)
   mainUi.processTreeWidget.setFont(font)
-  if systemOverviewUi is not None:
-    systemOverviewUi.setFontSize(fontSize)
+  if systemOverviewUiWindow is not None:
+    systemOverviewUiWindow.setFontSize(fontSize)
   if networkOverviewUi is not None:
     networkOverviewUi.setFontSize(fontSize)
   
@@ -406,7 +406,7 @@ def updateUI(): #pylint: disable-msg=R0912
     singleProcessUiList[_ui].update(reader)
     
   #update CPU plots
-  systemOverviewUi.update()
+  systemOverviewUiWindow.update()
   
   #network plots
   networkOverviewUi.update()
@@ -504,14 +504,14 @@ def setupMainUi(newSettings):
     print "wait for a reader"
     time.sleep(0.1)
   
-  global systemOverviewUi #pylint: disable-msg=W0603
-  systemOverviewUi = systemoverview.systemOverviewUi(reader.getCpuCount(), 
+  global systemOverviewUiWindow #pylint: disable-msg=W0603
+  systemOverviewUiWindow = systemoverviewui.systemOverviewUi(reader.getCpuCount(), 
                                                      int(settings["historySampleCount"]), reader)
   global networkOverviewUi #pylint: disable-msg=W0603
   networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCards(), 
                                                         int(settings["historySampleCount"]), reader)
-  global systemOverviewUi #pylint: disable-msg=W0603
-  systemOverviewUi.setFontSize(int(settings["fontSize"]))
+  global systemOverviewUiWindow #pylint: disable-msg=W0603
+  systemOverviewUiWindow.setFontSize(int(settings["fontSize"]))
   
   global networkOverviewUi #pylint: disable-msg=W0603
   networkOverviewUi.setFontSize(int(settings["fontSize"]))

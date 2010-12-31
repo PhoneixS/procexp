@@ -1,41 +1,52 @@
 """tcp server for procexp graphical clients"""
 import utils
 import threading
-import socket
 import communication.tcp
 
-PORTNUMBER = 4000
 
-g_clients_lock = threading.Lock()
-g_clients = []
-g_address = (socket.gethostname(), 4000)
-g_stop = False
 
-def sendData(data):
-  """send data to all clients"""
-  with g_clients_lock:
-    for client in g_clients:
-      try:
-        client.send(data)        
-      except:
-        g_clients.remove(client)
+
+class procexpServer(object):
+  """process explorer /proc server"""
+  def __init__(self, address):
+    self.__clients_lock__ = threading.Lock()
+    self.__address__ = address
+    self.__server__ = None
+    self.__clients__ = []
+    self.__stop__ = False
+    
+  def sendData(self, data):
+    """send data to all clients"""
+    with self.__clients_lock__:
+      for client in self.__clients__:
+        try:
+          client.send(data)        
+        except:
+          self.__clients__.remove(client)
+
+  def stopServer(self):
+    """stop the server"""
+    self.__stop__ = True
+    self.__server__.close()
+    for t in self.doServe.running:
+      t.join()
   
-@utils.asynchronous(None)
-def doServe():
-  '''Accepts clients and adds them to list'''
-  try:
-    server = communication.tcp.Server(g_address)
-    print "server=", server
-    while not g_stop:
-      try:
-        client = server.accept()
-      except:
-        if not g_stop:
-          print "accept failed"
-        break
-      with g_clients_lock:
-        g_clients.append(client)
-      print('client accepted: ' + str(client))
-  except:
-    import traceback
-    print traceback.format_exc()
+  @utils.asynchronous(None)
+  def doServe(self):
+    '''Accepts clients and adds them to list'''
+    try:
+      self.__server__ = communication.tcp.Server(self.__address__)
+      print "server=", self.__server__
+      while not self.__stop__:
+        try:
+          client = self.__server__.accept()
+        except communication.tcp.TCPError:
+          if not self.__stop__:
+            print "accept failed"
+          break
+        with self.__clients_lock__:
+          self.__clients__.append(client)
+        print('client accepted: ' + str(client))
+    except:
+      import traceback
+      print traceback.format_exc()
