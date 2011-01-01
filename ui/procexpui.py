@@ -28,7 +28,7 @@ import systemoverviewui
 import configobj
 import settingsui
 import plotobjects
-import networkoverview
+import networkoverviewui
 import colorlegend
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
@@ -57,7 +57,7 @@ cpuUsageSystemHistory = None
 cpuUsageIoWaitHistory = None
 cpuUsageIrqHistory = None
 systemOverviewUiWindow = None
-networkOverviewUi = None
+networkOverviewUiWindow = None
 MainWindow = None
 
 firstUpdate = True
@@ -112,7 +112,7 @@ def performMenuAction(action):
   elif action is mainUi.actionSystem_information:
     systemOverviewUiWindow.show()
   elif action is mainUi.actionNetwork_Information:
-    networkOverviewUi.show()
+    networkOverviewUiWindow.show()
   elif action is mainUi.actionClose_this_window:
     MainWindow.close()
   elif action is mainUi.actionClose_all_and_exit:
@@ -140,8 +140,8 @@ def setFontSize(fontSize):
   mainUi.processTreeWidget.setFont(font)
   if systemOverviewUiWindow is not None:
     systemOverviewUiWindow.setFontSize(fontSize)
-  if networkOverviewUi is not None:
-    networkOverviewUi.setFontSize(fontSize)
+  if networkOverviewUiWindow is not None:
+    networkOverviewUiWindow.setFontSize(fontSize)
   
 def saveSettings():
   """save settings """
@@ -409,7 +409,7 @@ def updateUI(): #pylint: disable-msg=R0912
   systemOverviewUiWindow.update()
   
   #network plots
-  networkOverviewUi.update()
+  networkOverviewUiWindow.update()
     
   #update the cpu graph
   try:
@@ -501,20 +501,19 @@ def setupMainUi(newSettings):
   MainWindow.show()
   #wait for a fresh reader
   while reader == None:
-    print "wait for a reader"
     time.sleep(0.1)
   
   global systemOverviewUiWindow #pylint: disable-msg=W0603
   systemOverviewUiWindow = systemoverviewui.systemOverviewUi(reader.getCpuCount(), 
                                                      int(settings["historySampleCount"]), reader)
-  global networkOverviewUi #pylint: disable-msg=W0603
-  networkOverviewUi = networkoverview.networkOverviewUi(reader.getNetworkCards(), 
+  global networkOverviewUiWindow #pylint: disable-msg=W0603
+  networkOverviewUiWindow = networkoverviewui.networkOverviewUi(reader.getNetworkCards(), 
                                                         int(settings["historySampleCount"]), reader)
   global systemOverviewUiWindow #pylint: disable-msg=W0603
   systemOverviewUiWindow.setFontSize(int(settings["fontSize"]))
   
-  global networkOverviewUi #pylint: disable-msg=W0603
-  networkOverviewUi.setFontSize(int(settings["fontSize"]))
+  global networkOverviewUiWindow #pylint: disable-msg=W0603
+  networkOverviewUiWindow.setFontSize(int(settings["fontSize"]))
   
   #updateUI()
   
