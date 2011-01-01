@@ -28,6 +28,8 @@ import subprocess
 import procreader.tcpip_stat as tcpip_stat
 
 import copy
+
+import datadef
 UNKNOWN = "---" 
 
 tcpstates = [\
@@ -45,7 +47,10 @@ tcpstates = [\
 "TCP_CLOSING"]
 
 class singleUi(object):
-  def __init__(self, proc, cmdLine, name, reader):
+  def __init__(self, proc, cmdLine, name, reader, sendDataToServer):
+    
+    #request to the server to get ldd data.
+    sendDataToServer(datadef.ServerPidRequest(proc, "ldd", None))  
     self.__depth__ = reader.getHistoryDepth(proc)
     self.__proc__ = proc
     self.__reader__ = reader

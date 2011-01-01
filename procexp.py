@@ -83,7 +83,7 @@ def runAsGui():
     ui_settings = loadSettings()
     procExpClient = client.ProcExpClient(onNewReader, ("127.0.0.1", 4000))
     procExpClient.getData()
-    ui.procexpui.setupMainUi(ui_settings)
+    ui.procexpui.setupMainUi(ui_settings, procExpClient.sendData)
     ui.procexpui.applyNewSettings()
     ui.procexpui.runMainUi()
     procExpClient.stop()

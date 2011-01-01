@@ -67,6 +67,8 @@ oldProcList = {}
 #default settings
 settings = {}
 
+g_clientSendConn = None
+
 def performMenuAction(action):
   """actions of the menu's"""
   global onlyUser #pylint: disable-msg=W0603
@@ -96,7 +98,8 @@ def performMenuAction(action):
       singleProcessUiList[process] = singleprocessui.singleUi(process, 
                                                             procList[int(process)]["cmdline"], 
                                                             procList[int(process)]["name"], 
-                                                            reader) 
+                                                            reader,
+                                                            g_clientSendConn) 
       #int(settings["historySampleCount"]))
   elif action is mainUi.actionSaveSettings:
     saveSettings()
@@ -484,8 +487,10 @@ def applyNewSettings():
   setColumnWidths()
   
 
-def setupMainUi(newSettings):
+def setupMainUi(newSettings, clientSendtoServerConnection):
   """setup the GUI"""
+  global g_clientSendConn #pylint: disable-msg=W0603
+  g_clientSendConn = clientSendtoServerConnection
   global settings #pylint: disable-msg=W0603
   settings = copy.deepcopy(newSettings)
   global app #pylint: disable-msg=W0603

@@ -3,6 +3,7 @@
 import utils
 import communication.tcp
 import time 
+import threading
 
 class ProcExpClient(object):
   """reads from a linux process explorer server and can send data to the server"""
@@ -11,6 +12,7 @@ class ProcExpClient(object):
     self.__stop__ = False
     self.__cb__ = dataCallback
     self.__client__ = None
+    self.__sendLock__ = threading.Lock()
     
   def stop(self):
     """stop the client"""
@@ -18,6 +20,11 @@ class ProcExpClient(object):
     self.__client__.close()
     for t in self.getData.running:
       t.join()
+      
+  def sendData(self, data):
+    """send data to server"""
+    with self.__sendLock__:
+      self.__client__.send(data)
       
   @utils.asynchronous(None)
   def getData(self):
@@ -33,5 +40,5 @@ class ProcExpClient(object):
           newReader = self.__client__.receive()
           self.__cb__(newReader)
         except:
-          client = None
+          self.__client__ = None
           break
