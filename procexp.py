@@ -22,14 +22,12 @@
 import os
 import configobj
 import ui.procexpui
-import utils
-import communication.tcp
 import time
 import server
 import procreader.reader
 from optparse import OptionParser
+import client 
 
-g_stop = False
 defaultSettings = \
 {"fontSize": 10, 
  "columnWidths": [100,60,40,100,30,30,30,30],
@@ -50,25 +48,11 @@ def produceData(theServer):
       time.sleep(1000 / 1000)
     except:
       stop = True
-      
-@utils.asynchronous(None)
-def getData():
-  """get data from a procexp server"""
-  client = None
-  while g_stop == False:
-    while g_stop == False and client == None:
-      try:
-        client = communication.tcp.Client(("127.0.0.1", 4000))
-      except communication.tcp.TCPError:
-        time.sleep(0.1)
-    while g_stop == False:
-      try:
-        newReader = client.receive()
-        ui.procexpui.insertNewReaderUpdate(newReader)
-      except:
-        client = None
-        break
-         
+
+def onNewReader(newReader):
+  """called when data comes from server"""
+  ui.procexpui.insertNewReaderUpdate(newReader)      
+        
 def loadSettings():
   """load settings"""
   settings = {}
@@ -97,12 +81,12 @@ def runAsGui():
   """run the GUI part of the linux process explorer"""
   try:
     ui_settings = loadSettings()
-    getData()    
+    procExpClient = client.ProcExpClient(onNewReader, ("127.0.0.1", 4000))
+    procExpClient.getData()
     ui.procexpui.setupMainUi(ui_settings)
     ui.procexpui.applyNewSettings()
     ui.procexpui.runMainUi()
-    global g_stop #pylint: disable-msg=W0603
-    g_stop = True
+    procExpClient.stop()
   except:
     import traceback
     print traceback.format_exc()
