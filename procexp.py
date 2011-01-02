@@ -35,19 +35,26 @@ defaultSettings = \
  "historySampleCount": 200
 }
 
+g_reader = None
+
 def produceData(theServer):
   """produce data for clients"""
-  reader = procreader.reader.procreader(int("1000"), int("200"))
+  global g_reader #pylint: disable-msg=W0603
+  g_reader = procreader.reader.procreader(int("1000"), int("200"))
   stop = False
   if True:#onlyUser:
-    reader.setFilterUID(os.geteuid())
+    g_reader.setFilterUID(os.geteuid())
   while stop == False:
     try:
-      reader.doReadProcessInfo()
-      theServer.sendData(reader)
+      g_reader.doReadProcessInfo()
+      theServer.sendData(g_reader)
       time.sleep(1000 / 1000)
-    except:
+    except KeyboardInterrupt:
       stop = True
+    except:
+      import traceback
+      print traceback.format_exc()
+      
 
 def onNewReader(newReader):
   """called when data comes from server"""
@@ -91,6 +98,15 @@ def runAsGui():
     import traceback
     print traceback.format_exc()
 
+def onClientData(data):
+  """ process requests from client """
+  if g_reader is not None:
+    if data.req == "ldd":
+      g_reader.update_lddinfo(data.pid)
+    else:
+      print "unsupported request"
+      print "Received:", data
+
 def main():
   """main"""
   usage = "usage: %prog [options]"
@@ -109,7 +125,7 @@ def main():
     import socket
     PORTNUMBER = 4000
     address = (socket.gethostname(), PORTNUMBER)
-    procexpserver = server.procexpServer(address)
+    procexpserver = server.procexpServer(address, onClientData)
     procexpserver.doServe()
     print "process explorer server started."
     produceData(procexpserver)

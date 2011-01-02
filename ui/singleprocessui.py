@@ -66,7 +66,7 @@ class singleUi(object):
     self.__tcpStat__ = None
     self.__TCPHist__ = [0] * self.__reader__.getHistoryDepth(self.__proc__)
     self.__prevtcpipbytes__ = 0
-
+    self.__lddoutput__ = None
     #-------- top plot CPU usage-------------------------------------------------------------------
     #Curves for CPU usage
     self.__curveCpuHist__ = Qwt.QwtPlotCurve("CPU History")
@@ -196,7 +196,8 @@ class singleUi(object):
     QtCore.QObject.connect(self.__procDetails__.filterEdit, QtCore.SIGNAL('textEdited(QString)'), self.__onFilterTextEdit__)
     
     self.update_sockets()
-    self.__lddoutput__ = None
+    self.__reader__.update_lddinfo(proc)
+    
   def __del__(self):
     try:
       if self.__tcpStat__ != None:

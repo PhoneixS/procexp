@@ -39,6 +39,9 @@ class ProcExpClient(object):
         try:
           newReader = self.__client__.receive()
           self.__cb__(newReader)
-        except:
+        except communication.tcp.TCPError:
           self.__client__ = None
           break
+        except:
+          import traceback
+          print traceback.format_exc()

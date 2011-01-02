@@ -25,11 +25,13 @@ import os
 import utils
 import subprocess
 import datetime
-
+import threading
 UNKNOWN = "---"
 
 
 g_passwd = None
+g_pendinglddupdatesLock__ = threading.Lock() #do not refactor as part of a class, because it
+                                             #is not pickable
 
 class singleProcessDetailsAndHistory(object):
   def __init__(self, pid, historyDepth):
@@ -126,6 +128,9 @@ class singleProcessDetailsAndHistory(object):
         self.ppid = utils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
       except utils.FileError:
         self.ppid = None
+  def do_ldd(self):
+    print self.__pid__, "do_ldd: create ldd method here!!"
+    
 
 class _cpuActivityReader(object):
   """class for reading acivity per cpu"""
@@ -151,6 +156,8 @@ class _cpuActivityReader(object):
     self.__overallSystemCpuUsage__ = None
     self.__overallIoWaitCpuUsage__ = None
     self.__overallIrqCpuUsage__ = None
+    
+    
     
   def update(self):
     """do an update from the /proc filesystem """
@@ -224,7 +231,7 @@ class _cpuActivityReader(object):
     self.__overallIrqCpuUsage__     = \
       round(((self.__deltaIrqMode__ + self.__deltaSoftIrqMode__) *1.0 / total)*100, 1) \
       if total > 0 else 0
-      
+    
   def overallUserCpuUsage(self):
     """get cpu usage for all cpu's""" 
     return self.__overallUserCpuUsage__
@@ -266,6 +273,8 @@ class procreader(object): #pylint: disable-msg=R0902
     self.__noofprocs__ = 0
     self.__noofrunningprocs__ = 0
     self.__lastpid__ = 0
+    self.__pendinglddupdates__ = []
+    
          
     cpuinfo = utils.readFullFile("/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
@@ -347,6 +356,14 @@ class procreader(object): #pylint: disable-msg=R0902
     for cpu in self.__cpuArray__:
       cpu.update()
 
+  def __update_all_ldd__(self):
+    with g_pendinglddupdatesLock__:
+      for process in self.__pendinglddupdates__: 
+        if self.__processList__.has_key(int(process)):
+          self.__processList__[int(process)]["history"].do_ldd()
+      self.__pendinglddupdates__ = []
+      
+    
   
   def overallUserCpuUsage(self):
     """get overallUserCpuUsage"""
@@ -726,6 +743,7 @@ class procreader(object): #pylint: disable-msg=R0902
     self.__getNetworkCardUsage()
     #keep line below as last command
     self.__prevTimeStamp__ = time.time()
+    self.__update_all_ldd__()
     
   def getProcessInfo(self):
     """get process info of all current processes, filtered possible by UID"""
@@ -775,3 +793,8 @@ class procreader(object): #pylint: disable-msg=R0902
   def getLoadAvg(self):
     """get load average totals"""
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
+  def update_lddinfo(self, process):
+    """initiate an update of ldd info of given process"""
+    with g_pendinglddupdatesLock__:
+      self.__pendinglddupdates__.append(process)
+
