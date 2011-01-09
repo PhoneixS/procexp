@@ -27,7 +27,7 @@ import subprocess
 import datetime
 import threading
 UNKNOWN = "---"
-
+NOTSET = "Not set"
 
 g_passwd = None
 g_pendinglddupdatesLock__ = threading.Lock() #do not refactor as part of a class, because it
@@ -38,9 +38,10 @@ class singleProcessDetailsAndHistory(object):
     self.__pid__ = str(pid)
     self.__pathPrefix__ = "/proc/"+self.__pid__+"/"
     self.__pwd__ = UNKNOWN
-    self.__exepath__ = UNKNOWN
     self.__openFiles__ = {}
     self.__memMap__ = ""
+    self.__lddoutput__ = NOTSET
+    self.exe = None
     self.cpuUsageHistory = [0] * historyDepth
     self.cpuUsageKernelHistory = [0] * historyDepth
     self.rssUsageHistory = [0] * historyDepth
@@ -129,8 +130,26 @@ class singleProcessDetailsAndHistory(object):
       except utils.FileError:
         self.ppid = None
   def do_ldd(self):
-    print self.__pid__, "do_ldd: create ldd method here!!"
-    
+    #update ldd output. Do this here: then it happens only when the user wants to see it
+    #by opening a process properties window
+    try:
+      exepath = self.exe
+      if self.exe is not None:
+        ldd = subprocess.Popen(["ldd" , exepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output = ldd.communicate()
+        err = output[1]
+        if len(err) >0:
+          self.__lddoutput__ = err
+        else:
+          self.__lddoutput__ = output[0]
+          self.__lddoutput__ = self.__lddoutput__.replace("\t","")
+    except:
+      import traceback
+      print traceback.format_exc()
+      self.__lddoutput__  = "--"
+
+  def get_lddInfo(self):
+    return self.__lddoutput__
 
 class _cpuActivityReader(object):
   """class for reading acivity per cpu"""
@@ -797,4 +816,5 @@ class procreader(object): #pylint: disable-msg=R0902
     """initiate an update of ldd info of given process"""
     with g_pendinglddupdatesLock__:
       self.__pendinglddupdates__.append(process)
-
+  def get_lddInfo(self, process):
+    return self.__processList__[int(process)]["history"].get_lddInfo()

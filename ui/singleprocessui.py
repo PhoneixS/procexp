@@ -23,9 +23,9 @@
 import ui.processdetails
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
-import subprocess
 
 import procreader.tcpip_stat as tcpip_stat
+import procreader.reader 
 
 import copy
 
@@ -51,6 +51,7 @@ class singleUi(object):
     
     #request to the server to get ldd data.
     sendDataToServer(datadef.ServerPidRequest(proc, "ldd", None))  
+    self.__sendDataToServerMethod = sendDataToServer
     self.__depth__ = reader.getHistoryDepth(proc)
     self.__proc__ = proc
     self.__reader__ = reader
@@ -196,7 +197,6 @@ class singleUi(object):
     QtCore.QObject.connect(self.__procDetails__.filterEdit, QtCore.SIGNAL('textEdited(QString)'), self.__onFilterTextEdit__)
     
     self.update_sockets()
-    self.__reader__.update_lddinfo(proc)
     
   def __del__(self):
     try:
@@ -340,21 +340,10 @@ class singleUi(object):
         
         #update ldd output. Do this here: then it happens only when the user wants to see it
         #by opening a process properties window
+        data = self.__reader__.get_lddInfo(self.__proc__)
+        if data == procreader.reader.NOTSET:
+          self.__sendDataToServerMethod(datadef.ServerPidRequest(self.__proc__, "ldd", None))
+        self.__procDetails__.libraryTextEdit.setText(data)
         
         
-        if self.__lddoutput__ is None:
-          try:
-            exepath = self.__reader__.getexe(self.__proc__)
-            ldd = subprocess.Popen(["ldd" , exepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            output = ldd.communicate()
-            err = output[1]
-            if len(err) >0:
-              self.__lddoutput__ = err
-            else:
-              self.__lddoutput__ = output[0]
-              self.__lddoutput__ = self.__lddoutput__.replace("\t","")
-            self.__procDetails__.libraryTextEdit.setText(self.__lddoutput__)
-            
-          except:
-            self.__lddoutput__  = "--"
    
