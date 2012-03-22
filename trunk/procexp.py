@@ -35,6 +35,7 @@ from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 import cpuaffinity
 import sys
+import signal
 
 timer = None
 reader = None
@@ -344,93 +345,93 @@ def expandAll():
     expandChilds(item)
 
 def updateUI():
-  global procList
-  global treeProcesses, greenTopLevelItems, redTopLevelItems
-  global mainUi
-  global firstUpdate
-  reader.doReadProcessInfo()
-  procList, closedProc, newProc = reader.getProcessInfo()
-  
-  #color all green processes with default background
-  defaultBgColor = app.palette().color(QtGui.QPalette.Base)  
-  for proc in greenTopLevelItems:
-    for column in xrange(greenTopLevelItems[proc].columnCount()):
-      greenTopLevelItems[proc].setBackgroundColor(column, defaultBgColor)
-  greenTopLevelItems = {}
- 
-  #delete all red widgetItems
-  for proc in redTopLevelItems:
-    for topLevelIndex in xrange(mainUi.processTreeWidget.topLevelItemCount()):
-      topLevelItem = mainUi.processTreeWidget.topLevelItem(topLevelIndex)
-      delChild(topLevelItem, redTopLevelItems[proc])
-      if topLevelItem == redTopLevelItems[proc]:
-        mainUi.processTreeWidget.takeTopLevelItem(topLevelIndex)
-        
-  redTopLevelItems = {}
-  
-  #create new items and mark items to be deleted red
-  #draw tree hierarchy of processes
-  for proc in newProc:
-    widgetItem = addProcessAndParents(proc, procList)
-
-
-  #if the process has childs which do still exist, "reparent" the child.
-  for proc in procList:
-    if procList[proc]["PPID"] == 0:
-      item = treeProcesses[proc]
-      if item.parent() is not None:
-        parentItem = item.parent()
-        for idx in xrange(parentItem.childCount()):
-          if item == parentItem.child(idx):
-            parentItem.takeChild(idx)
-        mainUi.processTreeWidget.addTopLevelItem(treeProcesses[proc])
-
-  #copy processed to be deleted to the red list      
-  for proc in closedProc:
-    redTopLevelItems[proc] = treeProcesses[proc]
-   
-      
-  #color all deleted processed red 
-  for proc in redTopLevelItems:
-    for column in xrange(redTopLevelItems[proc].columnCount()):
-      redTopLevelItems[proc].setBackgroundColor(column, QtGui.QColor(255,0,0))
-  
-  #update status information about the processes  
-  for proc in procList:   
-    treeProcesses[proc].setData(0, 0, procList[proc]["name"])
-    treeProcesses[proc].setData(1, 0, str(proc))
-    treeProcesses[proc].setData(2, 0, procList[proc]["cpuUsage"])
-    treeProcesses[proc].setData(3, 0, procList[proc]["cmdline"])
-    treeProcesses[proc].setData(4, 0, procList[proc]["uid"])
-    treeProcesses[proc].setData(5, 0, procList[proc]["wchan"])
-    treeProcesses[proc].setData(6, 0, procList[proc]["nfThreads"])
-
-  for proc in closedProc:
-    del treeProcesses[proc]
-
-
-
-  #color all new processes 'green'
-  if firstUpdate == False:
-    for proc in greenTopLevelItems:
-      item = greenTopLevelItems[proc]
-      for column in xrange(item.columnCount()):
-        item.setBackgroundColor(column, QtGui.QColor(0,255,0))
-    
-  if (len(closedProc) > 0) or (len(newProc) > 0):
-    expandAll()
-  
-  for ui in singleProcessUiList:
-    singleProcessUiList[ui].update()
-    
-  #update CPU plots
-  systemOverviewUi.update()
-  
-  #network plots
-  networkOverviewUi.update()
-    
-  #update the cpu graph
   try:
+    global procList
+    global treeProcesses, greenTopLevelItems, redTopLevelItems
+    global mainUi
+    global firstUpdate
+    reader.doReadProcessInfo()
+    procList, closedProc, newProc = reader.getProcessInfo()
+    
+    #color all green processes with default background
+    defaultBgColor = app.palette().color(QtGui.QPalette.Base)  
+    for proc in greenTopLevelItems:
+      for column in xrange(greenTopLevelItems[proc].columnCount()):
+        greenTopLevelItems[proc].setBackgroundColor(column, defaultBgColor)
+    greenTopLevelItems = {}
+   
+    #delete all red widgetItems
+    for proc in redTopLevelItems:
+      for topLevelIndex in xrange(mainUi.processTreeWidget.topLevelItemCount()):
+        topLevelItem = mainUi.processTreeWidget.topLevelItem(topLevelIndex)
+        delChild(topLevelItem, redTopLevelItems[proc])
+        if topLevelItem == redTopLevelItems[proc]:
+          mainUi.processTreeWidget.takeTopLevelItem(topLevelIndex)
+          
+    redTopLevelItems = {}
+    
+    #create new items and mark items to be deleted red
+    #draw tree hierarchy of processes
+    for proc in newProc:
+      widgetItem = addProcessAndParents(proc, procList)
+
+
+    #if the process has childs which do still exist, "reparent" the child.
+    for proc in procList:
+      if procList[proc]["PPID"] == 0:
+        item = treeProcesses[proc]
+        if item.parent() is not None:
+          parentItem = item.parent()
+          for idx in xrange(parentItem.childCount()):
+            if item == parentItem.child(idx):
+              parentItem.takeChild(idx)
+          mainUi.processTreeWidget.addTopLevelItem(treeProcesses[proc])
+
+    #copy processed to be deleted to the red list      
+    for proc in closedProc:
+      redTopLevelItems[proc] = treeProcesses[proc]
+     
+        
+    #color all deleted processed red 
+    for proc in redTopLevelItems:
+      for column in xrange(redTopLevelItems[proc].columnCount()):
+        redTopLevelItems[proc].setBackgroundColor(column, QtGui.QColor(255,0,0))
+    
+    #update status information about the processes  
+    for proc in procList:   
+      treeProcesses[proc].setData(0, 0, procList[proc]["name"])
+      treeProcesses[proc].setData(1, 0, str(proc))
+      treeProcesses[proc].setData(2, 0, procList[proc]["cpuUsage"])
+      treeProcesses[proc].setData(3, 0, procList[proc]["cmdline"])
+      treeProcesses[proc].setData(4, 0, procList[proc]["uid"])
+      treeProcesses[proc].setData(5, 0, procList[proc]["wchan"])
+      treeProcesses[proc].setData(6, 0, procList[proc]["nfThreads"])
+
+    for proc in closedProc:
+      del treeProcesses[proc]
+
+
+
+    #color all new processes 'green'
+    if firstUpdate == False:
+      for proc in greenTopLevelItems:
+        item = greenTopLevelItems[proc]
+        for column in xrange(item.columnCount()):
+          item.setBackgroundColor(column, QtGui.QColor(0,255,0))
+      
+    if (len(closedProc) > 0) or (len(newProc) > 0):
+      expandAll()
+    
+    for ui in singleProcessUiList:
+      singleProcessUiList[ui].update()
+      
+    #update CPU plots
+    systemOverviewUi.update()
+    
+    #network plots
+    networkOverviewUi.update()
+      
+    #update the cpu graph
     global cpuUsageHistory
     global cpuUsageSystemHistory
     global cpuUsageIoWaitHistory
@@ -471,9 +472,9 @@ def updateUI():
     curveIoWaitHist.setData(range(int(settings["historySampleCount"])), cpuUsageIoWaitHistory)
     curveIrqHist.setData(range(int(settings["historySampleCount"])), cpuUsageIrqHistory)
     mainUi.qwtPlotOverallCpuHist.replot()
-    
   except:
     import traceback
+    print "unhandled exception:"
     print traceback.format_exc()
   
   firstUpdate = False
@@ -502,5 +503,9 @@ systemOverviewUi.setFontSize(int(settings["fontSize"]))
 networkOverviewUi.setFontSize(int(settings["fontSize"]))
 
 updateUI()
+
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
 sys.exit(app.exec_())
 
