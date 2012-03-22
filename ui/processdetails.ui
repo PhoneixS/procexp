@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
-    <height>549</height>
+    <width>684</width>
+    <height>647</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -65,7 +65,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="image">
       <attribute name="title">
@@ -79,9 +79,9 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,3">
             <property name="spacing">
-             <number>-1</number>
+             <number>6</number>
             </property>
             <property name="sizeConstraint">
              <enum>QLayout::SetDefaultConstraint</enum>
@@ -90,14 +90,14 @@
              <widget class="QLabel" name="label_2">
               <property name="minimumSize">
                <size>
-                <width>90</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -116,7 +116,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>20</height>
+                <height>16777215</height>
                </size>
               </property>
              </widget>
@@ -124,18 +124,18 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,3">
             <item>
              <widget class="QLabel" name="label_3">
               <property name="minimumSize">
                <size>
-                <width>90</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>90</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -156,18 +156,24 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1,3">
             <item>
              <widget class="QLabel" name="label_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
-                <width>90</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>90</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -188,19 +194,19 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,3">
             <item>
              <widget class="QLabel" name="label_5">
               <property name="minimumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -219,7 +225,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -236,19 +242,19 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_12">
+           <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,3">
             <item>
              <widget class="QLabel" name="label_6">
               <property name="minimumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -267,7 +273,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -284,19 +290,19 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,3">
             <item>
              <widget class="QLabel" name="label_7">
               <property name="minimumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>90</width>
-                <height>20</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
               <property name="text">
@@ -315,7 +321,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -347,11 +353,6 @@
         </widget>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="performance">
-      <attribute name="title">
-       <string>Performance</string>
-      </attribute>
      </widget>
      <widget class="QWidget" name="performanceGraph">
       <attribute name="title">
@@ -566,11 +567,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="threads">
-      <attribute name="title">
-       <string>Threads</string>
-      </attribute>
-     </widget>
      <widget class="QWidget" name="tcpip">
       <attribute name="title">
        <string>TCP/IP</string>
@@ -580,11 +576,6 @@
         <widget class="QTextEdit" name="tcpipText"/>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="security">
-      <attribute name="title">
-       <string>Security</string>
-      </attribute>
      </widget>
      <widget class="QWidget" name="environment">
       <attribute name="title">
@@ -614,6 +605,69 @@
       <attribute name="title">
        <string>Strings</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Not implemented yet!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="security">
+      <attribute name="title">
+       <string>Security</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Not implemented yet!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="performance">
+      <attribute name="title">
+       <string>Performance</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Not implemented yet!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="threads">
+      <attribute name="title">
+       <string>Threads</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Not implemented yet!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

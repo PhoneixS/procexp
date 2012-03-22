@@ -372,7 +372,7 @@ class procreader(object):
         self.__processList__[process]["cpuUsageKernel"] = cpuUsageKernel
         self.__processList__[process]["prevJiffyKernel"] = nextJiffyKernel
         self.__processList__[process]["PPID"] = int(procStatSplitted[3])
-        self.__processList__[process]["name"] = procStatSplitted[1]
+        self.__processList__[process]["name"] = procStatSplitted[1][1:].replace(")","")
         
         self.__processList__[process]["Rss"] = totalRssMem
         self.__processList__[process]["history"].update(cpuUsage, cpuUsageKernel, totalRssMem, deltaio/1024)

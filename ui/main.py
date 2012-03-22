@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         self.actionKill_process.setText(QtGui.QApplication.translate("MainWindow", "Kill process", None, QtGui.QApplication.UnicodeUTF8))
         self.actionKill_process_tree.setText(QtGui.QApplication.translate("MainWindow", "Kill process tree", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSuspend_process.setText(QtGui.QApplication.translate("MainWindow", "Suspend process", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionProperties.setText(QtGui.QApplication.translate("MainWindow", "Properies", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionProperties.setText(QtGui.QApplication.translate("MainWindow", "Properties", None, QtGui.QApplication.UnicodeUTF8))
         self.actionShow_process_from_all_users.setText(QtGui.QApplication.translate("MainWindow", "Show process from all users", None, QtGui.QApplication.UnicodeUTF8))
         self.action8.setText(QtGui.QApplication.translate("MainWindow", "8", None, QtGui.QApplication.UnicodeUTF8))
         self.action9.setText(QtGui.QApplication.translate("MainWindow", "9", None, QtGui.QApplication.UnicodeUTF8))

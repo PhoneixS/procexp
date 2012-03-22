@@ -19,6 +19,7 @@
 import threading
 import subprocess_new, subprocess
 import time
+import shlex
 
 
 def tcpdumpCmdStr(connList):
@@ -43,7 +44,7 @@ class tcpipstat(threading.Thread):
     self.stop = False
     self.nfBytes = 0
     self.__tcpdump__ = subprocess_new.Popen_events(\
-      [tcpdumpCmdStr(self.__ipportlist__)], shell=True, 
+      shlex.split(tcpdumpCmdStr(self.__ipportlist__)), shell=False, 
       stdout = subprocess.PIPE, onStdOut=self.onStdOutHandler, onStdErr=self.onStdErrHandler)
     
   def onStdOutHandler(self, msg):
