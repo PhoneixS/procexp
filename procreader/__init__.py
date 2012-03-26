@@ -18,4 +18,6 @@
 '''
 processReader
 -------------
+
+Reads from the /proc filesystem.
 '''

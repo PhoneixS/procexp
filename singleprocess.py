@@ -47,9 +47,10 @@ tcpstates = [\
 "TCP_CLOSING"]
 
 class singleProcessDetailsAndHistory(object):
-  def __init__(self, pid, historyDepth):
+  def __init__(self, pid, historyDepth, prefixDir = ""):
+    self._prefixDir = prefixDir
     self.__pid__ = str(pid)
-    self.__pathPrefix__ = "/proc/"+self.__pid__+"/"
+    self.__pathPrefix__ = self._prefixDir+"/proc/"+self.__pid__+"/"
     self.__pwd__ = UNKNOWN
     self.__exepath__ = UNKNOWN
     self.__openFiles__ = {}
@@ -119,7 +120,7 @@ class singleProcessDetailsAndHistory(object):
         procstartedtime_seconds = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[21]
       
       
-        procstat = procutils.readFullFile("/proc/stat").split("\n")
+        procstat = procutils.readFullFile(self._prefixDir+"/proc/stat").split("\n")
         for line in procstat:
           if line.find("btime") != -1:
             systemstarted_seconds = line.split(" ")[1]

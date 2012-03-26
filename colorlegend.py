@@ -15,10 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 import ui.helplegend
 
 def doColorHelpLegend():
+  """Make a color legend window"""
   Dialog = QtGui.QDialog()
   myui = ui.helplegend.Ui_Dialog()
   myui.setupUi(Dialog)

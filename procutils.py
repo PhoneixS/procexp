@@ -19,7 +19,7 @@
 import os
 import signal
 from ctypes import *
-
+import traceback
 
 lib = cdll.LoadLibrary("libc.so.6")
 s = create_string_buffer('\000' * 1024)
@@ -54,29 +54,12 @@ def readFullFileFast(path):
     raise
   
   except:
-    import traceback
     print "Unhandled exception"
     print traceback.format_exc()
     raise
-
-def readFullFileSlow(path):
-  with open(path,"rb") as f:
-    return f.read()
-    f.close()
-    return text
     
 def readFullFile(path):
   return readFullFileFast(path)
-  if False:
-    res_fast = readFullFileFast(path)
-    res_slow = readFullFileSlow(path)
-    
-    if res_fast != res_slow:
-      print "================ DIFF ================", path
-      print res_fast
-      print "--------------------------------------"
-      print res_slow
-    return res_slow
 
 def killProcess(process):
   try:

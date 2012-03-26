@@ -22,18 +22,14 @@
 import time
 import os
 import procutils
-import copy
 import singleprocess
-import binascii
 import subprocess
 
 UNKNOWN = "---"
 
 
-g_passwd = None
-
 class cpuhistoryreader(object):
-  def __init__(self, cpu):
+  def __init__(self, cpu, prefixdir=""):
     self.__cpu__ = cpu
     self.__prevUserMode__ = None
     self.__prevUserNiceMode__ = None
@@ -51,9 +47,14 @@ class cpuhistoryreader(object):
     self.__deltaIrqMode__ = None
     self.__deltaSoftIrqMode__ = None
     self.__newjiffies = None
+    self.__overallUserCpuUsage__    = 0
+    self.__overallSystemCpuUsage__  = 0
+    self.__overallIoWaitCpuUsage__  = 0
+    self.__overallIrqCpuUsage__     = 0
+    self._prefixdir = prefixdir
     
   def update(self):
-    jiffyStr = procutils.readFullFile('/proc/stat').split("\n")[self.__cpu__+1]
+    jiffyStr = procutils.readFullFile(self._prefixdir+'/proc/stat').split("\n")[self.__cpu__+1]
     userMode = int(jiffyStr.split()[1])
     userNiceMode = int(jiffyStr.split()[2])
     systemMode = int(jiffyStr.split()[3])
@@ -127,25 +128,46 @@ class cpuhistoryreader(object):
     return self.__newjiffies
  
 class procreader(object):
-  def __init__(self, timerValue, historyCount):
+  def __init__(self, timerValue, historyCount, prefixDir = ""):
+    self._prefixDir = prefixDir
     self.__initReader__()
     self.__uidFilter__ = None
     self.__updateTimer__ = timerValue
     self.__historyCount__ = historyCount
     self.__allcpu__ = cpuhistoryreader(-1)
-    
-    cpuinfo = procutils.readFullFile("/proc/cpuinfo").split("\n")
+    self.__overallUserCpuUsage__ = 0
+    self.__overallSystemCpuUsage__  = 0
+    self.__processList__ = {}
+    self.__deltaJiffies__ = 0
+    self.__prevJiffies__ = 0    
+    self.__closedProcesses__ = set()
+    self.__newProcesses__ = set()
+    self.__passwdfile = procutils.readFullFile("/etc/passwd").split("\n")
+    self.__allConnections__ = {}
+    cpuinfo = procutils.readFullFile(self._prefixDir+"/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
     self.__networkCards__= {}
     self.__cpuArray__ = []
     self.__prevTimeStamp__ = None
+    self.__allUDP__ = {}
+    self.__totalMemKb   = 0
+    self.__actualMemKb  = 0
+    self.__buffersMemKb = 0
+    self.__cachedMemKb  = 0
+    self.__loadavg__ = 0
+    self.__noofprocs__ = 0
+    self.__noofrunningprocs__ = 0
+    self.__lastpid__ = 0
+    
+    
+    
     for line in cpuinfo:
       if line.startswith("processor"):
         self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__))
         self.__cpuCount__ += 1
     
     #network cards
-    data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
+    data = procutils.readFullFile(self._prefixDir+'/proc/net/dev').split("\n")[2:]
     for line in data:
       cardName = line.split(":")[0].strip()
       if len(cardName) > 0:
@@ -161,19 +183,13 @@ class procreader(object):
       try:
         ethtool = subprocess.Popen(["ethtool", card], stdout=subprocess.PIPE, stderr=subprocess.PIPE )
         data = ethtool.communicate()
-      except:
+      except (OSError, ValueError):
         ethtoolerror = True
       
-      try:
-        if data[0] is not None:
-          for line in data[0].split("\n"):
-            if line.find("Speed") != -1: 
-              speed = int(line.split(":")[1].split("Mb/s")[0])
-      #except subprocess.child_exception:
-      #  print "  For better results, allow rights to ethtool, and/or run as root"        
-      #  speed = None
-      except :
-        speed = None
+      if data[0] is not None:
+        for line in data[0].split("\n"):
+          if line.find("Speed") != -1: 
+            speed = int(line.split(":")[1].split("Mb/s")[0])
       
       if speed is not None:
         print "  ethernet device", card, "has speed", speed, "Mb/s according to ethtool"
@@ -236,13 +252,13 @@ class procreader(object):
     
   def getProcUid(self,proc):
     try:
-      uid = os.stat("/proc/"+proc).st_uid
+      uid = os.stat(self._prefixDir + "/proc/"+proc).st_uid
     except OSError:
       uid = 0
     return uid
     
   def __getAllProcesses__(self):
-    alldirs = os.listdir("/proc")   
+    alldirs = os.listdir(self._prefixDir + "/proc")   
     
     if self.__uidFilter__ != None:
       newProcessSetAll = [ process for process in alldirs if process.isdigit() ]
@@ -276,16 +292,10 @@ class procreader(object):
                                       "history":singleprocess.singleProcessDetailsAndHistory(process,self.__historyCount__)}
 
   def __getUIDName__(self, uid):
-    global g_passwd
-    if g_passwd is None:
-      g_passwd = procutils.readFullFile("/etc/passwd").split("\n")
     name = "???"
-    for line in g_passwd:
-      try:
-        if line.split(":")[2] == uid:
-          name = line.split(":")[0]
-      except:
-        pass
+    for line in self.__passwdfile:
+      if line.split(":")[2] == uid:
+        name = line.split(":")[0]
     return name
     
     
@@ -299,8 +309,8 @@ class procreader(object):
     for process in self.__processList__:
       if self.__processList__[process]["env"] == UNKNOWN:
         try:
-          env = procutils.readFullFile("/proc/"+str(process)+"/environ").split("\0")
-        except:
+          env = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/environ").split("\0")
+        except: #pylint:disable=W0702
           env = '-'
         self.__processList__[process]["env"] = env
       
@@ -308,20 +318,20 @@ class procreader(object):
     for process in self.__processList__:
       procStat = None
       try:
-        procStat = procutils.readFullFile("/proc/"+str(process)+"/stat")
+        procStat = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/stat")
         if self.__processList__[process]["cmdline"] == UNKNOWN:
-          cmdLine = procutils.readFullFile("/proc/"+str(process)+"/cmdline")
+          cmdLine = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/cmdline")
           self.__processList__[process]["cmdline"] = cmdLine.replace("\x00"," ")
 
         #get UID of process
         if self.__processList__[process]["uid"] == UNKNOWN:
-          uid = str(os.stat("/proc/"+str(process))[4])
+          uid = str(os.stat(self._prefixDir + "/proc/"+str(process))[4])
           self.__processList__[process]["uid"] = self.__getUIDName__(uid)        
       except:
-        pass
+        pass #pylint:disable=W0702
       
       try:    
-        statm = procutils.readFullFile("/proc/"+str(process)+"/statm")
+        statm = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/statm")
         totalRssMem = int(statm.split(' ')[1])*4 #in 4k pages
 
         #smaps = procutils.readFullFile("/proc/"+str(process)+"/smaps").split("kB\nRss:")
@@ -330,13 +340,13 @@ class procreader(object):
           #if line.startswith(" "):
             #totalRssMem += int(line.split("kB")[0].strip())
             
-      except:
+      except: #pylint:disable=W0702
         totalRssMem = 0
         
       try:
-        wchan = procutils.readFullFile("/proc/"+str(process)+"/wchan")
+        wchan = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/wchan")
         self.__processList__[process]["wchan"] = wchan
-      except:
+      except: #pylint:disable=W0702
         self.__processList__[process]["wchan"] = UNKNOWN
         
           
@@ -356,9 +366,9 @@ class procreader(object):
           cpuUsageKernel = 0
         #IO accounting
         try:
-          io = procutils.readFullFile("/proc/"+str(process)+"/io").split("\n")
+          io = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/io").split("\n")
           iototal = int(io[0].split(": ")[1]) + int(io[1].split(": ")[1])
-        except:
+        except: #pylint:disable=W0702
           iototal = 0
         
         if self.__processList__[process]["prevIO"] == 0: #first time
@@ -380,7 +390,8 @@ class procreader(object):
       else:
         self.__processList__[process]["PPID"] = 1
         
-  def getIOAccounting():
+  def getIOAccounting(self):
+    """to be implemented in the future"""
     pass
     #~ Description
     #~ -----------
@@ -450,26 +461,26 @@ class procreader(object):
     #~ counters, process A could see an intermediate result.    
   def __getAllSocketInfo__(self):
     self.__allConnections__ = {} #list of connections, organized by inode
-    data = procutils.readFullFile("/proc/net/tcp").split("\n")
+    data = procutils.readFullFile(self._prefixDir + "/proc/net/tcp").split("\n")
     for connection in data:
       if len(connection) > 1:
         self.__allConnections__[connection.split()[9]] = connection.split()
   def __getAllUDPInfo__(self):
     self.__allUDP__ = {} #list of connections, organized by inode
-    data = procutils.readFullFile("/proc/net/udp").split("\n")
+    data = procutils.readFullFile(self._prefixDir + "/proc/net/udp").split("\n")
     for udp in data:
       if len(udp) > 1:
         self.__allUDP__[udp.split()[9]] = udp.split()
 
   def __getMemoryInfo(self):
-    mem = procutils.readFullFile("/proc/meminfo").split("\n")
+    mem = procutils.readFullFile(self._prefixDir + "/proc/meminfo").split("\n")
     self.__totalMemKb   = int(mem[0].split()[1])
     self.__actualMemKb  = int(mem[1].split()[1])
     self.__buffersMemKb = int(mem[2].split()[1])
     self.__cachedMemKb  = int(mem[3].split()[1])
   
   def __getAverageLoad(self):
-    load = procutils.readFullFile("/proc/loadavg").split()
+    load = procutils.readFullFile(self._prefixDir + "/proc/loadavg").split()
     self.__loadavg__ = (load[0],load[1],load[2])
     self.__noofprocs__ = load[3].split("/")[1]
     self.__noofrunningprocs__ = load[3].split("/")[0]
@@ -490,28 +501,28 @@ class procreader(object):
     allFds = {}
     allUDP = {}
     try:
-      __allFds = os.listdir("/proc/" + str(process) + "/fd")
-    except:
+      __allFds = os.listdir(self._prefixDir + "/proc/" + str(process) + "/fd")
+    except OSError:
       __allFds = ""
     for fd in __allFds:
       try:
-        link = os.readlink("/proc/" + str(process) + "/fd/" + fd)
-      except:
+        link = os.readlink(self._prefixDir + "/proc/" + str(process) + "/fd/" + fd)
+      except OSError:
         link = ""
       if link.startswith("socket"):
         inode = link.split("[")[1].split("]")[0]
         try:
           allFds[inode] = self.__allConnections__[inode]
-        except:
+        except KeyError:
           pass
         try:
           allUDP[inode] = self.__allUDP__[inode]
-        except:
+        except KeyError:
           pass
     return allFds, allUDP
     
   def __getNetworkCardUsage(self):
-    data = procutils.readFullFile('/proc/net/dev').split("\n")[2:]
+    data = procutils.readFullFile(self._prefixDir + '/proc/net/dev').split("\n")[2:]
     actTime = time.time()
     for line in data:
       cardName = line.split(":")[0].strip()
@@ -595,3 +606,64 @@ class procreader(object):
   def getLoadAvg(self):
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
 
+
+
+if __name__ == "__main__":
+  print "test the procreader"
+  import unittest
+  import sys
+  import testdata
+  
+  
+    
+  
+  class Test(unittest.TestCase):
+    '''Defines the tests'''
+    
+    def __init__(self, methodName='runTest'):
+      """init"""
+      self._prefixDir = os.tmpnam() + "/"
+      unittest.TestCase.__init__(self, methodName)
+
+    def writeProcEntry(self, path, data):
+      dirName = os.path.dirname(self._prefixDir + "/proc/" + path)
+      
+      try:
+        os.makedirs(dirName)
+      except OSError: #dir exists already
+        pass
+      
+      _ = file(self._prefixDir + "/proc/" + path, "wb").write(data)  
+    
+    def test1(self): #pylint: disable=R0201
+      '''
+      '''
+      reader = procreader(1, 10, prefixDir=self._prefixDir)
+      reader.doReadProcessInfo()
+      
+    def setUp(self):
+      "Create a fake /proc dir with simulation data in /tmp"
+      os.mkdir(self._prefixDir)
+      #process entry for fake proc 10
+      os.mkdir(self._prefixDir + "/10")
+      #process entry for fake proc 10
+      os.mkdir(self._prefixDir + "/20")
+      self.writeProcEntry("cpuinfo", testdata.cpuInfo)
+      self.writeProcEntry("net/dev", testdata.procNetDev)
+      self.writeProcEntry("net/tcp",testdata.procNetTcp)
+
+    def tearDown(self):
+      "deconstructing"
+      
+      
+  def run():
+    '''
+    '''
+    suite = unittest.TestLoader().loadTestsFromTestCase(Test)
+    if unittest.TextTestRunner(stream = sys.stdout, verbosity = 2).run(suite).wasSuccessful():
+      result=0
+    else:
+      result=1
+    return result 
+
+  sys.exit(run())
