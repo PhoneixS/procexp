@@ -278,18 +278,19 @@ class procreader(object):
       del self.__processList__[process]
       
     for process in self.__newProcesses__:
-      self.__processList__[process] = {"name": "", \
-                                      "env": UNKNOWN, \
-                                      "prevJiffy":0, \
-                                      "prevJiffyKernel":0, \
-                                      "prevIO":0, \
-                                      "PPID":None, \
-                                      "cpuUsage":0, \
-                                      "cmdline" : UNKNOWN, \
-                                      "uid":UNKNOWN, \
-                                      "wchan":UNKNOWN, \
-                                      "nfThreads":UNKNOWN, \
-                                      "history":singleprocess.singleProcessDetailsAndHistory(process,self.__historyCount__)}
+      self.__processList__[process] = \
+        {"name": "", \
+        "env": UNKNOWN, \
+        "prevJiffy":0, \
+        "prevJiffyKernel":0, \
+        "prevIO":0, \
+        "PPID":None, \
+        "cpuUsage":0, \
+        "cmdline" : UNKNOWN, \
+        "uid":UNKNOWN, \
+        "wchan":UNKNOWN, \
+        "nfThreads":UNKNOWN, \
+        "history":singleprocess.singleProcessDetailsAndHistory(process,self.__historyCount__, prefixDir=self._prefixDir)}
 
   def __getUIDName__(self, uid):
     name = "???"
@@ -622,8 +623,10 @@ if __name__ == "__main__":
     
     def __init__(self, methodName='runTest'):
       """init"""
-      self._prefixDir = os.tmpnam() + "/"
       unittest.TestCase.__init__(self, methodName)
+      self._prefixDir = os.tmpnam() + "/"
+      print "test dir in: %s" %self._prefixDir
+      
 
     def writeProcEntry(self, path, data):
       dirName = os.path.dirname(self._prefixDir + "/proc/" + path)
@@ -635,11 +638,31 @@ if __name__ == "__main__":
       
       _ = file(self._prefixDir + "/proc/" + path, "wb").write(data)  
     
-    def test1(self): #pylint: disable=R0201
+    def writeProcLink(self, path, destdir):
+      """write a symblic link"""
+      dirName = os.path.dirname(self._prefixDir + "/proc/" + path)
+      
+      try:
+        os.makedirs(dirName)
+      except OSError: #path exists already
+        pass
+            
+      try:
+        os.symlink(destdir, self._prefixDir + "/proc/" + path)
+      except OSError: #symbolic link exists already
+        pass
+      
+    
+    def test_getCpuCount(self): #pylint: disable=R0201
       '''
       '''
-      reader = procreader(1, 10, prefixDir=self._prefixDir)
-      reader.doReadProcessInfo()
+      self._reader.doReadProcessInfo()
+      assert self._reader.getCpuCount() == 1
+      
+    def test_proc10cwd(self):
+      self._reader.doReadProcessInfo()
+      assert self._reader.getcwd(10) == "/tmp"
+      assert self._reader.getcwd(20) == "/usr"
       
     def setUp(self):
       "Create a fake /proc dir with simulation data in /tmp"
@@ -649,8 +672,19 @@ if __name__ == "__main__":
       #process entry for fake proc 10
       os.mkdir(self._prefixDir + "/20")
       self.writeProcEntry("cpuinfo", testdata.cpuInfo)
-      self.writeProcEntry("net/dev", testdata.procNetDev)
-      self.writeProcEntry("net/tcp",testdata.procNetTcp)
+      self.writeProcEntry("net/dev", testdata.procnetdev)
+      self.writeProcEntry("net/tcp", testdata.procNetTcp)
+      self.writeProcEntry("net/udp", testdata.procNetUdp)
+      self.writeProcEntry("meminfo", testdata.memInfo)
+      self.writeProcEntry("loadavg", testdata.loadavg)
+      self.writeProcLink("10/cwd", "/tmp")
+      self.writeProcLink("20/cwd", "/usr")
+      self.writeProcEntry("10/stat", testdata.proc10stat)
+      self.writeProcEntry("20/stat", testdata.proc10stat)
+      
+      self._reader = procreader(1, 10, prefixDir=self._prefixDir)
+      
+      
 
     def tearDown(self):
       "deconstructing"
@@ -659,7 +693,9 @@ if __name__ == "__main__":
   def run():
     '''
     '''
+    print "*********************"
     suite = unittest.TestLoader().loadTestsFromTestCase(Test)
+    print "tested"
     if unittest.TextTestRunner(stream = sys.stdout, verbosity = 2).run(suite).wasSuccessful():
       result=0
     else:
