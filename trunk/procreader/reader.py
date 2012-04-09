@@ -24,12 +24,13 @@ import os
 import procutils
 import singleprocess
 import subprocess
+import shutil
 
 UNKNOWN = "---"
 
 
 class cpuhistoryreader(object):
-  def __init__(self, cpu, prefixdir=""):
+  def __init__(self, cpu, prefixDir=""):
     self.__cpu__ = cpu
     self.__prevUserMode__ = None
     self.__prevUserNiceMode__ = None
@@ -51,7 +52,7 @@ class cpuhistoryreader(object):
     self.__overallSystemCpuUsage__  = 0
     self.__overallIoWaitCpuUsage__  = 0
     self.__overallIrqCpuUsage__     = 0
-    self._prefixdir = prefixdir
+    self._prefixdir = prefixDir
     
   def update(self):
     jiffyStr = procutils.readFullFile(self._prefixdir+'/proc/stat').split("\n")[self.__cpu__+1]
@@ -134,7 +135,7 @@ class procreader(object):
     self.__uidFilter__ = None
     self.__updateTimer__ = timerValue
     self.__historyCount__ = historyCount
-    self.__allcpu__ = cpuhistoryreader(-1)
+    self.__allcpu__ = cpuhistoryreader(-1, prefixDir=prefixDir)
     self.__overallUserCpuUsage__ = 0
     self.__overallSystemCpuUsage__  = 0
     self.__processList__ = {}
@@ -163,7 +164,7 @@ class procreader(object):
     
     for line in cpuinfo:
       if line.startswith("processor"):
-        self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__))
+        self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__, prefixDir=prefixDir))
         self.__cpuCount__ += 1
     
     #network cards
@@ -636,7 +637,7 @@ if __name__ == "__main__":
       except OSError: #dir exists already
         pass
       
-      _ = file(self._prefixDir + "/proc/" + path, "wb").write(data)  
+      _ = file(self._prefixDir + "/proc/" + path, "wb").write(str(data))  
     
     def writeProcLink(self, path, destdir):
       """write a symblic link"""
@@ -667,10 +668,6 @@ if __name__ == "__main__":
     def setUp(self):
       "Create a fake /proc dir with simulation data in /tmp"
       os.mkdir(self._prefixDir)
-      #process entry for fake proc 10
-      os.mkdir(self._prefixDir + "/10")
-      #process entry for fake proc 10
-      os.mkdir(self._prefixDir + "/20")
       self.writeProcEntry("cpuinfo", testdata.cpuInfo)
       self.writeProcEntry("net/dev", testdata.procnetdev)
       self.writeProcEntry("net/tcp", testdata.procNetTcp)
@@ -680,22 +677,85 @@ if __name__ == "__main__":
       self.writeProcLink("10/cwd", "/tmp")
       self.writeProcLink("20/cwd", "/usr")
       self.writeProcEntry("10/stat", testdata.proc10stat)
-      self.writeProcEntry("20/stat", testdata.proc10stat)
-      
+      self.writeProcEntry("20/stat", testdata.proc20stat)
+      self.writeProcEntry("stat", testdata.procstat)
       self._reader = procreader(1, 10, prefixDir=self._prefixDir)
       
       
 
     def tearDown(self):
       "deconstructing"
+      shutil.rmtree(self._prefixDir, True)
+
+    def test_overallUserCpuUsage(self):
+      self.writeProcEntry("stat", testdata.procstat.modify([(1, "0"), (2, "0"), (3, "0"), (4, "0")]))
+      self._reader.doReadProcessInfo()
+      assert self._reader.overallUserCpuUsage() == 0
+      self.writeProcEntry("stat", testdata.procstat.modify([(1, "12"), (2, "1000"), (3, "330"), (4, "4000")]))
+      self._reader.doReadProcessInfo()
+      print self._reader.overallUserCpuUsage()
+      assert self._reader.overallUserCpuUsage() == 18.9
       
+    def test_overallSystemCpuUsage(self):
+      self._reader.doReadProcessInfo()
+    def test_overallIoWaitCpuUsage(self):
+      self._reader.doReadProcessInfo()
+    def test_overallIrqCpuUsage(self):
+      self._reader.doReadProcessInfo()
+    def test_getSingleCpuUsage(self):
+      self._reader.doReadProcessInfo()
+    def test_setFilterUID(self):
+      self._reader.doReadProcessInfo()
+    def test_noFilterUID(self):
+      self._reader.doReadProcessInfo()
+    def test_getProcUid(self):
+      self._reader.doReadProcessInfo()
+    def test_getIOAccounting(self):
+      self._reader.doReadProcessInfo()
+    def test_getNetworkCards(self):
+      self._reader.doReadProcessInfo()
+    def test_getNetworkCardUsage(self):
+      self._reader.doReadProcessInfo()
+    def test_getNetworkCardData(self):
+      self._reader.doReadProcessInfo()
+    def test_getAllProcessSockets(self):
+      self._reader.doReadProcessInfo()
+    def test_doReadProcessInfo(self):
+      self._reader.doReadProcessInfo()
+    def test_getProcessInfo(self):
+      self._reader.doReadProcessInfo()
+    def test_hasProcess(self):
+      self._reader.doReadProcessInfo()
+    def test_getProcessCpuUsageHistory(self):
+      self._reader.doReadProcessInfo()
+    def test_getcwd(self):
+      self._reader.doReadProcessInfo()
+    def test_getexe(self):
+      self._reader.doReadProcessInfo()
+    def test_getstartedtime(self):
+      self._reader.doReadProcessInfo()
+    def test_getcmdline(self):
+      self._reader.doReadProcessInfo()
+    def test_getppid(self):
+      self._reader.doReadProcessInfo()
+    def test_getProcessCpuUsageKernelHistory(self):
+      self._reader.doReadProcessInfo()
+    def test_getProcessRssUsageHistory(self):
+      self._reader.doReadProcessInfo()
+    def test_getIOHistory(self):
+      self._reader.doReadProcessInfo()
+    def test_getEnvironment(self):
+      self._reader.doReadProcessInfo()
+    def test_getHistoryDepth(self):
+      self._reader.doReadProcessInfo()
+    def test_getMemoryUsage(self):
+      self._reader.doReadProcessInfo()
+    def test_getLoadAvg(self):
+      self._reader.doReadProcessInfo()      
       
   def run():
-    '''
-    '''
-    print "*********************"
+    '''test the reader object'''
     suite = unittest.TestLoader().loadTestsFromTestCase(Test)
-    print "tested"
     if unittest.TextTestRunner(stream = sys.stdout, verbosity = 2).run(suite).wasSuccessful():
       result=0
     else:
@@ -703,3 +763,5 @@ if __name__ == "__main__":
     return result 
 
   sys.exit(run())
+
+
