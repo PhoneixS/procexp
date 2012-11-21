@@ -22,6 +22,7 @@
 
 import procreader.reader
 import ui.main
+import logui 
 import procutils
 import os
 import singleprocess
@@ -36,6 +37,7 @@ import PyQt4.Qwt5 as Qwt
 import cpuaffinity
 import sys
 import signal
+
 
 timer = None
 reader = None
@@ -63,6 +65,7 @@ MainWindow = None
 firstUpdate = True
 
 procList = {}
+
 
 #default settings
 settings = {}
@@ -127,10 +130,11 @@ def performMenuAction(action):
   elif action is mainUi.actionColor_legend:
     colorlegend.doColorHelpLegend()
   elif action is mainUi.actionSet_affinity:
-    print "aff"
     cpuaffinity.doAffinity()
+  elif action is mainUi.actionLog:
+    logui.doLogWindow()
   else:
-    print action, "This action is not yet supported."
+    procutils.log("This action (%s)is not yet supported." %action)
 
 def setFontSize(fontSize):
   global settings
@@ -410,8 +414,6 @@ def updateUI():
     for proc in closedProc:
       del treeProcesses[proc]
 
-
-
     #color all new processes 'green'
     if firstUpdate == False:
       for proc in greenTopLevelItems:
@@ -472,12 +474,15 @@ def updateUI():
     curveIoWaitHist.setData(range(int(settings["historySampleCount"])), cpuUsageIoWaitHistory)
     curveIrqHist.setData(range(int(settings["historySampleCount"])), cpuUsageIrqHistory)
     mainUi.qwtPlotOverallCpuHist.replot()
+
+    logui.update()
   except:
     import traceback
-    print "unhandled exception:"
+    procutils.log("Unhandled exception:%s" %traceback.format_exc())
     print traceback.format_exc()
   
   firstUpdate = False
+  i=2/0
   
 app = QtGui.QApplication(sys.argv)
 app.setStyle("Windows")
