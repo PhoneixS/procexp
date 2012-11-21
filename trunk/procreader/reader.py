@@ -175,8 +175,8 @@ class procreader(object):
         self.__networkCards__[cardName] = {"actual":[0, 0, 0, 0],  #in/s out/s previn, prevout]
                                            "speed":None}
     #try to find speeds if ethtool is available and accessible
-    print "network card speed detection results"
-    print "------------------------------------"
+    procutils.log("network card speed detection results")
+    procutils.log("------------------------------------")
     
     ethtoolerror = False
     for card in self.__networkCards__:
@@ -193,13 +193,13 @@ class procreader(object):
             speed = int(line.split(":")[1].split("Mb/s")[0])
       
       if speed is not None:
-        print "  ethernet device", card, "has speed", speed, "Mb/s according to ethtool"
+        procutils.log("  ethernet device %s has speed %s Mb/s according to ethtool" %(card, speed))
         self.__networkCards__[card]["speed"] = speed
       else:
-        print "  ethernet device", card, "has unknown speed"
-        print "  network graph scaling for", card, "is set to autoscale"
+        procutils.log("  ethernet device %s has unknown speed" %card)
+        procutils.log("  network graph scaling for %s is set to autoscale" %card)
     if ethtoolerror:
-      print "  ** ethtool not found, or access denied. For better results, allow access to ethtool"
+      procutils.log("  ** ethtool not found, or access denied. For better results, allow access to ethtool")
 
   def __initReader__(self):
     self.__processList__ = {}
@@ -607,161 +607,4 @@ class procreader(object):
     return self.__totalMemKb, self.__actualMemKb, self.__buffersMemKb, self.__cachedMemKb
   def getLoadAvg(self):
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
-
-
-
-if __name__ == "__main__":
-  print "test the procreader"
-  import unittest
-  import sys
-  import testdata
-  
-  
-    
-  
-  class Test(unittest.TestCase):
-    '''Defines the tests'''
-    
-    def __init__(self, methodName='runTest'):
-      """init"""
-      unittest.TestCase.__init__(self, methodName)
-      self._prefixDir = os.tmpnam() + "/"
-      print "test dir in: %s" %self._prefixDir
-      
-
-    def writeProcEntry(self, path, data):
-      dirName = os.path.dirname(self._prefixDir + "/proc/" + path)
-      
-      try:
-        os.makedirs(dirName)
-      except OSError: #dir exists already
-        pass
-      
-      _ = file(self._prefixDir + "/proc/" + path, "wb").write(str(data))  
-    
-    def writeProcLink(self, path, destdir):
-      """write a symblic link"""
-      dirName = os.path.dirname(self._prefixDir + "/proc/" + path)
-      
-      try:
-        os.makedirs(dirName)
-      except OSError: #path exists already
-        pass
-            
-      try:
-        os.symlink(destdir, self._prefixDir + "/proc/" + path)
-      except OSError: #symbolic link exists already
-        pass
-      
-    
-    def test_getCpuCount(self): #pylint: disable=R0201
-      '''
-      '''
-      self._reader.doReadProcessInfo()
-      assert self._reader.getCpuCount() == 1
-      
-    def test_proc10cwd(self):
-      self._reader.doReadProcessInfo()
-      assert self._reader.getcwd(10) == "/tmp"
-      assert self._reader.getcwd(20) == "/usr"
-      
-    def setUp(self):
-      "Create a fake /proc dir with simulation data in /tmp"
-      os.mkdir(self._prefixDir)
-      self.writeProcEntry("cpuinfo", testdata.cpuInfo)
-      self.writeProcEntry("net/dev", testdata.procnetdev)
-      self.writeProcEntry("net/tcp", testdata.procNetTcp)
-      self.writeProcEntry("net/udp", testdata.procNetUdp)
-      self.writeProcEntry("meminfo", testdata.memInfo)
-      self.writeProcEntry("loadavg", testdata.loadavg)
-      self.writeProcLink("10/cwd", "/tmp")
-      self.writeProcLink("20/cwd", "/usr")
-      self.writeProcEntry("10/stat", testdata.proc10stat)
-      self.writeProcEntry("20/stat", testdata.proc20stat)
-      self.writeProcEntry("stat", testdata.procstat)
-      self._reader = procreader(1, 10, prefixDir=self._prefixDir)
-      
-      
-
-    def tearDown(self):
-      "deconstructing"
-      shutil.rmtree(self._prefixDir, True)
-
-    def test_overallUserCpuUsage(self):
-      self.writeProcEntry("stat", testdata.procstat.modify([(1, "0"), (2, "0"), (3, "0"), (4, "0")]))
-      self._reader.doReadProcessInfo()
-      assert self._reader.overallUserCpuUsage() == 0
-      self.writeProcEntry("stat", testdata.procstat.modify([(1, "12"), (2, "1000"), (3, "330"), (4, "4000")]))
-      self._reader.doReadProcessInfo()
-      print self._reader.overallUserCpuUsage()
-      assert self._reader.overallUserCpuUsage() == 18.9
-      
-    def test_overallSystemCpuUsage(self):
-      self._reader.doReadProcessInfo()
-    def test_overallIoWaitCpuUsage(self):
-      self._reader.doReadProcessInfo()
-    def test_overallIrqCpuUsage(self):
-      self._reader.doReadProcessInfo()
-    def test_getSingleCpuUsage(self):
-      self._reader.doReadProcessInfo()
-    def test_setFilterUID(self):
-      self._reader.doReadProcessInfo()
-    def test_noFilterUID(self):
-      self._reader.doReadProcessInfo()
-    def test_getProcUid(self):
-      self._reader.doReadProcessInfo()
-    def test_getIOAccounting(self):
-      self._reader.doReadProcessInfo()
-    def test_getNetworkCards(self):
-      self._reader.doReadProcessInfo()
-    def test_getNetworkCardUsage(self):
-      self._reader.doReadProcessInfo()
-    def test_getNetworkCardData(self):
-      self._reader.doReadProcessInfo()
-    def test_getAllProcessSockets(self):
-      self._reader.doReadProcessInfo()
-    def test_doReadProcessInfo(self):
-      self._reader.doReadProcessInfo()
-    def test_getProcessInfo(self):
-      self._reader.doReadProcessInfo()
-    def test_hasProcess(self):
-      self._reader.doReadProcessInfo()
-    def test_getProcessCpuUsageHistory(self):
-      self._reader.doReadProcessInfo()
-    def test_getcwd(self):
-      self._reader.doReadProcessInfo()
-    def test_getexe(self):
-      self._reader.doReadProcessInfo()
-    def test_getstartedtime(self):
-      self._reader.doReadProcessInfo()
-    def test_getcmdline(self):
-      self._reader.doReadProcessInfo()
-    def test_getppid(self):
-      self._reader.doReadProcessInfo()
-    def test_getProcessCpuUsageKernelHistory(self):
-      self._reader.doReadProcessInfo()
-    def test_getProcessRssUsageHistory(self):
-      self._reader.doReadProcessInfo()
-    def test_getIOHistory(self):
-      self._reader.doReadProcessInfo()
-    def test_getEnvironment(self):
-      self._reader.doReadProcessInfo()
-    def test_getHistoryDepth(self):
-      self._reader.doReadProcessInfo()
-    def test_getMemoryUsage(self):
-      self._reader.doReadProcessInfo()
-    def test_getLoadAvg(self):
-      self._reader.doReadProcessInfo()      
-      
-  def run():
-    '''test the reader object'''
-    suite = unittest.TestLoader().loadTestsFromTestCase(Test)
-    if unittest.TextTestRunner(stream = sys.stdout, verbosity = 2).run(suite).wasSuccessful():
-      result=0
-    else:
-      result=1
-    return result 
-
-  sys.exit(run())
-
 
