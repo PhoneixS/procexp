@@ -20,6 +20,38 @@ import os
 import signal
 from ctypes import *
 import traceback
+import Queue
+logQueue = Queue.Queue()
+import sys
+import PyQt4.QtGui
+
+
+def logUnhandledException(exc_type, exc_value, exc_traceback):
+  """log an unhandled exception"""
+
+  filename, line, dummy, dummy = \
+    traceback.extract_tb(exc_traceback).pop()
+  filename = os.path.basename(filename)
+  error = "%s: %s" % (str(exc_type).split(".")[-1], exc_value)
+  msg = error + " on line %d, file %s" % (line, filename) 
+  errorbox = PyQt4.QtGui.QMessageBox()
+  errorbox.setText("Unhandled exception:\n"+msg)
+  errorbox.exec_()
+  file("/tmp/procexp.log","ab").write(msg+"\n")
+  
+sys.excepthook = logUnhandledException
+
+def log(msg):
+  """put a log message into the queue"""
+  logQueue.put(msg)
+
+def getLog():
+  #get almost all logs
+  ret_s = ""
+  while not logQueue.empty():
+    ret_s += logQueue.get(block=False) + "\n"
+  return ret_s
+
 
 lib = cdll.LoadLibrary("libc.so.6")
 s = create_string_buffer('\000' * 1024)
@@ -54,8 +86,7 @@ def readFullFileFast(path):
     raise
   
   except:
-    print "Unhandled exception"
-    print traceback.format_exc()
+    log("Unhandled exception: %s" % traceback.format_exc())
     raise
     
 def readFullFile(path):
