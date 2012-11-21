@@ -482,7 +482,6 @@ def updateUI():
     print traceback.format_exc()
   
   firstUpdate = False
-  i=2/0
   
 app = QtGui.QApplication(sys.argv)
 app.setStyle("Windows")
