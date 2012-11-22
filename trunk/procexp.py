@@ -22,7 +22,8 @@
 
 import procreader.reader
 import ui.main
-import logui 
+import logui
+import aboutui 
 import procutils
 import os
 import singleprocess
@@ -135,6 +136,8 @@ def performMenuAction(action):
     cpuaffinity.doAffinity()
   elif action is mainUi.actionLog:
     logui.doLogWindow()
+  elif action is mainUi.actionAbout:
+    aboutui.doAboutWindow()
   else:
     procutils.log("This action (%s)is not yet supported." %action)
 
