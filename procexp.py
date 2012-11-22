@@ -127,6 +127,8 @@ def performMenuAction(action):
     for window in singleProcessUiList:
       singleProcessUiList[window].closeWindow()
     MainWindow.close()
+    if logui.dialog is not None:
+      logui.dialog.close()
   elif action is mainUi.actionColor_legend:
     colorlegend.doColorHelpLegend()
   elif action is mainUi.actionSet_affinity:
@@ -402,14 +404,18 @@ def updateUI():
         redTopLevelItems[proc].setBackgroundColor(column, QtGui.QColor(255,0,0))
     
     #update status information about the processes  
-    for proc in procList:   
-      treeProcesses[proc].setData(0, 0, procList[proc]["name"])
-      treeProcesses[proc].setData(1, 0, str(proc))
-      treeProcesses[proc].setData(2, 0, procList[proc]["cpuUsage"])
-      treeProcesses[proc].setData(3, 0, procList[proc]["cmdline"])
-      treeProcesses[proc].setData(4, 0, procList[proc]["uid"])
-      treeProcesses[proc].setData(5, 0, procList[proc]["wchan"])
-      treeProcesses[proc].setData(6, 0, procList[proc]["nfThreads"])
+    try:
+      for proc in procList:   
+        treeProcesses[proc].setData(0, 0, procList[proc]["name"])
+        treeProcesses[proc].setData(1, 0, str(proc))
+        treeProcesses[proc].setData(2, 0, procList[proc]["cpuUsage"])
+        treeProcesses[proc].setData(3, 0, procList[proc]["cmdline"])
+        treeProcesses[proc].setData(4, 0, procList[proc]["uid"])
+        treeProcesses[proc].setData(5, 0, procList[proc]["wchan"])
+        treeProcesses[proc].setData(6, 0, procList[proc]["nfThreads"])
+    except RuntimeError:
+      #underlying c++ object has been deleted
+      pass
 
     for proc in closedProc:
       del treeProcesses[proc]

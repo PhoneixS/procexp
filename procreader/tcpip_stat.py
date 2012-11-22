@@ -18,12 +18,11 @@
 
 import threading
 import subprocess_new, subprocess
-import time
 import shlex
 import procutils
 
-
 def tcpdumpCmdStr(connList):
+  """generate correct command line parameters for tcpdump"""
   totalcmd = ""
   for connection in connList:
     srcaddr, srcport = connection[0]
@@ -37,8 +36,8 @@ def tcpdumpCmdStr(connList):
         totalcmd += " or " + cmd
   return "tcpdump -U -l -q -nn -i any " + totalcmd
 
-
 class tcpipstat(threading.Thread):
+  """This class can read tcp ip statistics"""
   def __init__(self, ip_portlist):
     threading.Thread.__init__(self)
     self.__ipportlist__ = ip_portlist
@@ -60,6 +59,7 @@ class tcpipstat(threading.Thread):
     procutils.log(msg)
     
   def doStop(self):
+    """stop the tcpip stats"""
     self.stop = True
     try:
       self.__tcpdump__.terminate()
@@ -68,10 +68,10 @@ class tcpipstat(threading.Thread):
       pass
     
   def run(self):
+    """run"""
     try:
       while self.stop == False:
-        s = self.__tcpdump__.communicate()
-        print s
+        _ = self.__tcpdump__.communicate()
     except:
       procutils.log("Could NOT get data from tcpdump. TCPIP bytes view is not working.")
       procutils.log("tcpdump must be accessible, and you need sufficient rights for using tcpdump.")
