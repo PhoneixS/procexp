@@ -78,23 +78,19 @@ class Popen_events(subprocess.Popen):
 
           if self.stdout in rlist:
               data = self.stdout.readline()
-              #data = os.read(self.stdout.fileno(), 1024)
               if data == "":
                   self.stdout.close()
                   read_set.remove(self.stdout)
               if self.__onStdOut != None:
                 self.__onStdOut(data)
-              #stdout.append(data)
 
           if self.stderr in rlist:
-              data = self.stdout.readline()
-              #data = os.read(self.stderr.fileno(), 1024)
+              data = self.stderr.readline()
               if data == "":
                   self.stderr.close()
                   read_set.remove(self.stderr)
               if self.__onStdErr != None:
                 self.__onStdErr(data)
-              #stderr.append(data)
 
       # All data exchanged.  Translate lists into strings.
       if stdout is not None:

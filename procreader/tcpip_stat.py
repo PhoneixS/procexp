@@ -20,6 +20,7 @@ import threading
 import subprocess_new, subprocess
 import time
 import shlex
+import procutils
 
 
 def tcpdumpCmdStr(connList):
@@ -45,26 +46,35 @@ class tcpipstat(threading.Thread):
     self.nfBytes = 0
     self.__tcpdump__ = subprocess_new.Popen_events(\
       shlex.split(tcpdumpCmdStr(self.__ipportlist__)), shell=False, 
-      stdout = subprocess.PIPE, onStdOut=self.onStdOutHandler, onStdErr=self.onStdErrHandler)
+      stdout = subprocess.PIPE, stderr=subprocess.PIPE, onStdOut=self.onStdOutHandler, onStdErr=self.onStdErrHandler)
     
   def onStdOutHandler(self, msg):
+    """stdout handler"""
     try:
       self.nfBytes += int(msg.split()[6])
     except IndexError:
       pass
+  
   def onStdErrHandler(self, msg):
-    pass
+    """log messages from stderr"""
+    procutils.log(msg)
     
   def doStop(self):
     self.stop = True
-    self.__tcpdump__.terminate()
+    try:
+      self.__tcpdump__.terminate()
+    except OSError:
+      #could be already killed, ignore it
+      pass
     
   def run(self):
     try:
       while self.stop == False:
         s = self.__tcpdump__.communicate()
+        print s
     except:
-      print "Could NOT get data from tcpdump." 
-      print "tcpdump must be accessible, and you need sufficient rights for using tcpdump"
+      procutils.log("Could NOT get data from tcpdump. TCPIP bytes view is not working.")
+      procutils.log("tcpdump must be accessible, and you need sufficient rights for using tcpdump.")
+      procutils.log("For better results, run process explorer for Linux as root.")
       
 
