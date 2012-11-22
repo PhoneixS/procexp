@@ -658,14 +658,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Not implemented yet!</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
+        <widget class="QTextEdit" name="threadTextEdit"/>
        </item>
       </layout>
      </widget>
