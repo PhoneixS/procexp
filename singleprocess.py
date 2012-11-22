@@ -63,11 +63,23 @@ class singleProcessDetailsAndHistory(object):
     self.cmdline = None
     self.startedtime = None
     self.ppid = None
+    self.threads = {}
+
   def __getOpenFileNames__(self):
     alldirs = os.listdir(self.__pathPrefix__ + "fd")
     self.__openFiles__ = {}
-    for dir in alldirs:
-      self.__openFiles__[dir] = {"path":os.readlink(self.__pathPrefix__ + dir)}
+    for thedir in alldirs:
+      self.__openFiles__[thedir] = {"path":os.readlink(self.__pathPrefix__ + dir)}
+  
+  def _getThreadsInfo__(self):
+    alldirs = os.listdir(self.__pathPrefix__ + "task/")
+    self.threads = {}
+    for t in alldirs:
+      wchan = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/wchan")
+      sched = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/sched")
+      wakeupcount = int(sched.split("\n")[23].split(":")[1]) #23 is wakeupcount 
+      self.threads[t] = [wchan, "wakeups %s" %wakeupcount]
+    
   def update(self, cpuUsage, cpuUsageKernel, totalRss, IO):
     if cpuUsage > 100:
       cpuUsage = 0
@@ -142,6 +154,9 @@ class singleProcessDetailsAndHistory(object):
         self.ppid = procutils.readFullFile(self.__pathPrefix__ + "stat").split(" ")[3]
       except procutils.FileError:
         self.ppid = None
+        
+    #all threads
+    self._getThreadsInfo__()
       
       
 class singleUi(object):
@@ -215,7 +230,7 @@ class singleUi(object):
     self.__curveRssHistExt__.setPen(QtGui.QPen(QtGui.QColor(248,248,0)))
     self.__curveRssHistExt__.attach(self.__procDetails__.qwtPlotRssHist)
     
-    #self.__procDetails__.qwtPlotRssHist.setAxisScale(0,0,100,10)
+    #self.__procDetails__.qwtPlotRssHgetThreist.setAxisScale(0,0,100,10)
     self.__RssPlotGrid__ = Qwt.QwtPlotGrid()
     self.__RssPlotGrid__.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
     self.__RssPlotGrid__.setMinPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
@@ -450,4 +465,12 @@ class singleUi(object):
             
           except:
             self.__lddoutput__  = "--"
+        
+        #thread ID's
+        
+        text = ""
+        threadsInfo = self.__reader__.getThreads(self.__proc__)
+        for t in threadsInfo:
+          text += str(t)+" "+ str(threadsInfo[t]) + "\n"
+        self.__procDetails__.threadTextEdit.setText(text)
    

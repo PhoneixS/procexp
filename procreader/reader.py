@@ -607,4 +607,6 @@ class procreader(object):
     return self.__totalMemKb, self.__actualMemKb, self.__buffersMemKb, self.__cachedMemKb
   def getLoadAvg(self):
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
+  def getThreads(self, process):
+    return self.__processList__[int(process)]["history"].threads
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Thu Mar 22 09:11:17 2012
+# Created: Thu Nov 22 02:02:38 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -205,7 +205,7 @@ class Ui_Dialog(object):
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
         self.horizontalLayout_5 = QtGui.QHBoxLayout(self.groupBox_2)
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
-        self.qwtPlotCpuHist = Qwt5.QwtPlot(self.groupBox_2)
+        self.qwtPlotCpuHist = QwtPlot(self.groupBox_2)
         self.qwtPlotCpuHist.setObjectName(_fromUtf8("qwtPlotCpuHist"))
         self.horizontalLayout_5.addWidget(self.qwtPlotCpuHist)
         self.gridLayout_2.addWidget(self.groupBox_2, 0, 1, 1, 1)
@@ -231,7 +231,7 @@ class Ui_Dialog(object):
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout(self.groupBox)
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
-        self.qwtPlotRssHist = Qwt5.QwtPlot(self.groupBox)
+        self.qwtPlotRssHist = QwtPlot(self.groupBox)
         self.qwtPlotRssHist.setObjectName(_fromUtf8("qwtPlotRssHist"))
         self.horizontalLayout_4.addWidget(self.qwtPlotRssHist)
         self.gridLayout_2.addWidget(self.groupBox, 1, 1, 1, 1)
@@ -257,7 +257,7 @@ class Ui_Dialog(object):
         self.IO.setObjectName(_fromUtf8("IO"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(self.IO)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.qwtPlotIoHist = Qwt5.QwtPlot(self.IO)
+        self.qwtPlotIoHist = QwtPlot(self.IO)
         self.qwtPlotIoHist.setObjectName(_fromUtf8("qwtPlotIoHist"))
         self.horizontalLayout_2.addWidget(self.qwtPlotIoHist)
         self.gridLayout_2.addWidget(self.IO, 2, 1, 1, 1)
@@ -283,7 +283,7 @@ class Ui_Dialog(object):
         self.IO_2.setObjectName(_fromUtf8("IO_2"))
         self.horizontalLayout_7 = QtGui.QHBoxLayout(self.IO_2)
         self.horizontalLayout_7.setObjectName(_fromUtf8("horizontalLayout_7"))
-        self.qwtPlotTcpipHist = Qwt5.QwtPlot(self.IO_2)
+        self.qwtPlotTcpipHist = QwtPlot(self.IO_2)
         self.qwtPlotTcpipHist.setObjectName(_fromUtf8("qwtPlotTcpipHist"))
         self.horizontalLayout_7.addWidget(self.qwtPlotTcpipHist)
         self.gridLayout_2.addWidget(self.IO_2, 3, 1, 1, 1)
@@ -348,11 +348,9 @@ class Ui_Dialog(object):
         self.threads.setObjectName(_fromUtf8("threads"))
         self.verticalLayout_9 = QtGui.QVBoxLayout(self.threads)
         self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
-        self.label_9 = QtGui.QLabel(self.threads)
-        self.label_9.setText(QtGui.QApplication.translate("Dialog", "Not implemented yet!", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_9.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_9.setObjectName(_fromUtf8("label_9"))
-        self.verticalLayout_9.addWidget(self.label_9)
+        self.threadTextEdit = QtGui.QTextEdit(self.threads)
+        self.threadTextEdit.setObjectName(_fromUtf8("threadTextEdit"))
+        self.verticalLayout_9.addWidget(self.threadTextEdit)
         self.tabWidget.addTab(self.threads, _fromUtf8(""))
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
 
@@ -370,7 +368,7 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.performance), QtGui.QApplication.translate("Dialog", "Performance", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.threads), QtGui.QApplication.translate("Dialog", "Threads", None, QtGui.QApplication.UnicodeUTF8))
 
-from PyQt4 import Qwt5
+from PyQt4.Qwt5 import QwtPlot
 
 if __name__ == "__main__":
     import sys
