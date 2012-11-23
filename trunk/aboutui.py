@@ -21,7 +21,7 @@ import os
 
 def doAboutWindow():
   """Make a log window"""
-  icon = os.path.dirname(__file__) + "/icon.png"
+  icon = os.path.dirname(__file__) + "/ui/icon.png"
   dialog = QtGui.QDialog()
   about = ui.about.Ui_Dialog()
   about.setupUi(dialog)
