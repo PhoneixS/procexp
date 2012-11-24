@@ -53,6 +53,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>freeze</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QwtPlot" name="qwtPlotOverallCpuHist">
          <property name="minimumSize">
           <size>
@@ -95,7 +102,7 @@
      <x>0</x>
      <y>0</y>
      <width>518</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
