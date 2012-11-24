@@ -84,11 +84,17 @@ def performMenuAction(action):
   global systemOverviewUi
   global networkOverviewUi
   if action is mainUi.actionKill_process:
-    selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+    try:
+      selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+    except IndexError:
+      return
     process = selectedItem.data(1,0).toString()
     procutils.killProcessHard(process)
   elif action is mainUi.actionKill_process_tree:
-    selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+    try:
+      selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+    except IndexError:
+      return
     process = selectedItem.data(1,0).toString()
     killProcessTree(process, procList)
   elif action is mainUi.actionShow_process_from_all_users:
@@ -101,12 +107,16 @@ def performMenuAction(action):
       clearTree()
       onlyUser = True
   elif action is mainUi.actionProperties:
-    selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+    try:
+      selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+    except IndexError:
+      return
     process = str(selectedItem.data(1,0).toString())
     if singleProcessUiList.has_key(process):
       singleProcessUiList[process].makeVisible()
     else:
-      singleProcessUiList[process] = singleprocess.singleUi(process, procList[int(process)]["cmdline"], procList[int(process)]["name"], reader, int(settings["historySampleCount"]))
+      if procList.has_key(int(process)):
+        singleProcessUiList[process] = singleprocess.singleUi(process, procList[int(process)]["cmdline"], procList[int(process)]["name"], reader, int(settings["historySampleCount"]))
   elif action is mainUi.actionSaveSettings:
     saveSettings()
   elif action is mainUi.actionSettings:
@@ -133,7 +143,12 @@ def performMenuAction(action):
   elif action is mainUi.actionColor_legend:
     colorlegend.doColorHelpLegend()
   elif action is mainUi.actionSet_affinity:
-    cpuaffinity.doAffinity()
+    try:
+      selectedItem = mainUi.processTreeWidget.selectedItems()[0]
+      process = str(selectedItem.data(1,0).toString())
+    except IndexError:
+      return
+    cpuaffinity.doAffinity(reader.getCpuCount(), process)
   elif action is mainUi.actionLog:
     logui.doLogWindow()
   elif action is mainUi.actionAbout:
@@ -359,9 +374,13 @@ def updateUI():
     global treeProcesses, greenTopLevelItems, redTopLevelItems
     global mainUi
     global firstUpdate
+    
+    if mainUi.freezeCheckBox.isChecked():
+      return
+    
     reader.doReadProcessInfo()
     procList, closedProc, newProc = reader.getProcessInfo()
-    
+
     #color all green processes with default background
     defaultBgColor = app.palette().color(QtGui.QPalette.Base)  
     for proc in greenTopLevelItems:

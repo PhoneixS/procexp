@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
+    <width>358</width>
     <height>320</height>
    </rect>
   </property>
@@ -28,7 +28,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QCheckBox" name="checkBox_0">
             <property name="text">
              <string>CPU0</string>
             </property>

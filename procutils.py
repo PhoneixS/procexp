@@ -18,13 +18,19 @@
 
 import os
 import signal
-from ctypes import *
+import ctypes
 import traceback
 import Queue
 logQueue = Queue.Queue()
 import sys
 import PyQt4.QtGui
 
+
+def message(msg):
+  errorbox = PyQt4.QtGui.QMessageBox()
+  errorbox.setText(msg)
+  errorbox.exec_()
+  
 
 def logUnhandledException(exc_type, exc_value, exc_traceback):
   """log an unhandled exception"""
@@ -53,8 +59,8 @@ def getLog():
   return ret_s
 
 
-lib = cdll.LoadLibrary("libc.so.6")
-s = create_string_buffer('\000' * 1024)
+lib = ctypes.cdll.LoadLibrary("libc.so.6")
+s = ctypes.create_string_buffer('\000' * 1024)
 
 class FileError(Exception):
   pass

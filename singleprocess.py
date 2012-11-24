@@ -72,16 +72,19 @@ class singleProcessDetailsAndHistory(object):
       self.__openFiles__[thedir] = {"path":os.readlink(self.__pathPrefix__ + dir)}
   
   def _getThreadsInfo__(self):
-    alldirs = os.listdir(self.__pathPrefix__ + "task/")
     self.threads = {}
-    for t in alldirs:
-      try:
-        wchan = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/wchan")
-        sched = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/sched")
-        wakeupcount = int(sched.split("\n")[23].split(":")[1]) #23 is wakeupcount 
-        self.threads[t] = [wchan, "wakeups %s" %wakeupcount]
-      except:
-        pass
+    try:
+      alldirs = os.listdir(self.__pathPrefix__ + "task/")
+      for t in alldirs:
+        try:
+          wchan = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/wchan")
+          sched = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/sched")
+          wakeupcount = int(sched.split("\n")[23].split(":")[1]) #23 is wakeupcount 
+          self.threads[t] = [wchan, "wakeups %s" %wakeupcount]
+        except:
+          pass
+    except OSError:
+      pass
     
   def update(self, cpuUsage, cpuUsageKernel, totalRss, IO):
     if cpuUsage > 100:

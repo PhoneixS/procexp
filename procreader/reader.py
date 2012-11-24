@@ -294,11 +294,15 @@ class procreader(object):
         "history":singleprocess.singleProcessDetailsAndHistory(process,self.__historyCount__, prefixDir=self._prefixDir)}
 
   def __getUIDName__(self, uid):
-    name = "???"
+    """get the users realname from the password file"""
     for line in self.__passwdfile:
-      if line.split(":")[2] == uid:
-        name = line.split(":")[0]
-    return name
+      try:
+        if line.split(":")[2] == uid:
+          name = line.split(":")[0]
+          return name
+      except IndexError:
+        pass
+    return "???"
     
     
   def __removeUnknownParents__(self):#useful when filtered on UID

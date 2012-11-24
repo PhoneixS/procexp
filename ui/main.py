@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Wed Nov 21 19:58:20 2012
+# Created: Fri Nov 23 14:59:12 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,7 +35,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.qwtPlotOverallCpuHist = Qwt5.QwtPlot(self.frame)
+        self.freezeCheckBox = QtGui.QCheckBox(self.frame)
+        self.freezeCheckBox.setText(QtGui.QApplication.translate("MainWindow", "freeze", None, QtGui.QApplication.UnicodeUTF8))
+        self.freezeCheckBox.setObjectName(_fromUtf8("freezeCheckBox"))
+        self.horizontalLayout.addWidget(self.freezeCheckBox)
+        self.qwtPlotOverallCpuHist = QwtPlot(self.frame)
         self.qwtPlotOverallCpuHist.setMinimumSize(QtCore.QSize(150, 0))
         self.qwtPlotOverallCpuHist.setMaximumSize(QtCore.QSize(150, 50))
         self.qwtPlotOverallCpuHist.setObjectName(_fromUtf8("qwtPlotOverallCpuHist"))
@@ -50,7 +54,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.processTreeWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 518, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 518, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
@@ -197,7 +201,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         pass
 
-from PyQt4 import Qwt5
+from PyQt4.Qwt5 import QwtPlot
 
 if __name__ == "__main__":
     import sys
