@@ -46,7 +46,9 @@ def doAffinity(cpuCount, process):
           newAff = newAff | 2**cpu
 
   if affinity != newAff:
-    result = subprocess.Popen(["taskset", "-p", hex(newAff).replace("0x",""), str(process)], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    proc = subprocess.Popen(["taskset", "-p", hex(newAff).replace("0x",""), str(process)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
+    result = proc.returncode
     if result != 0:
       procutils.message("Setting process %s affinity value to %s failed" %(process, hex(newAff).replace("0x","")))
   
