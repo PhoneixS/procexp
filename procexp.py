@@ -34,7 +34,6 @@ import plotobjects
 import networkoverview
 import colorlegend
 from PyQt4 import QtCore, QtGui
-import PyQt4.Qwt5 as Qwt
 import cpuaffinity
 import sys
 import signal

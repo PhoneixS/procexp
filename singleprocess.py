@@ -80,7 +80,7 @@ class singleProcessDetailsAndHistory(object):
           wchan = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/wchan")
           sched = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/sched")
           wakeupcount = int(sched.split("\n")[23].split(":")[1]) #23 is wakeupcount 
-          self.threads[t] = [wchan, "wakeups %s" %wakeupcount]
+          self.threads[t] = [wchan, wakeupcount]
         except:
           pass
     except OSError:
@@ -472,11 +472,26 @@ class singleUi(object):
           except:
             self.__lddoutput__  = "--"
         
-        #thread ID's
-        
-        text = ""
+        #thread information
         threadsInfo = self.__reader__.getThreads(self.__proc__)
-        for t in threadsInfo:
-          text += str(t)+" "+ str(threadsInfo[t]) + "\n"
-        self.__procDetails__.threadTextEdit.setText(text)
-   
+        self.__procDetails__.threadsTableWidget.clearContents()
+        
+        fontInfo = QtGui.QFontInfo(self.__procDetails__.threadsTableWidget.viewOptions().font)
+        height = fontInfo.pixelSize()
+        
+        row=0
+        for t in threadsInfo:      
+          if self.__procDetails__.threadsTableWidget.rowCount() > row:
+            self.__procDetails__.threadsTableWidget.removeRow(row)
+          self.__procDetails__.threadsTableWidget.insertRow(row)
+          if height != -1:
+            self.__procDetails__.threadsTableWidget.setRowHeight(row, height)
+          self.__procDetails__.threadsTableWidget.setVerticalHeaderItem (row, QtGui.QTableWidgetItem(""))
+          
+          itemTid = QtGui.QTableWidgetItem(str(t))
+          itemWchan = QtGui.QTableWidgetItem(str(threadsInfo[t][0]))
+          itemWakeups = QtGui.QTableWidgetItem(str(threadsInfo[t][1]))
+          self.__procDetails__.threadsTableWidget.setItem(row, 0, itemTid)
+          self.__procDetails__.threadsTableWidget.setItem(row, 1, itemWchan)
+          self.__procDetails__.threadsTableWidget.setItem(row, 2, itemWakeups)
+          row += 1

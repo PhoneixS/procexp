@@ -65,7 +65,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="image">
       <attribute name="title">
@@ -667,7 +667,23 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
-        <widget class="QTextEdit" name="threadTextEdit"/>
+        <widget class="QTableWidget" name="threadsTableWidget">
+         <column>
+          <property name="text">
+           <string>ThreadID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>WCHAN</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Wakeups</string>
+          </property>
+         </column>
+        </widget>
        </item>
       </layout>
      </widget>

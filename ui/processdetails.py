@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Sun Nov 25 09:51:52 2012
+# Created: Sun Nov 25 10:43:14 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -351,14 +351,25 @@ class Ui_Dialog(object):
         self.threads.setObjectName(_fromUtf8("threads"))
         self.verticalLayout_9 = QtGui.QVBoxLayout(self.threads)
         self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
-        self.threadTextEdit = QtGui.QTextEdit(self.threads)
-        self.threadTextEdit.setObjectName(_fromUtf8("threadTextEdit"))
-        self.verticalLayout_9.addWidget(self.threadTextEdit)
+        self.threadsTableWidget = QtGui.QTableWidget(self.threads)
+        self.threadsTableWidget.setObjectName(_fromUtf8("threadsTableWidget"))
+        self.threadsTableWidget.setColumnCount(3)
+        self.threadsTableWidget.setRowCount(0)
+        item = QtGui.QTableWidgetItem()
+        item.setText(QtGui.QApplication.translate("Dialog", "ThreadID", None, QtGui.QApplication.UnicodeUTF8))
+        self.threadsTableWidget.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        item.setText(QtGui.QApplication.translate("Dialog", "WCHAN", None, QtGui.QApplication.UnicodeUTF8))
+        self.threadsTableWidget.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        item.setText(QtGui.QApplication.translate("Dialog", "Wakeups", None, QtGui.QApplication.UnicodeUTF8))
+        self.threadsTableWidget.setHorizontalHeaderItem(2, item)
+        self.verticalLayout_9.addWidget(self.threadsTableWidget)
         self.tabWidget.addTab(self.threads, _fromUtf8(""))
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -369,6 +380,19 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.strings), QtGui.QApplication.translate("Dialog", "Strings", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.security), QtGui.QApplication.translate("Dialog", "Security", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.performance), QtGui.QApplication.translate("Dialog", "Performance", None, QtGui.QApplication.UnicodeUTF8))
+        item = self.threadsTableWidget.horizontalHeaderItem(0)
+        item = self.threadsTableWidget.horizontalHeaderItem(1)
+        item = self.threadsTableWidget.horizontalHeaderItem(2)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.threads), QtGui.QApplication.translate("Dialog", "Threads", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4.Qwt5 import QwtPlot
+
+if __name__ == "__main__":
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    Dialog = QtGui.QDialog()
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.show()
+    sys.exit(app.exec_())
+
