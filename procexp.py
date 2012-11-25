@@ -249,7 +249,8 @@ def onHeaderContextMenu(point):
     action.setData(idx)
     menu.addAction(action)
   selectedItem = menu.exec_(mainUi.processTreeWidget.mapToGlobal(point))
-  mainUi.processTreeWidget.setColumnHidden(selectedItem.data().toInt()[0], not selectedItem.isChecked())
+  if selectedItem is not None:
+    mainUi.processTreeWidget.setColumnHidden(selectedItem.data().toInt()[0], not selectedItem.isChecked())
   
 def prepareUI(mainUi):
   global timer
