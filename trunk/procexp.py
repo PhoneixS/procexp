@@ -299,7 +299,7 @@ def prepareUI(mainUi):
   scale = plotobjects.scaleObject()
   scale.min = 0
   scale.max = 100
-  plot = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale)
+  _ = plotobjects.procExpPlot(mainUi.qwtPlotOverallCpuHist, scale, hasGrid=False)
   
 def clearTree():
   global mainUi

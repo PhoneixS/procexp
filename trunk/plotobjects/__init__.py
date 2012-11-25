@@ -42,13 +42,14 @@ class niceCurve(object):
 
 
 class procExpPlot(object):
-  def __init__(self, qwtPlot, scale=None):
+  def __init__(self, qwtPlot, scale=None, hasGrid=True):
     self.__plot__ = qwtPlot
-    self.__curveCpuPlotGrid= Qwt.QwtPlotGrid()
-    self.__curveCpuPlotGrid.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
-    self.__curveCpuPlotGrid.setMinPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
-    self.__curveCpuPlotGrid.enableXMin(True)
-    self.__curveCpuPlotGrid.attach(self.__plot__)  
+    if hasGrid:
+      self.__curveCpuPlotGrid= Qwt.QwtPlotGrid()
+      self.__curveCpuPlotGrid.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
+      self.__curveCpuPlotGrid.setMinPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
+      self.__curveCpuPlotGrid.enableXMin(True)
+      self.__curveCpuPlotGrid.attach(self.__plot__)  
     self.__plot__.setCanvasBackground(QtGui.QColor(0,0,0))
     self.__plot__.enableAxis(0, False )
     self.__plot__.enableAxis(2, False )
