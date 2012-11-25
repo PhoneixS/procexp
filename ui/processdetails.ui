@@ -101,7 +101,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Path</string>
+               <string>Path:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -112,12 +112,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="imagePathEdit">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
+             <widget class="QLabel" name="imagePathLabel">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -140,7 +137,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Command line</string>
+               <string>Command line:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -151,7 +148,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="imageCommandLineEdit"/>
+             <widget class="QLabel" name="imageCommandLineLabel">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -178,7 +179,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Current directory</string>
+               <string>Current directory:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -189,7 +190,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="imagePwdEdit"/>
+             <widget class="QLabel" name="imagePwdLabel">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -210,7 +215,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Started (UTC)</string>
+               <string>Started (UTC):</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -235,7 +240,7 @@
                </size>
               </property>
               <property name="text">
-               <string>&lt;&gt;</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -258,7 +263,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Pid</string>
+               <string>Pid:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -283,7 +288,7 @@
                </size>
               </property>
               <property name="text">
-               <string>&lt;&gt;</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -306,7 +311,7 @@
                </size>
               </property>
               <property name="text">
-               <string>PPid</string>
+               <string>PPid:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -331,7 +336,7 @@
                </size>
               </property>
               <property name="text">
-               <string>&lt;&gt;</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -347,7 +352,11 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
-           <widget class="QTextEdit" name="libraryTextEdit"/>
+           <widget class="QTextEdit" name="libraryTextEdit">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

@@ -444,13 +444,13 @@ class singleUi(object):
         self.__procDetails__.labelActualTcpip.setText(str(actual) + " kB/s")
         self.__procDetails__.actualTcpip.setValue(actual)
         
-        self.__procDetails__.imagePwdEdit.setText(self.__reader__.getcwd(self.__proc__))
-        self.__procDetails__.imageCommandLineEdit.setText(self.__reader__.getcmdline(self.__proc__))
-        self.__procDetails__.imagePathEdit.setText(self.__reader__.getexe(self.__proc__))
-        
-        self.__procDetails__.imagePidLabel.setText(str(self.__proc__))
-        self.__procDetails__.imageStartedLabel.setText(self.__reader__.getstartedtime(self.__proc__))
-        self.__procDetails__.imagePPidLabel.setText(self.__reader__.getppid(self.__proc__))
+        self.__procDetails__.imagePwdLabel.setText(self.__reader__.getcwd(self.__proc__))
+        if str(self.__procDetails__.imageCommandLineLabel.text()) == "":
+          self.__procDetails__.imageCommandLineLabel.setText(self.__reader__.getcmdline(self.__proc__))
+          self.__procDetails__.imagePathLabel.setText(self.__reader__.getexe(self.__proc__))
+          self.__procDetails__.imagePidLabel.setText(str(self.__proc__))
+          self.__procDetails__.imageStartedLabel.setText(self.__reader__.getstartedtime(self.__proc__))
+          self.__procDetails__.imagePPidLabel.setText(self.__reader__.getppid(self.__proc__))
         
         #update ldd output. Do this here: then it happens only when the user wants to see it
         #by opening a process properties window
