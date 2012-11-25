@@ -477,7 +477,7 @@ class singleUi(object):
         self.__procDetails__.threadsTableWidget.clearContents()
         
         fontInfo = QtGui.QFontInfo(self.__procDetails__.threadsTableWidget.viewOptions().font)
-        height = fontInfo.pixelSize()
+        height = int(fontInfo.pixelSize()*1.2+0.5)
         
         row=0
         for t in threadsInfo:      
