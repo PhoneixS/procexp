@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'about.ui'
 #
-# Created: Thu Nov 22 20:13:15 2012
+# Created: Sun Nov 25 17:03:56 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -89,6 +89,10 @@ class Ui_Dialog(object):
         self.label_7.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label_7.setObjectName(_fromUtf8("label_7"))
         self.verticalLayout_2.addWidget(self.label_7)
+        self.label_8 = QtGui.QLabel(Dialog)
+        self.label_8.setText(QtGui.QApplication.translate("Dialog", "Christian Stadelmann", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_8.setObjectName(_fromUtf8("label_8"))
+        self.verticalLayout_2.addWidget(self.label_8)
         self.verticalLayout_3.addLayout(self.verticalLayout_2)
         self.line_3 = QtGui.QFrame(Dialog)
         self.line_3.setFrameShape(QtGui.QFrame.HLine)
@@ -115,14 +119,4 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         pass
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
 
