@@ -341,7 +341,7 @@ class singleUi(object):
   def update_sockets(self):
     #fill tcp/ip values
     connections, udp = self.__reader__.getAllProcessSockets(self.__proc__)
-    text = ""
+    text = []
     allConn = []
     for conn in connections:
       ipfrom = connections[conn][1].split(":")
@@ -360,8 +360,12 @@ class singleUi(object):
       allConn.append(((ipfromaddrdec,int(ipfromport,16)),(iptoaddrdec,int(iptoport,16))))
       
       state = tcpstates[int(connections[conn][3],16)]
+      
+      ipfromResolved = procutils.resolveIP(ipfromaddrdec)
+      iptoResolved = procutils.resolveIP(iptoaddrdec)
     
-      text = text + "TCPIP  " + ipfromaddrdec +":"+ str(int(ipfromport,16))  + "<-->" + iptoaddrdec + ":"+ str(int(iptoport,16)) +" "+state + "\n"
+      
+      text.append(("TCPIP", ipfromResolved, str(int(ipfromport,16)), iptoResolved, str(int(iptoport,16)), state))
       
     #create a tcpdump for tcp performance measurement of this process
     #in this object, only do stat if user requested the UI, because there will
@@ -388,8 +392,33 @@ class singleUi(object):
       ipfromport = ipfrom[1]
       ipfromaddr = ipfrom[0]
       ipfromaddrdec = str(int(ipfromaddr[6:8],16)) + "." + str(int(ipfromaddr[4:6],16)) + "." + str(int(ipfromaddr[2:4],16)) + "." + str(int(ipfromaddr[0:2],16))
-      text = text + "  UDP  " + ipfromaddrdec +":"+ str(int(ipfromport,16))+"\n"
-    self.__procDetails__.tcpipText.setText(text)
+      text.append(("UDP", ipfromaddrdec, str(int(ipfromport,16)), "-", "-", "-"))
+    
+    self.__procDetails__.tcpipTableWidget.clearContents()
+    fontInfo = QtGui.QFontInfo(self.__procDetails__.tcpipTableWidget.viewOptions().font)
+    height = int(fontInfo.pixelSize()*1.2+0.5)
+    row=0
+    for line in text:      
+      if self.__procDetails__.tcpipTableWidget.rowCount() > row:
+        self.__procDetails__.tcpipTableWidget.removeRow(row)
+      self.__procDetails__.tcpipTableWidget.insertRow(row)
+      if height != -1:
+        self.__procDetails__.tcpipTableWidget.setRowHeight(row, height)
+      self.__procDetails__.tcpipTableWidget.setVerticalHeaderItem (row, QtGui.QTableWidgetItem(""))
+      
+      itemProto = QtGui.QTableWidgetItem(line[0])
+      itemFrom = QtGui.QTableWidgetItem(line[1])
+      itemFromPort = QtGui.QTableWidgetItem(line[2])
+      itemTo = QtGui.QTableWidgetItem(line[3])
+      itemToPort = QtGui.QTableWidgetItem(line[4])
+      itemState = QtGui.QTableWidgetItem(line[5])
+      self.__procDetails__.tcpipTableWidget.setItem(row, 0, itemProto)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 1, itemFrom)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 2, itemFromPort)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 3, itemTo)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 4, itemToPort)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 5, itemState)
+      row += 1
     
   def update(self):
     if self.__processGone__ == False:
@@ -446,7 +475,10 @@ class singleUi(object):
         
         self.__procDetails__.imagePwdLabel.setText(self.__reader__.getcwd(self.__proc__))
         if str(self.__procDetails__.imageCommandLineLabel.text()) == "":
-          self.__procDetails__.imageCommandLineLabel.setText(self.__reader__.getcmdline(self.__proc__))
+          cmdLine = self.__reader__.getcmdline(self.__proc__)
+          if len(cmdLine) > 80:
+            cmdLine = cmdLine[:80] + "..." 
+          self.__procDetails__.imageCommandLineLabel.setText(cmdLine)
           self.__procDetails__.imagePathLabel.setText(self.__reader__.getexe(self.__proc__))
           self.__procDetails__.imagePidLabel.setText(str(self.__proc__))
           self.__procDetails__.imageStartedLabel.setText(self.__reader__.getstartedtime(self.__proc__))

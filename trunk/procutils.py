@@ -24,7 +24,10 @@ import Queue
 logQueue = Queue.Queue()
 import sys
 import PyQt4.QtGui
+import threading
+import socket
 
+_ipResolver = None
 
 def message(msg):
   errorbox = PyQt4.QtGui.QMessageBox()
@@ -115,3 +118,53 @@ def humanReadable(value):
     return str(int(value/1000)) + " kB"
   else:
     return str(int(value/1000000)) + " MB"
+
+
+class IpResolver(object):
+  """resolve IP numbers, threaded."""
+  def __init__(self):
+    """init"""
+    self._maxResolvers = 20
+    self._nrResolvers = 0
+    self._resolvedTable = {}
+    
+  def _doRsolve(self, ip):
+    """resolve the given IP"""
+    try:
+      name = socket.gethostbyaddr(ip)[0]
+    except socket.herror:
+      #host could not be resolved
+      name = ip
+    self._resolvedTable[ip] = name
+    self._nrResolvers -= 1
+    
+  def resolveIP(self, ip):
+    """resolve IP number"""
+    if self._resolvedTable.has_key(ip):
+      return self._resolvedTable[ip]
+    else:
+      if self._nrResolvers < self._maxResolvers:
+        self._nrResolvers += 1
+        t = threading.Thread(target=self._doRsolve, args=(ip,))
+        t.start()
+      #because the resolver is working we return the IP for now.
+      #hopefully the next request the resolver will have done its job.
+      return ip
+    
+def resolveIP(ip):
+  """resolve IP, multithreaded"""
+  global _ipResolver
+  if _ipResolver is None:
+    _ipResolver = IpResolver()     
+  return _ipResolver.resolveIP(ip)
+
+
+
+
+
+
+
+
+
+
+
