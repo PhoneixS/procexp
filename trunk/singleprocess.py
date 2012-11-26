@@ -399,9 +399,8 @@ class singleUi(object):
     height = int(fontInfo.pixelSize()*1.2+0.5)
     row=0
     for line in text:      
-      if self.__procDetails__.tcpipTableWidget.rowCount() > row:
-        self.__procDetails__.tcpipTableWidget.removeRow(row)
-      self.__procDetails__.tcpipTableWidget.insertRow(row)
+      if self.__procDetails__.tcpipTableWidget.rowCount() <= row:
+        self.__procDetails__.tcpipTableWidget.insertRow(row)
       if height != -1:
         self.__procDetails__.tcpipTableWidget.setRowHeight(row, height)
       self.__procDetails__.tcpipTableWidget.setVerticalHeaderItem (row, QtGui.QTableWidgetItem(""))
@@ -513,9 +512,8 @@ class singleUi(object):
         
         row=0
         for t in threadsInfo:      
-          if self.__procDetails__.threadsTableWidget.rowCount() > row:
-            self.__procDetails__.threadsTableWidget.removeRow(row)
-          self.__procDetails__.threadsTableWidget.insertRow(row)
+          if self.__procDetails__.threadsTableWidget.rowCount() <= row:
+            self.__procDetails__.threadsTableWidget.insertRow(row)
           if height != -1:
             self.__procDetails__.threadsTableWidget.setRowHeight(row, height)
           self.__procDetails__.threadsTableWidget.setVerticalHeaderItem (row, QtGui.QTableWidgetItem(""))
