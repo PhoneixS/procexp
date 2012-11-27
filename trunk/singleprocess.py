@@ -375,9 +375,11 @@ class singleUi(object):
       if self.__tcpStat__ != None:
         self.__tcpStat__.doStop()
         self.__tcpStat__.join()
+        self.__tcpStat__ = None
       
-      self.__tcpStat__ = tcpip_stat.tcpipstat(self.__tcpConnections__)
-      self.__tcpStat__.start()
+      if len(self.__tcpConnections__) > 0:
+        self.__tcpStat__ = tcpip_stat.tcpipstat(self.__tcpConnections__)
+        self.__tcpStat__.start()
         
     if self.__tcpStat__ != None:
       nfBytes = self.__tcpStat__.nfBytes 
