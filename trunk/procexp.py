@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # This file is part of the Linux Process Explorer
 # See www.sourceforge.net/projects/procexp
 #
