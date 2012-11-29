@@ -18,7 +18,7 @@ def onStdOutHandler(msg):
   msg = msg[3:msg.rfind(":")]
 
   if connections.has_key(msg):
-    connections[msg][0] += bytes
+    connections[msg][0] += bytes+64
     connections[msg][1] = TIMEOUT
   else:
     connections[msg] = [bytes, TIMEOUT]
