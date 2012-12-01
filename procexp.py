@@ -38,7 +38,7 @@ from PyQt4 import QtCore, QtGui
 import cpuaffinity
 import sys
 import signal
-
+import procreader.tcpip_stat as tcpip_stat
 
 timer = None
 reader = None
@@ -370,6 +370,8 @@ def expandAll():
     expandChilds(item)
 
 def updateUI():
+  """update"""
+  tcpip_stat.tick()
   try:
     global procList
     global treeProcesses, greenTopLevelItems, redTopLevelItems
@@ -523,6 +525,7 @@ loadSettings()
 
 timer.start(int(settings["updateTimer"]))  
 
+tcpip_stat.start()
 MainWindow.show()
 
 reader = procreader.reader.procreader(int(settings["updateTimer"]), int(settings["historySampleCount"]))
@@ -540,5 +543,7 @@ updateUI()
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-sys.exit(app.exec_())
+app.exec_()
+tcpip_stat.stop()
+sys.exit()
 

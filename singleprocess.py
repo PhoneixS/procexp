@@ -370,24 +370,17 @@ class singleUi(object):
     #create a tcpdump for tcp performance measurement of this process
     #in this object, only do stat if user requested the UI, because there will
     #be many tcpdumps running which is unacceptable.
-    if self.__tcpConnections__ != allConn:
-      self.__tcpConnections__ = copy.deepcopy(allConn)
-      if self.__tcpStat__ != None:
-        self.__tcpStat__.doStop()
-        self.__tcpStat__.join()
-        self.__tcpStat__ = None
+    nfBytes=0
+    for conn in allConn:
+      key = "%s.%s > %s.%s" %(conn[0][0], conn[0][1], conn[1][0], conn[1][1])
+      if tcpip_stat.connections.has_key(key):
+        nfBytes+=tcpip_stat.connections[key][tcpip_stat.BYTESPERSECONDIDX]    
+      key = "%s.%s > %s.%s" %(conn[1][0], conn[1][1], conn[0][0], conn[0][1])
+      if tcpip_stat.connections.has_key(key):
+        nfBytes+=tcpip_stat.connections[key][tcpip_stat.BYTESPERSECONDIDX]    
       
-      if len(self.__tcpConnections__) > 0:
-        self.__tcpStat__ = tcpip_stat.tcpipstat(self.__tcpConnections__)
-        self.__tcpStat__.start()
-        
-    if self.__tcpStat__ != None:
-      nfBytes = self.__tcpStat__.nfBytes 
-      if nfBytes - self.__prevtcpipbytes__ > 0:
-        self.__TCPHist__.append(nfBytes - self.__prevtcpipbytes__)
-      else:
-        self.__TCPHist__.append(0)
-      self.__prevtcpipbytes__ = nfBytes
+    nfBytes = self.__tcpStat__.nfBytes 
+    self.__TCPHist__.append(nfBytes)
     self.__TCPHist__ = self.__TCPHist__[1:]
     for conn in udp:
       ipfrom = udp[conn][1].split(":")
