@@ -132,8 +132,6 @@ def performMenuAction(action):
     systemOverviewUi.show()
   elif action is mainUi.actionNetwork_Information:
     networkOverviewUi.show()
-  elif action is mainUi.actionClose_this_window:
-    MainWindow.close()
   elif action is mainUi.actionClose_all_and_exit:
     for window in singleProcessUiList:
       singleProcessUiList[window].closeWindow()
@@ -539,7 +537,6 @@ systemOverviewUi.setFontSize(int(settings["fontSize"]))
 networkOverviewUi.setFontSize(int(settings["fontSize"]))
 
 updateUI()
-
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 

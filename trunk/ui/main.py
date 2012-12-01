@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Fri Nov 23 14:59:12 2012
+# Created: Sat Dec  1 12:56:25 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -154,7 +154,7 @@ class Ui_MainWindow(object):
         self.actionClose_this_window.setText(QtGui.QApplication.translate("MainWindow", "Close this window", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose_this_window.setObjectName(_fromUtf8("actionClose_this_window"))
         self.actionClose_all_and_exit = QtGui.QAction(MainWindow)
-        self.actionClose_all_and_exit.setText(QtGui.QApplication.translate("MainWindow", "Close all and exit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClose_all_and_exit.setText(QtGui.QApplication.translate("MainWindow", "Close", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose_all_and_exit.setObjectName(_fromUtf8("actionClose_all_and_exit"))
         self.actionColor_legend = QtGui.QAction(MainWindow)
         self.actionColor_legend.setText(QtGui.QApplication.translate("MainWindow", "Color legend", None, QtGui.QApplication.UnicodeUTF8))
@@ -168,7 +168,6 @@ class Ui_MainWindow(object):
         self.actionLog = QtGui.QAction(MainWindow)
         self.actionLog.setText(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
         self.actionLog.setObjectName(_fromUtf8("actionLog"))
-        self.menuFile.addAction(self.actionClose_this_window)
         self.menuFile.addAction(self.actionClose_all_and_exit)
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
         self.menuView.addAction(self.actionSystem_information)

@@ -53,7 +53,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="freezeCheckBox">
          <property name="text">
           <string>freeze</string>
          </property>
@@ -109,7 +109,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionClose_this_window"/>
     <addaction name="actionClose_all_and_exit"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
@@ -290,7 +289,7 @@
   </action>
   <action name="actionClose_all_and_exit">
    <property name="text">
-    <string>Close all and exit</string>
+    <string>Close</string>
    </property>
   </action>
   <action name="actionColor_legend">
