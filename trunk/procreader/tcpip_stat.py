@@ -1,80 +1,77 @@
-# This file is part of the Linux Process Explorer
-# See www.sourceforge.net/projects/procexp
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 2, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
-
-
+import subprocess
+import subprocess_new
+import Queue
 import threading
-import subprocess_new, subprocess
-import shlex
-import procutils
+import datetime
 
-def tcpdumpCmdStr(connList):
-  """generate correct command line parameters for tcpdump"""
-  totalcmd = ""
-  for connection in connList:
-    srcaddr, srcport = connection[0]
-    dstaddr, dstport = connection[1]
-    if srcaddr != "0.0.0.0" and dstaddr != "0.0.0.0":
-      cmd  = "\(\( host " + str(srcaddr) + " and port " + str(srcport) + " \) and "
-      cmd += "\( host " + str(dstaddr) + " and port " + str(dstport) + " \)\)"
-      if totalcmd == "":
-        totalcmd = cmd
-      else:
-        totalcmd += " or " + cmd
-  return "tcpdump -U -l -q -nn -i any " + totalcmd
+TIMEOUT=10
+TIMEOUTIDX=1
+COUNTIDX=0
+BYTESPERSECONDIDX=2
 
-class tcpipstat(threading.Thread):
-  """This class can read tcp ip statistics"""
-  def __init__(self, ip_portlist):
-    threading.Thread.__init__(self)
-    self.__ipportlist__ = ip_portlist
-    self.stop = False
-    self.nfBytes = 0
-    self.__tcpdump__ = subprocess_new.Popen_events(\
-      shlex.split(tcpdumpCmdStr(self.__ipportlist__)), shell=False, 
-      stdout = subprocess.PIPE, stderr=subprocess.PIPE, onStdOut=self.onStdOutHandler, onStdErr=self.onStdErrHandler)
-    
-  def onStdOutHandler(self, msg):
-    """stdout handler"""
-    try:
-      self.nfBytes += int(msg.split()[6])
-    except IndexError:
-      pass
+q = Queue.Queue()
+_g_prevTime = None 
+_g_proc = None
+
+connections = {}
+
+def _onStdOutHandler(msg):
+  """stdout handler"""
+  global connections
+
+  nfbytes = int(msg[msg.rfind(" "):])
+  msg = msg[3:msg.rfind(":")]
+
+  if connections.has_key(msg):
+    connections[msg][COUNTIDX] += nfbytes+64
+    connections[msg][TIMEOUTIDX] = TIMEOUT
+  else:
+    connections[msg] = [nfbytes, TIMEOUT, 0]
   
-  def onStdErrHandler(self, msg):
-    """log messages from stderr"""
-    procutils.log(msg)
+  
+def _onStdErrHandler(msg):
+  """log messages from stderr"""
     
-  def doStop(self):
-    """stop the tcpip stats"""
-    self.stop = True
-    try:
-      self.__tcpdump__.terminate()
-    except OSError:
-      #could be already killed, ignore it
-      pass
-    
-  def run(self):
-    """run"""
-    try:
-      while self.stop == False:
-        _ = self.__tcpdump__.communicate()
-    except:
-      procutils.log("Could NOT get data from tcpdump. TCPIP bytes view is not working.")
-      procutils.log("tcpdump must be accessible, and you need sufficient rights for using tcpdump.")
-      procutils.log("For better results, run process explorer for Linux as root.")
-      
+def _start():
+  global _g_proc
+  try:
+    _g_proc = subprocess_new.Popen_events("tcpdump -U -l -q -nn -t -i any | grep -F 'IP '", shell=True,\
+                                       stdout = subprocess.PIPE, stderr=subprocess.PIPE, \
+                                       onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
+    _g_proc.communicate()
+  except:
+    import traceback
+    print traceback.format_exc()
 
+def start():
+  """start measuring"""  
+  threading.Thread(target=_start).start()
+  
+def stop():
+  """stop"""
+  global _g_proc
+  try:
+    _g_proc.kill()
+  except OSError:
+    pass
+
+def tick():
+  global _g_prevTime
+  global connections
+  if _g_prevTime is None:
+    _g_prevTime = datetime.datetime.now()
+  else:
+    now = datetime.datetime.now()
+    delta = now - _g_prevTime
+    _g_prevTime = now
+    deltasecs = delta.seconds + delta.microsconds*1.0 / 1000000.0
+    todelete = []
+    for conn in connections:
+      if connections[conn][TIMEOUTIDX] == 0:
+        todelete.append(conn)
+      else:
+        connections[conn][TIMEOUTIDX] -= 1
+        connections[BYTESPERSECONDIDX] = int(connections[COUNTIDX]*1.0 / deltasecs)
+      connections[conn][COUNTIDX] = 0 
+    for conn in todelete:
+      connections.pop(conn)
