@@ -277,7 +277,6 @@ class singleUi(object):
     self.__curveTcpipHistExt__.setPen(QtGui.QPen(QtGui.QColor(215,124,224)))
     self.__curveTcpipHistExt__.attach(self.__procDetails__.qwtPlotTcpipHist)
     
-    
     #self.__procDetails__.qwtPlotIoHist.setAxisScale(0,0,100,10)
     self.__TcpipPlotGrid__ = Qwt.QwtPlotGrid()
     self.__TcpipPlotGrid__.setMajPen(QtGui.QPen(QtGui.QColor(0,100,0), 0, QtCore.Qt.SolidLine))
@@ -300,6 +299,13 @@ class singleUi(object):
     self.__procDetails__.qwtPlotTcpipHist.enableAxis(0, False )    
     self.__procDetails__.qwtPlotTcpipHist.enableAxis(2, False )
     #----------------------------------------------------------------------------------------------
+    
+    self._availableLabel = QtGui.QLabel("Not available, no traffic or tcpdump not available",\
+                                        parent=self.__procDetails__.qwtPlotTcpipHist )
+    font = QtGui.QFont("Arial", pointSize=12)
+    self._availableLabel.setFont(font)
+    self._availableLabel.setStyleSheet("QLabel { color : grey; }");
+    self._availableLabel.show()
     
     QtCore.QObject.connect(self.__procDetails__.pushButtonOK, QtCore.SIGNAL('clicked()'), self.__onClose__)
   
@@ -378,7 +384,8 @@ class singleUi(object):
       key = "%s.%s > %s.%s" %(conn[1][0], conn[1][1], conn[0][0], conn[0][1])
       if tcpip_stat.connections.has_key(key):
         nfBytes+=tcpip_stat.connections[key][tcpip_stat.BYTESPERSECONDIDX]    
-      
+    if nfBytes > 0:
+      self._availableLabel.hide()  
     self.__TCPHist__.append(nfBytes)
     self.__TCPHist__ = self.__TCPHist__[1:]
     for conn in udp:
