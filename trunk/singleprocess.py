@@ -379,7 +379,6 @@ class singleUi(object):
       if tcpip_stat.connections.has_key(key):
         nfBytes+=tcpip_stat.connections[key][tcpip_stat.BYTESPERSECONDIDX]    
       
-    nfBytes = self.__tcpStat__.nfBytes 
     self.__TCPHist__.append(nfBytes)
     self.__TCPHist__ = self.__TCPHist__[1:]
     for conn in udp:
