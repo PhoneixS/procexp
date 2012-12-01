@@ -3,6 +3,7 @@ import subprocess_new
 import Queue
 import threading
 import datetime
+import signal
 
 TIMEOUT=10
 TIMEOUTIDX=1
@@ -38,8 +39,10 @@ def _start():
     _g_proc = subprocess_new.Popen_events("tcpdump -U -l -q -nn -t -i any | grep -F 'IP '", shell=True,\
                                        stdout = subprocess.PIPE, stderr=subprocess.PIPE, \
                                        onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
-    print "communicating"
-    _g_proc.communicate()
+    try:
+      _g_proc.communicate()
+    except:
+      pass
     print "communicated"
   except:
     import traceback
@@ -52,13 +55,10 @@ def start():
 def stop():
   """stop"""
   global _g_proc
-  print "stop"
-  try:
-    _g_proc.kill()
-  except OSError:
-    print "OSError"
-    pass
-  print "stopped"
+  print _g_proc
+  _g_proc.kill()
+
+  print "killed"
   
 def tick():
   global _g_prevTime

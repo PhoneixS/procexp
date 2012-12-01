@@ -37,86 +37,76 @@ class Popen_events(subprocess.Popen):
     self.__onStdErr = onStdErr
     
   def _newCommunicate(self, input):
-    try:
-      read_set = []
-      write_set = []
-      stdout = None # Return
-      stderr = None # Return
+    read_set = []
+    write_set = []
+    stdout = None # Return
+    stderr = None # Return
 
-      if self.stdin:
-          # Flush stdio buffer.  This might block, if the user has
-          # been writing to .stdin in an uncontrolled fashion.
-          self.stdin.flush()
-          if input:
-              write_set.append(self.stdin)
-          else:
+    if self.stdin:
+        # Flush stdio buffer.  This might block, if the user has
+        # been writing to .stdin in an uncontrolled fashion.
+        self.stdin.flush()
+        if input:
+            write_set.append(self.stdin)
+        else:
+            self.stdin.close()
+    if self.stdout:
+        read_set.append(self.stdout)
+        stdout = []
+    if self.stderr:
+        read_set.append(self.stderr)
+        stderr = []
+
+    input_offset = 0
+    while read_set or write_set:
+      rlist, wlist, _ = select.select(read_set, write_set, [])
+
+      if self.stdin in wlist:
+          # When select has indicated that the file is writable,
+          # we can write up to PIPE_BUF bytes without risk
+          # blocking.  POSIX defines PIPE_BUF >= 512
+          chunk = input[input_offset : input_offset + 512]
+          bytes_written = os.write(self.stdin.fileno(), chunk)
+          input_offset += bytes_written
+          if input_offset >= len(input):
               self.stdin.close()
-      if self.stdout:
-          read_set.append(self.stdout)
-          stdout = []
-      if self.stderr:
-          read_set.append(self.stderr)
-          stderr = []
+              write_set.remove(self.stdin)
 
-      input_offset = 0
-      while read_set or write_set:
-          try:
-              rlist, wlist, xlist = select.select(read_set, write_set, [])
-          except select.error, e:
-              if e.args[0] == errno.EINTR:
-                print "cont"
-                continue
-              raise
+      if self.stdout in rlist:
+          data = self.stdout.readline()
+          if data == "":
+              self.stdout.close()
+              read_set.remove(self.stdout)
+          if self.__onStdOut != None:
+            self.__onStdOut(data)
 
-          if self.stdin in wlist:
-              # When select has indicated that the file is writable,
-              # we can write up to PIPE_BUF bytes without risk
-              # blocking.  POSIX defines PIPE_BUF >= 512
-              chunk = input[input_offset : input_offset + 512]
-              bytes_written = os.write(self.stdin.fileno(), chunk)
-              input_offset += bytes_written
-              if input_offset >= len(input):
-                  self.stdin.close()
-                  write_set.remove(self.stdin)
+      if self.stderr in rlist:
+          data = self.stderr.readline()
+          if data == "":
+              self.stderr.close()
+              read_set.remove(self.stderr)
+          if self.__onStdErr != None:
+            self.__onStdErr(data)
 
-          if self.stdout in rlist:
-              data = self.stdout.readline()
-              if data == "":
-                  self.stdout.close()
-                  read_set.remove(self.stdout)
-              if self.__onStdOut != None:
-                self.__onStdOut(data)
+    # All data exchanged.  Translate lists into strings.
+    if stdout is not None:
+        stdout = ''.join(stdout)
+    if stderr is not None:
+        stderr = ''.join(stderr)
 
-          if self.stderr in rlist:
-              data = self.stderr.readline()
-              if data == "":
-                  self.stderr.close()
-                  read_set.remove(self.stderr)
-              if self.__onStdErr != None:
-                self.__onStdErr(data)
+    # Translate newlines, if requested.  We cannot let the file
+    # object do the translation: It is based on stdio, which is
+    # impossible to combine with select (unless forcing no
+    # buffering).
+    if self.universal_newlines and hasattr(file, 'newlines'):
+        if stdout:
+            stdout = self._translate_newlines(stdout)
+        if stderr:
+            stderr = self._translate_newlines(stderr)
 
-      # All data exchanged.  Translate lists into strings.
-      if stdout is not None:
-          stdout = ''.join(stdout)
-      if stderr is not None:
-          stderr = ''.join(stderr)
+    self.wait()
+    return (stdout, stderr)
 
-      # Translate newlines, if requested.  We cannot let the file
-      # object do the translation: It is based on stdio, which is
-      # impossible to combine with select (unless forcing no
-      # buffering).
-      if self.universal_newlines and hasattr(file, 'newlines'):
-          if stdout:
-              stdout = self._translate_newlines(stdout)
-          if stderr:
-              stderr = self._translate_newlines(stderr)
-
-      self.wait()
-      return (stdout, stderr)
-    except IOError:
-      raise
-    except:
-      raise
       
   def communicate(self, myinput=None):
     """Interact with process: Send data to stdin.  Read data from
