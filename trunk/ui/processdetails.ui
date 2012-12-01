@@ -65,7 +65,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="image">
       <attribute name="title">
@@ -611,6 +611,16 @@
          <column>
           <property name="text">
            <string>State</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>BytesSent</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>BytesRec</string>
           </property>
          </column>
         </widget>

@@ -7,6 +7,7 @@ import datetime
 TIMEOUT=10
 TIMEOUTIDX=1
 COUNTIDX=0
+TOTALIDX=3
 BYTESPERSECONDIDX=2
 
 q = Queue.Queue()
@@ -25,9 +26,10 @@ def _onStdOutHandler(msg):
   
     if connections.has_key(msg):
       connections[msg][COUNTIDX] += nfbytes+64
+      connections[msg][TOTALIDX] += nfbytes+64
       connections[msg][TIMEOUTIDX] = TIMEOUT
     else:
-      connections[msg] = [nfbytes, TIMEOUT, 0]
+      connections[msg] = [nfbytes, TIMEOUT, 0, 0]
   except ValueError:
     pass  
   

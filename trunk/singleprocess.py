@@ -349,6 +349,7 @@ class singleUi(object):
     connections, udp = self.__reader__.getAllProcessSockets(self.__proc__)
     text = []
     allConn = []
+    nftotalBytesPerSecond = 0
     for conn in connections:
       ipfrom = connections[conn][1].split(":")
       ipfromport = ipfrom[1]
@@ -365,28 +366,28 @@ class singleUi(object):
       
       allConn.append(((ipfromaddrdec,int(ipfromport,16)),(iptoaddrdec,int(iptoport,16))))
       
+      key1 = "%s.%s > %s.%s" %(ipfromaddrdec, int(ipfromport,16), iptoaddrdec, int(iptoport,16))
+      bytesSent=0
+      bytesReceived=0
+      if tcpip_stat.connections.has_key(key1):
+        bytesSent=tcpip_stat.connections[key1][tcpip_stat.TOTALIDX]
+        nftotalBytesPerSecond+= tcpip_stat.connections[key1][tcpip_stat.BYTESPERSECONDIDX]   
+      key2 = "%s.%s > %s.%s" %(iptoaddrdec, int(iptoport,16), ipfromaddrdec, int(ipfromport,16))
+      if tcpip_stat.connections.has_key(key2):
+        bytesReceived=tcpip_stat.connections[key2][tcpip_stat.TOTALIDX]    
+        nftotalBytesPerSecond+=tcpip_stat.connections[key2][tcpip_stat.BYTESPERSECONDIDX]
+      
       state = tcpstates[int(connections[conn][3],16)]
       
       ipfromResolved = procutils.resolveIP(ipfromaddrdec)
       iptoResolved = procutils.resolveIP(iptoaddrdec)
     
       
-      text.append(("TCPIP", ipfromResolved, str(int(ipfromport,16)), iptoResolved, str(int(iptoport,16)), state))
+      text.append(("TCPIP", ipfromResolved, str(int(ipfromport,16)), iptoResolved, str(int(iptoport,16)), state, bytesSent, bytesReceived))
       
-    #create a tcpdump for tcp performance measurement of this process
-    #in this object, only do stat if user requested the UI, because there will
-    #be many tcpdumps running which is unacceptable.
-    nfBytes=0
-    for conn in allConn:
-      key = "%s.%s > %s.%s" %(conn[0][0], conn[0][1], conn[1][0], conn[1][1])
-      if tcpip_stat.connections.has_key(key):
-        nfBytes+=tcpip_stat.connections[key][tcpip_stat.BYTESPERSECONDIDX]    
-      key = "%s.%s > %s.%s" %(conn[1][0], conn[1][1], conn[0][0], conn[0][1])
-      if tcpip_stat.connections.has_key(key):
-        nfBytes+=tcpip_stat.connections[key][tcpip_stat.BYTESPERSECONDIDX]    
-    if nfBytes > 0:
+    if nftotalBytesPerSecond > 0:
       self._availableLabel.hide()  
-    self.__TCPHist__.append(nfBytes)
+    self.__TCPHist__.append(nftotalBytesPerSecond)
     self.__TCPHist__ = self.__TCPHist__[1:]
     for conn in udp:
       ipfrom = udp[conn][1].split(":")
@@ -412,12 +413,17 @@ class singleUi(object):
       itemTo = QtGui.QTableWidgetItem(line[3])
       itemToPort = QtGui.QTableWidgetItem(line[4])
       itemState = QtGui.QTableWidgetItem(line[5])
+      bytesSent = QtGui.QTableWidgetItem(str(line[6]))
+      bytesReceived = QtGui.QTableWidgetItem(str(line[7]))
       self.__procDetails__.tcpipTableWidget.setItem(row, 0, itemProto)
       self.__procDetails__.tcpipTableWidget.setItem(row, 1, itemFrom)
       self.__procDetails__.tcpipTableWidget.setItem(row, 2, itemFromPort)
       self.__procDetails__.tcpipTableWidget.setItem(row, 3, itemTo)
       self.__procDetails__.tcpipTableWidget.setItem(row, 4, itemToPort)
       self.__procDetails__.tcpipTableWidget.setItem(row, 5, itemState)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 6, bytesSent)
+      self.__procDetails__.tcpipTableWidget.setItem(row, 7, bytesReceived)
+      
       row += 1
     
   def update(self):
