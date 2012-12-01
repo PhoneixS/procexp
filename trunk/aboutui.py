@@ -18,9 +18,11 @@
 from PyQt4 import QtGui
 import ui.about
 import os
+dialog = None
 
 def doAboutWindow():
   """Make a log window"""
+  global dialog
   icon = os.path.dirname(__file__) + "/ui/icon.png"
   dialog = QtGui.QDialog()
   about = ui.about.Ui_Dialog()
