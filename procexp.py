@@ -135,9 +135,13 @@ def performMenuAction(action):
   elif action is mainUi.actionClose_all_and_exit:
     for window in singleProcessUiList:
       singleProcessUiList[window].closeWindow()
+    systemOverviewUi.close()
+    networkOverviewUi.close()
     MainWindow.close()
     if logui.dialog is not None:
       logui.dialog.close()
+    if aboutui.dialog is not None:
+      aboutui.dialog.close()
   elif action is mainUi.actionColor_legend:
     colorlegend.doColorHelpLegend()
   elif action is mainUi.actionSet_affinity:

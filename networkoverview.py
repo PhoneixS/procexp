@@ -187,6 +187,9 @@ class networkOverviewUi(object):
   def show(self):
     self.__dialog__.show()
     self.__dialog__.setVisible(True)    
+ 
+  def close(self):
+    self.__dialog__.close()
 
   def setFontSize(self, fontSize):
     font = QtGui.QFont()

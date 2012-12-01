@@ -300,7 +300,7 @@ class singleUi(object):
     self.__procDetails__.qwtPlotTcpipHist.enableAxis(2, False )
     #----------------------------------------------------------------------------------------------
     
-    self._availableLabel = QtGui.QLabel("Not available, no traffic or tcpdump not available",\
+    self._availableLabel = QtGui.QLabel("No traffic or tcpdump not available.",\
                                         parent=self.__procDetails__.qwtPlotTcpipHist )
     font = QtGui.QFont("Arial", pointSize=12)
     self._availableLabel.setFont(font)
