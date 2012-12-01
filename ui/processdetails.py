@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Sat Dec  1 13:29:46 2012
+# Created: Sat Dec  1 13:49:36 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -395,7 +395,7 @@ class Ui_Dialog(object):
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

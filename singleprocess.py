@@ -413,16 +413,19 @@ class singleUi(object):
       itemTo = QtGui.QTableWidgetItem(line[3])
       itemToPort = QtGui.QTableWidgetItem(line[4])
       itemState = QtGui.QTableWidgetItem(line[5])
-      bytesSent = QtGui.QTableWidgetItem(str(line[6]))
-      bytesReceived = QtGui.QTableWidgetItem(str(line[7]))
+      if len(line) > 6:
+        bytesSent = QtGui.QTableWidgetItem(str(line[6]))
+        bytesReceived = QtGui.QTableWidgetItem(str(line[7]))
+        
       self.__procDetails__.tcpipTableWidget.setItem(row, 0, itemProto)
       self.__procDetails__.tcpipTableWidget.setItem(row, 1, itemFrom)
       self.__procDetails__.tcpipTableWidget.setItem(row, 2, itemFromPort)
       self.__procDetails__.tcpipTableWidget.setItem(row, 3, itemTo)
       self.__procDetails__.tcpipTableWidget.setItem(row, 4, itemToPort)
       self.__procDetails__.tcpipTableWidget.setItem(row, 5, itemState)
-      self.__procDetails__.tcpipTableWidget.setItem(row, 6, bytesSent)
-      self.__procDetails__.tcpipTableWidget.setItem(row, 7, bytesReceived)
+      if len(line) > 6:
+        self.__procDetails__.tcpipTableWidget.setItem(row, 6, bytesSent)
+        self.__procDetails__.tcpipTableWidget.setItem(row, 7, bytesReceived)
       
       row += 1
     
