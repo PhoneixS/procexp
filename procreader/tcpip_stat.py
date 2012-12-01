@@ -3,7 +3,6 @@ import subprocess_new
 import Queue
 import threading
 import datetime
-import signal
 
 TIMEOUT=10
 TIMEOUTIDX=1
@@ -80,3 +79,4 @@ def tick():
         connections[conn][COUNTIDX] = 0 
     for conn in todelete:
       connections.pop(conn)
+
