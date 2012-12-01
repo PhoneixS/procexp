@@ -38,7 +38,9 @@ def _start():
     _g_proc = subprocess_new.Popen_events("tcpdump -U -l -q -nn -t -i any | grep -F 'IP '", shell=True,\
                                        stdout = subprocess.PIPE, stderr=subprocess.PIPE, \
                                        onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
+    print "communicating"
     _g_proc.communicate()
+    print "communicated"
   except:
     import traceback
     print traceback.format_exc()
@@ -50,11 +52,14 @@ def start():
 def stop():
   """stop"""
   global _g_proc
+  print "stop"
   try:
     _g_proc.kill()
   except OSError:
+    print "OSError"
     pass
-
+  print "stopped"
+  
 def tick():
   global _g_prevTime
   global connections
@@ -64,14 +69,14 @@ def tick():
     now = datetime.datetime.now()
     delta = now - _g_prevTime
     _g_prevTime = now
-    deltasecs = delta.seconds + delta.microsconds*1.0 / 1000000.0
+    deltasecs = delta.seconds + delta.microseconds*1.0 / 1000000.0
     todelete = []
     for conn in connections:
       if connections[conn][TIMEOUTIDX] == 0:
         todelete.append(conn)
       else:
         connections[conn][TIMEOUTIDX] -= 1
-        connections[BYTESPERSECONDIDX] = int(connections[COUNTIDX]*1.0 / deltasecs)
-      connections[conn][COUNTIDX] = 0 
+        connections[conn][BYTESPERSECONDIDX] = int(connections[conn][COUNTIDX]*1.0 / deltasecs)
+        connections[conn][COUNTIDX] = 0 
     for conn in todelete:
       connections.pop(conn)

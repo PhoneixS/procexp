@@ -19,6 +19,7 @@
 import subprocess
 import os
 import select
+import errno
 
 class Popen_events(subprocess.Popen):
   
@@ -36,6 +37,7 @@ class Popen_events(subprocess.Popen):
     self.__onStdErr = onStdErr
     
   def _newCommunicate(self, input):
+    try:
       read_set = []
       write_set = []
       stdout = None # Return
@@ -62,7 +64,8 @@ class Popen_events(subprocess.Popen):
               rlist, wlist, xlist = select.select(read_set, write_set, [])
           except select.error, e:
               if e.args[0] == errno.EINTR:
-                  continue
+                print "cont"
+                continue
               raise
 
           if self.stdin in wlist:
@@ -110,8 +113,12 @@ class Popen_events(subprocess.Popen):
 
       self.wait()
       return (stdout, stderr)
-    
-  def communicate(self, input=None):
+    except IOError:
+      raise
+    except:
+      raise
+      
+  def communicate(self, myinput=None):
     """Interact with process: Send data to stdin.  Read data from
     stdout and stderr, until end-of-file is reached.  Wait for
     process to terminate.  The optional input argument should be a
@@ -120,5 +127,5 @@ class Popen_events(subprocess.Popen):
 
     communicate() returns a tuple (stdout, stderr)."""
 
-    return self._newCommunicate(input)  
+    return self._newCommunicate(myinput)  
 
