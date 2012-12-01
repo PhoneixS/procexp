@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Sun Nov 25 13:52:46 2012
+# Created: Sat Dec  1 13:29:46 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -297,7 +297,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.tcpipTableWidget = QtGui.QTableWidget(self.tcpip)
         self.tcpipTableWidget.setObjectName(_fromUtf8("tcpipTableWidget"))
-        self.tcpipTableWidget.setColumnCount(6)
+        self.tcpipTableWidget.setColumnCount(8)
         self.tcpipTableWidget.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         item.setText(QtGui.QApplication.translate("Dialog", "Proto", None, QtGui.QApplication.UnicodeUTF8))
@@ -317,6 +317,12 @@ class Ui_Dialog(object):
         item = QtGui.QTableWidgetItem()
         item.setText(QtGui.QApplication.translate("Dialog", "State", None, QtGui.QApplication.UnicodeUTF8))
         self.tcpipTableWidget.setHorizontalHeaderItem(5, item)
+        item = QtGui.QTableWidgetItem()
+        item.setText(QtGui.QApplication.translate("Dialog", "BytesSent", None, QtGui.QApplication.UnicodeUTF8))
+        self.tcpipTableWidget.setHorizontalHeaderItem(6, item)
+        item = QtGui.QTableWidgetItem()
+        item.setText(QtGui.QApplication.translate("Dialog", "BytesRec", None, QtGui.QApplication.UnicodeUTF8))
+        self.tcpipTableWidget.setHorizontalHeaderItem(7, item)
         self.horizontalLayout_6.addWidget(self.tcpipTableWidget)
         self.tabWidget.addTab(self.tcpip, _fromUtf8(""))
         self.environment = QtGui.QWidget()
@@ -389,7 +395,7 @@ class Ui_Dialog(object):
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -401,6 +407,8 @@ class Ui_Dialog(object):
         item = self.tcpipTableWidget.horizontalHeaderItem(3)
         item = self.tcpipTableWidget.horizontalHeaderItem(4)
         item = self.tcpipTableWidget.horizontalHeaderItem(5)
+        item = self.tcpipTableWidget.horizontalHeaderItem(6)
+        item = self.tcpipTableWidget.horizontalHeaderItem(7)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tcpip), QtGui.QApplication.translate("Dialog", "TCP/IP", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.environment), QtGui.QApplication.translate("Dialog", "Environment", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.strings), QtGui.QApplication.translate("Dialog", "Strings", None, QtGui.QApplication.UnicodeUTF8))
@@ -411,5 +419,14 @@ class Ui_Dialog(object):
         item = self.threadsTableWidget.horizontalHeaderItem(2)
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.threads), QtGui.QApplication.translate("Dialog", "Threads", None, QtGui.QApplication.UnicodeUTF8))
 
-
 from PyQt4.Qwt5 import QwtPlot
+
+if __name__ == "__main__":
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    Dialog = QtGui.QDialog()
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.show()
+    sys.exit(app.exec_())
+
