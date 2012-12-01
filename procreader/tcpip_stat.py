@@ -12,38 +12,38 @@ BYTESPERSECONDIDX=2
 
 q = Queue.Queue()
 _g_prevTime = None 
-_g_proc = None
+_g_proctcpdump = None
+_g_procgrep = None
 
 connections = {}
 
 def _onStdOutHandler(msg):
   """stdout handler"""
   global connections
-
-  nfbytes = int(msg[msg.rfind(" "):])
-  msg = msg[3:msg.rfind(":")]
-
-  if connections.has_key(msg):
-    connections[msg][COUNTIDX] += nfbytes+64
-    connections[msg][TIMEOUTIDX] = TIMEOUT
-  else:
-    connections[msg] = [nfbytes, TIMEOUT, 0]
+  try:
+    nfbytes = int(msg[msg.rfind(" "):])
+    msg = msg[3:msg.rfind(":")]
   
+    if connections.has_key(msg):
+      connections[msg][COUNTIDX] += nfbytes+64
+      connections[msg][TIMEOUTIDX] = TIMEOUT
+    else:
+      connections[msg] = [nfbytes, TIMEOUT, 0]
+  except ValueError:
+    pass  
   
 def _onStdErrHandler(msg):
   """log messages from stderr"""
     
 def _start():
-  global _g_proc
+  global _g_proctcpdump
+  global _g_procgrep
   try:
-    _g_proc = subprocess_new.Popen_events("tcpdump -U -l -q -nn -t -i any | grep -F 'IP '", shell=True,\
-                                       stdout = subprocess.PIPE, stderr=subprocess.PIPE, \
-                                       onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
-    try:
-      _g_proc.communicate()
-    except:
-      pass
-    print "communicated"
+    _g_proctcpdump = subprocess.Popen(["tcpdump", "-U", "-l", "-q", "-nn", "-t" ,"-i", "any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
+    _g_procgrep = subprocess_new.Popen_events(["grep", "-F", "IP "], bufsize=1024, \
+                                              stdin=_g_proctcpdump.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \
+                                              onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
+    _g_procgrep.communicate()
   except:
     import traceback
     print traceback.format_exc()
@@ -54,11 +54,11 @@ def start():
   
 def stop():
   """stop"""
-  global _g_proc
-  print _g_proc
-  _g_proc.kill()
-
-  print "killed"
+  try:
+    _g_proctcpdump.kill()
+    _g_procgrep.kill()
+  except OSError:
+    pass
   
 def tick():
   global _g_prevTime
