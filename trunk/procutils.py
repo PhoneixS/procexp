@@ -113,7 +113,7 @@ def killProcessHard(process):
 
 def humanReadable(value):
   if value < 1000:
-    return "% B" %int(value)
+    return "%s B" %str(value)
   elif value >= 1024 and value < 1024*1024:
     return "%4.1f kB" %float(value*1.0/1024.0)
   else:
