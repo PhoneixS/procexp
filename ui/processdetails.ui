@@ -36,6 +36,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="launchTcpDump">
+       <property name="text">
+        <string>start tcpip measurements</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButtonOK">
        <property name="text">
         <string>&amp;OK</string>

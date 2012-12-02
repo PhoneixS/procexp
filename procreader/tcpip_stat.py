@@ -42,7 +42,7 @@ q = Queue.Queue()
 _g_prevTime = None 
 _g_proctcpdump = None
 _g_procgrep = None
-
+_g_started = False
 connections = {}
 
 def _onStdOutHandler(msg):
@@ -67,27 +67,37 @@ def _onStdErrHandler(msg):
 def _start():
   global _g_proctcpdump
   global _g_procgrep
+  global _g_started
   try:
-    _g_proctcpdump = subprocess.Popen(["tcpdump", "-U", "-l", "-q", "-nn", "-t" ,"-i", "any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
+    message = "Linux Process Explorer needs access to all network traffic, using tcpdump. Therefore root access is required."
+    _g_proctcpdump = subprocess.Popen(["gksudo", "-m", message, "tcpdump -U -l -q -nn -t -i any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
     _g_procgrep = subprocess_new.Popen_events(["grep", "-F", "IP "], bufsize=1024, \
                                               stdin=_g_proctcpdump.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \
                                               onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
+    _g_started = True
     _g_procgrep.communicate()
+    stop()
   except:
-    import traceback
-    print traceback.format_exc()
+    stop()
 
 def start():
-  """start measuring"""  
-  threading.Thread(target=_start).start()
+  """start measuring"""
+  if _g_started == False:  
+    threading.Thread(target=_start).start()
+
+def started():
+  return _g_started
   
 def stop():
   """stop"""
+  global _g_started
   try:
-    _g_proctcpdump.kill()
-    _g_procgrep.kill()
+    if _g_proctcpdump is not None: 
+      _g_proctcpdump.kill()
+      _g_procgrep.kill()
   except OSError:
     pass
+  _g_started = False
   
 def tick():
   global _g_prevTime

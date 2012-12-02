@@ -527,7 +527,6 @@ loadSettings()
 
 timer.start(int(settings["updateTimer"]))  
 
-tcpip_stat.start()
 MainWindow.show()
 
 reader = procreader.reader.procreader(int(settings["updateTimer"]), int(settings["historySampleCount"]))
