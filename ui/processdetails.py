@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Sat Dec  1 13:49:36 2012
+# Created: Sun Dec  2 01:04:53 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -318,10 +318,10 @@ class Ui_Dialog(object):
         item.setText(QtGui.QApplication.translate("Dialog", "State", None, QtGui.QApplication.UnicodeUTF8))
         self.tcpipTableWidget.setHorizontalHeaderItem(5, item)
         item = QtGui.QTableWidgetItem()
-        item.setText(QtGui.QApplication.translate("Dialog", "BytesSent", None, QtGui.QApplication.UnicodeUTF8))
+        item.setText(QtGui.QApplication.translate("Dialog", "Sent/sec", None, QtGui.QApplication.UnicodeUTF8))
         self.tcpipTableWidget.setHorizontalHeaderItem(6, item)
         item = QtGui.QTableWidgetItem()
-        item.setText(QtGui.QApplication.translate("Dialog", "BytesRec", None, QtGui.QApplication.UnicodeUTF8))
+        item.setText(QtGui.QApplication.translate("Dialog", "Rec/Sec", None, QtGui.QApplication.UnicodeUTF8))
         self.tcpipTableWidget.setHorizontalHeaderItem(7, item)
         self.horizontalLayout_6.addWidget(self.tcpipTableWidget)
         self.tabWidget.addTab(self.tcpip, _fromUtf8(""))

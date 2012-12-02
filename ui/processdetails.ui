@@ -615,12 +615,12 @@
          </column>
          <column>
           <property name="text">
-           <string>BytesSent</string>
+           <string>Sent/sec</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>BytesRec</string>
+           <string>Rec/Sec</string>
           </property>
          </column>
         </widget>

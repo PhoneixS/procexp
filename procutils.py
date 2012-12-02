@@ -113,11 +113,11 @@ def killProcessHard(process):
 
 def humanReadable(value):
   if value < 1000:
-    return str(int(value)) + " B"
-  elif value >= 1000 and value < 1000000:
-    return str(int(value/1000)) + " kB"
+    return "% B" %int(value)
+  elif value >= 1024 and value < 1024*1024:
+    return "%4.1f kB" %float(value*1.0/1024.0)
   else:
-    return str(int(value/1000000)) + " MB"
+    return "%4.1f MB" %float(value*1.0/(1024.0*1024.0))
 
 
 class IpResolver(object):

@@ -29,7 +29,6 @@ import subprocess
 
 import procreader.tcpip_stat as tcpip_stat
 
-import copy
 UNKNOWN = "---" 
 
 tcpstates = [\
@@ -222,7 +221,6 @@ class singleUi(object):
     self.__curveCpuPlotGrid__.attach(self.__procDetails__.qwtPlotCpuHist)
     #----------------------------------------------------------------------------------------------
     
-    
     #-------- Middle plot memory usage-------------------------------------------------------------
     #Curve for memory usage
     self.__curveRssHist__ = Qwt.QwtPlotCurve("Rss History")
@@ -367,23 +365,23 @@ class singleUi(object):
       allConn.append(((ipfromaddrdec,int(ipfromport,16)),(iptoaddrdec,int(iptoport,16))))
       
       key1 = "%s.%s > %s.%s" %(ipfromaddrdec, int(ipfromport,16), iptoaddrdec, int(iptoport,16))
-      bytesSent=0
-      bytesReceived=0
+      bytesSentPerSecond=0
+      bytesReceivedPerSecond=0
       if tcpip_stat.connections.has_key(key1):
-        bytesSent=tcpip_stat.connections[key1][tcpip_stat.TOTALIDX]
-        nftotalBytesPerSecond+= tcpip_stat.connections[key1][tcpip_stat.BYTESPERSECONDIDX]   
+        bytesSentPerSecond=tcpip_stat.connections[key1][tcpip_stat.BYTESPERSECONDIDX]
+        nftotalBytesPerSecond+=bytesSentPerSecond   
       key2 = "%s.%s > %s.%s" %(iptoaddrdec, int(iptoport,16), ipfromaddrdec, int(ipfromport,16))
       if tcpip_stat.connections.has_key(key2):
-        bytesReceived=tcpip_stat.connections[key2][tcpip_stat.TOTALIDX]    
-        nftotalBytesPerSecond+=tcpip_stat.connections[key2][tcpip_stat.BYTESPERSECONDIDX]
+        bytesReceivedPerSecond=tcpip_stat.connections[key2][tcpip_stat.BYTESPERSECONDIDX]    
+        nftotalBytesPerSecond+=bytesReceivedPerSecond
       
       state = tcpstates[int(connections[conn][3],16)]
       
       ipfromResolved = procutils.resolveIP(ipfromaddrdec)
       iptoResolved = procutils.resolveIP(iptoaddrdec)
     
-      
-      text.append(("TCPIP", ipfromResolved, str(int(ipfromport,16)), iptoResolved, str(int(iptoport,16)), state, bytesSent, bytesReceived))
+      text.append(("TCPIP", ipfromResolved, str(int(ipfromport,16)), iptoResolved, str(int(iptoport,16)), state, \
+                   procutils.humanReadable(bytesSentPerSecond)+"/s", procutils.humanReadable(bytesReceivedPerSecond)+"/s"))
       
     if nftotalBytesPerSecond > 0:
       self._availableLabel.hide()  
@@ -414,8 +412,8 @@ class singleUi(object):
       itemToPort = QtGui.QTableWidgetItem(line[4])
       itemState = QtGui.QTableWidgetItem(line[5])
       if len(line) > 6:
-        bytesSent = QtGui.QTableWidgetItem(str(line[6]))
-        bytesReceived = QtGui.QTableWidgetItem(str(line[7]))
+        bytesSentSec = QtGui.QTableWidgetItem(str(line[6]))
+        bytesReceivedSec = QtGui.QTableWidgetItem(str(line[7]))
         
       self.__procDetails__.tcpipTableWidget.setItem(row, 0, itemProto)
       self.__procDetails__.tcpipTableWidget.setItem(row, 1, itemFrom)
@@ -424,8 +422,8 @@ class singleUi(object):
       self.__procDetails__.tcpipTableWidget.setItem(row, 4, itemToPort)
       self.__procDetails__.tcpipTableWidget.setItem(row, 5, itemState)
       if len(line) > 6:
-        self.__procDetails__.tcpipTableWidget.setItem(row, 6, bytesSent)
-        self.__procDetails__.tcpipTableWidget.setItem(row, 7, bytesReceived)
+        self.__procDetails__.tcpipTableWidget.setItem(row, 6, bytesSentSec)
+        self.__procDetails__.tcpipTableWidget.setItem(row, 7, bytesReceivedSec)
       
       row += 1
     
