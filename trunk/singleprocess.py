@@ -28,6 +28,7 @@ import PyQt4.Qwt5 as Qwt
 import subprocess
 
 import procreader.tcpip_stat as tcpip_stat
+import time
 
 UNKNOWN = "---" 
 
@@ -297,9 +298,8 @@ class singleUi(object):
     self.__procDetails__.qwtPlotTcpipHist.enableAxis(0, False )    
     self.__procDetails__.qwtPlotTcpipHist.enableAxis(2, False )
     #----------------------------------------------------------------------------------------------
-    
-    self._availableLabel = QtGui.QLabel("No traffic or tcpdump not available.",\
-                                        parent=self.__procDetails__.qwtPlotTcpipHist )
+    self._availableLabel = QtGui.QLabel("                                                                                ", parent=self.__procDetails__.qwtPlotTcpipHist )
+      
     font = QtGui.QFont("Arial", pointSize=12)
     self._availableLabel.setFont(font)
     self._availableLabel.setStyleSheet("QLabel { color : grey; }");
@@ -317,6 +317,20 @@ class singleUi(object):
     
     self.update_sockets()
     self.__lddoutput__ = None
+    
+    
+    #start tcpip measurement button
+    QtCore.QObject.connect(self.__procDetails__.launchTcpDump, QtCore.SIGNAL('clicked()'), self.__startTcpStat__)
+    
+    self.__procDetails__.launchTcpDump.setEnabled(not tcpip_stat.started())
+        
+  def __startTcpStat__(self):
+    """start tcpip throughput measurement"""
+    tcpip_stat.start()
+    time.sleep(2)
+    self.__procDetails__.launchTcpDump.setEnabled(False)
+    self._availableLabel.setText("  No TCP-IP traffic detected yet.")
+    
   def __del__(self):
     try:
       if self.__tcpStat__ != None:
@@ -428,6 +442,15 @@ class singleUi(object):
       row += 1
     
   def update(self):
+    
+    if not tcpip_stat.started():
+      self.__procDetails__.launchTcpDump.setEnabled(True)
+      self._availableLabel.setText("  TCP-IP measurement not started.")
+    else:
+      if self.__procDetails__.launchTcpDump.isEnabled():
+        self.__procDetails__.launchTcpDump.setEnabled(False)
+        self._availableLabel.setText("  No TCP-IP traffic detected yet.")
+   
     if self.__processGone__ == False:
       if not(self.__reader__.hasProcess(self.__proc__)):
         self.__processGone__ = True
