@@ -65,12 +65,12 @@ def _onStdErrHandler(msg):
   """log messages from stderr"""
     
 def _start():
+  """start"""
   global _g_proctcpdump
   global _g_procgrep
   global _g_started
   try:
-    message = "Linux Process Explorer needs access to all network traffic, using tcpdump. Therefore root access is required."
-    _g_proctcpdump = subprocess.Popen(["gksudo", "-m", message, "tcpdump -U -l -q -nn -t -i any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
+    _g_proctcpdump = subprocess.Popen(["pkexec", "tcpdump", "-U" , "-l", "-q", "-nn", "-t", "-i",  "any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
     _g_procgrep = subprocess_new.Popen_events(["grep", "-F", "IP "], bufsize=1024, \
                                               stdin=_g_proctcpdump.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \
                                               onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
