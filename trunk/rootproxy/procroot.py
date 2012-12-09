@@ -1,20 +1,44 @@
 #!/usr/bin/python
+
+#
+# This process runs as root and gets all commands from the ptoc fifo
+#
 import sys
 import subprocess
+import const
 
 ptoc_fifo = open(sys.argv[1], "r")
 ctop_fifo = open(sys.argv[2], "w")
 
+def _write(f, data):
+  """write to FIFO"""
+  f.write(data+"\n")
+  f.flush()
+
+processes = []
+
 while True:
-  subprocesscommand = eval(ptoc_fifo.readline())
-  if subprocesscommand[0] == "end":
+  data = ptoc_fifo.readline()
+  if data == "":
+    break
+  subprocesscommand = eval(data)
+  if subprocesscommand[0] == const.Command.END:
+    #end all processing
     break 
-  print subprocesscommand
-  if subprocesscommand[0] == "cmd":
+  elif subprocesscommand[0] == const.Command.COMMAND:
+    #execute command, and return result immediately
     try: 
-      result = ("OK", subprocess.check_output(subprocesscommand[1]))
+      result = (const.Result.OK, subprocess.check_output(subprocesscommand[1]))
     except subprocess.CalledProcessError as e:
-      result = ("FAIL", e.output)
-  ctop_fifo.write(repr(result)+"\n")
-  ctop_fifo.flush()
-  
+      result = (const.Result.FAIL, e.output)
+    _write(ctop_fifo, repr(result))
+  elif subprocesscommand[0] == const.Command.CONTINUE:
+    #start process and output to given existing fifo
+    f = open(subprocesscommand[2], "w")
+    processes.append(subprocess.Popen(subprocesscommand[1], stdout=f))
+    
+for proc in processes:
+  try:
+    proc.kill()
+  except OSError:
+    pass 

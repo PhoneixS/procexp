@@ -69,6 +69,7 @@ def _start():
   global _g_proctcpdump
   global _g_procgrep
   global _g_started
+  
   try:
     _g_proctcpdump = subprocess.Popen(["pkexec", "tcpdump", "-U" , "-l", "-q", "-nn", "-t", "-i",  "any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
     _g_procgrep = subprocess_new.Popen_events(["grep", "-F", "IP "], bufsize=1024, \
@@ -90,13 +91,15 @@ def started():
   
 def stop():
   """stop"""
-  global _g_started
   try:
-    if _g_proctcpdump is not None: 
+    global _g_started
+    if _g_proctcpdump is not None:
       _g_proctcpdump.kill()
       _g_procgrep.kill()
-  except OSError:
-    pass
+  except:
+    import traceback
+    print traceback.format_exc()
+
   _g_started = False
   
 def tick():
