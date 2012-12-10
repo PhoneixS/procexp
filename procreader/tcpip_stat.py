@@ -26,11 +26,12 @@
 #
 # When for a long TIMEOUT time no packages come in, the corresponding connection is cleared
  
-import subprocess
-import subprocess_new
 import Queue
 import threading
 import datetime
+import rootproxy
+import uuid
+import os
 
 TIMEOUT=10
 TIMEOUTIDX=1
@@ -40,67 +41,54 @@ BYTESPERSECONDIDX=2
 
 q = Queue.Queue()
 _g_prevTime = None 
-_g_proctcpdump = None
-_g_procgrep = None
 _g_started = False
+_g_fifo = None
 connections = {}
 
-def _onStdOutHandler(msg):
-  """stdout handler"""
+def readFifo():
+  """read fifo containing tcdump results"""
   global connections
-  try:
-    nfbytes = int(msg[msg.rfind(" "):])
-    msg = msg[3:msg.rfind(":")]
+  fifo = open(_g_fifo, "r")
+  while True:
+    msg = fifo.readline()
+    if msg.find("UDP") == -1:
+      try:
+        nfbytes = int(msg[msg.rfind(" "):])
+        msg = msg[3:msg.rfind(":")]
+      
+        if connections.has_key(msg):
+          connections[msg][COUNTIDX] += nfbytes+64
+          connections[msg][TOTALIDX] += nfbytes+64
+          connections[msg][TIMEOUTIDX] = TIMEOUT
+        else:
+          connections[msg] = [nfbytes, TIMEOUT, 0, 0]
+      except ValueError:
+        pass  
   
-    if connections.has_key(msg):
-      connections[msg][COUNTIDX] += nfbytes+64
-      connections[msg][TOTALIDX] += nfbytes+64
-      connections[msg][TIMEOUTIDX] = TIMEOUT
-    else:
-      connections[msg] = [nfbytes, TIMEOUT, 0, 0]
-  except ValueError:
-    pass  
-  
-def _onStdErrHandler(msg):
-  """log messages from stderr"""
-    
-def _start():
-  """start"""
-  global _g_proctcpdump
-  global _g_procgrep
-  global _g_started
-  
-  try:
-    _g_proctcpdump = subprocess.Popen(["pkexec", "tcpdump", "-U" , "-l", "-q", "-nn", "-t", "-i",  "any"], stdout = subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1024)
-    _g_procgrep = subprocess_new.Popen_events(["grep", "-F", "IP "], bufsize=1024, \
-                                              stdin=_g_proctcpdump.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE, \
-                                              onStdOut=_onStdOutHandler, onStdErr=_onStdErrHandler)
-    _g_started = True
-    _g_procgrep.communicate()
-    stop()
-  except:
-    stop()
-
 def start():
   """start measuring"""
-  if _g_started == False:  
-    threading.Thread(target=_start).start()
-
+  global _g_fifo
+  global _g_started
+  if _g_started == False:
+    rootproxy.start(asRoot=True)
+    _g_fifo = "/tmp/procexp_"+str(uuid.uuid4())
+    os.mkfifo(_g_fifo)
+    rootproxy.doContinuousCommand(["tcpdump", "-U" , "-l", "-q", "-nn", "-t", "-i",  "any"], _g_fifo)
+    _g_started = True
+    t = threading.Thread(target=readFifo)
+    t.daemon = True    
+    t.start()
+  
 def started():
   return _g_started
   
 def stop():
   """stop"""
-  try:
-    global _g_started
-    if _g_proctcpdump is not None:
-      _g_proctcpdump.kill()
-      _g_procgrep.kill()
-  except:
-    import traceback
-    print traceback.format_exc()
-
+  global _g_fifo
+  rootproxy.end()
   _g_started = False
+  if _g_fifo:
+    os.remove(_g_fifo)
   
 def tick():
   global _g_prevTime
