@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Sat Dec  1 12:56:25 2012
+# Created: Mon Dec 10 11:17:53 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -168,6 +168,9 @@ class Ui_MainWindow(object):
         self.actionLog = QtGui.QAction(MainWindow)
         self.actionLog.setText(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
         self.actionLog.setObjectName(_fromUtf8("actionLog"))
+        self.actionClear_Messages = QtGui.QAction(MainWindow)
+        self.actionClear_Messages.setText(QtGui.QApplication.translate("MainWindow", "Clear Messages", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClear_Messages.setObjectName(_fromUtf8("actionClear_Messages"))
         self.menuFile.addAction(self.actionClose_all_and_exit)
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
         self.menuView.addAction(self.actionSystem_information)
@@ -187,6 +190,7 @@ class Ui_MainWindow(object):
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionLog)
+        self.menuHelp.addAction(self.actionClear_Messages)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menubar.addAction(self.menuView.menuAction())

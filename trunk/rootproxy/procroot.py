@@ -15,7 +15,7 @@ def _write(f, data):
   f.write(data+"\n")
   f.flush()
 
-processes = []
+processes = {}
 
 while True:
   data = ptoc_fifo.readline()
@@ -35,10 +35,15 @@ while True:
   elif subprocesscommand[0] == const.Command.CONTINUE:
     #start process and output to given existing fifo
     f = open(subprocesscommand[2], "w")
-    processes.append(subprocess.Popen(subprocesscommand[1], stdout=f))
+    processes[subprocesscommand[2]] = subprocess.Popen(subprocesscommand[1], stdout=f)
+  elif subprocesscommand[0] == const.Command.STOP:
+    #start process and output to given existing fifo
+    processes[subprocesscommand[1]].kill()
+    processes[subprocesscommand[1]].wait()
+    
     
 for proc in processes:
   try:
-    proc.kill()
+    processes[proc].kill()
   except OSError:
     pass 

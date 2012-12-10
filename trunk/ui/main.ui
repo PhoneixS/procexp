@@ -153,6 +153,7 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionLog"/>
+    <addaction name="actionClear_Messages"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -310,6 +311,11 @@
   <action name="actionLog">
    <property name="text">
     <string>Log</string>
+   </property>
+  </action>
+  <action name="actionClear_Messages">
+   <property name="text">
+    <string>Clear Messages</string>
    </property>
   </action>
  </widget>
