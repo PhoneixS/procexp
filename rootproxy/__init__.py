@@ -53,6 +53,8 @@ def start(asRoot = True):
     started = True
   except IOError:
     started = False
+    os.remove(ptoc_filename)  
+    os.remove(ctop_filename)  
 
 def doCommand(CommandAndArgList):
   """issue command to procroot process and get the result"""
