@@ -20,6 +20,10 @@ def _write(f, data):
   """write to FIFO"""
   f.write(repr(data)+"\n")
   f.flush()
+
+def isStarted():
+  """is procroot running?"""
+  return started
   
 def start(asRoot = True):
   """start the command process, possible as root if required"""
@@ -48,8 +52,7 @@ def start(asRoot = True):
     ctop_file = open(ctop_filename, "r")
     started = True
   except IOError:
-    pass
-  
+    started = False
 
 def doCommand(CommandAndArgList):
   """issue command to procroot process and get the result"""
@@ -69,6 +72,12 @@ def doContinuousCommand(CommandAndArgList, outputFifo):
   global ptoc_file
   if started:
     _write(ptoc_file, (const.Command.CONTINUE, CommandAndArgList, outputFifo))
+
+def stopContinuousCommand(outputFifo):
+  """stop command writing in fifo outputFifo."""
+  global ptoc_file
+  if started:
+    _write(ptoc_file, (const.Command.STOP, outputFifo))
 
 def end():
   """stop procroot"""

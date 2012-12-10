@@ -317,18 +317,10 @@ class singleUi(object):
     
     self.update_sockets()
     self.__lddoutput__ = None
+    tcpip_stat.start()
     
-    
-    #start tcpip measurement button
-    QtCore.QObject.connect(self.__procDetails__.launchTcpDump, QtCore.SIGNAL('clicked()'), self.__startTcpStat__)
-    
-    self.__procDetails__.launchTcpDump.setEnabled(not tcpip_stat.started())
-        
   def __startTcpStat__(self):
     """start tcpip throughput measurement"""
-    tcpip_stat.start()
-    time.sleep(2)
-    self.__procDetails__.launchTcpDump.setEnabled(False)
     self._availableLabel.setText("  No TCP-IP traffic detected yet.")
     
   def __del__(self):
@@ -444,12 +436,9 @@ class singleUi(object):
   def update(self):
     
     if not tcpip_stat.started():
-      self.__procDetails__.launchTcpDump.setEnabled(True)
-      self._availableLabel.setText("  TCP-IP measurement not started.")
+      self._availableLabel.setText("  tcpdump not running (no root privileges?).")
     else:
-      if self.__procDetails__.launchTcpDump.isEnabled():
-        self.__procDetails__.launchTcpDump.setEnabled(False)
-        self._availableLabel.setText("  No TCP-IP traffic detected yet.")
+      self._availableLabel.setText("")
    
     if self.__processGone__ == False:
       if not(self.__reader__.hasProcess(self.__proc__)):
@@ -469,7 +458,6 @@ class singleUi(object):
         data = self.__reader__.getProcessCpuUsageKernelHistory(self.__proc__)
         self.__curveCpuKernelHist__.setData(self.__y__, data)
         self.__curveCpuKernelHistExt__.setData(self.__y__, data)
-
 
         self.__procDetails__.qwtPlotCpuHist.replot()
         self.__procDetails__.labelActualCpuUsage.setText(str(actual) + "%")

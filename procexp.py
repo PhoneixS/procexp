@@ -39,6 +39,8 @@ import cpuaffinity
 import sys
 import signal
 import procreader.tcpip_stat as tcpip_stat
+import rootproxy
+import messageui
 
 timer = None
 reader = None
@@ -155,6 +157,8 @@ def performMenuAction(action):
     logui.doLogWindow()
   elif action is mainUi.actionAbout:
     aboutui.doAboutWindow()
+  elif action is mainUi.actionClear_Messages:
+    messageui.clearAllMessages()
   else:
     procutils.log("This action (%s)is not yet supported." %action)
 
@@ -531,9 +535,15 @@ mainUi.setupUi(MainWindow)
 prepareUI(mainUi)
 loadSettings()
 
-timer.start(int(settings["updateTimer"]))  
 
 MainWindow.show()
+app.processEvents()
+
+rootproxy.start(asRoot=True)
+if not rootproxy.isStarted():
+  messageui.doMessageWindow("Process explorer has no root privileges. TCPIP traffic monitoring (using tcpdump) will not be available.")
+   
+timer.start(int(settings["updateTimer"]))  
 
 reader = procreader.reader.procreader(int(settings["updateTimer"]), int(settings["historySampleCount"]))
 if onlyUser:
@@ -551,5 +561,6 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 app.exec_()
 tcpip_stat.stop()
+rootproxy.end()
 sys.exit()
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'processdetails.ui'
 #
-# Created: Sun Dec  2 21:17:17 2012
+# Created: Mon Dec 10 09:43:38 2012
 #      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,10 +26,6 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         spacerItem = QtGui.QSpacerItem(178, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.launchTcpDump = QtGui.QPushButton(Dialog)
-        self.launchTcpDump.setText(QtGui.QApplication.translate("Dialog", "start tcpip measurements", None, QtGui.QApplication.UnicodeUTF8))
-        self.launchTcpDump.setObjectName(_fromUtf8("launchTcpDump"))
-        self.horizontalLayout.addWidget(self.launchTcpDump)
         self.pushButtonOK = QtGui.QPushButton(Dialog)
         self.pushButtonOK.setText(QtGui.QApplication.translate("Dialog", "&OK", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonOK.setObjectName(_fromUtf8("pushButtonOK"))
@@ -424,13 +420,3 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.threads), QtGui.QApplication.translate("Dialog", "Threads", None, QtGui.QApplication.UnicodeUTF8))
 
 from PyQt4.Qwt5 import QwtPlot
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
-

@@ -70,7 +70,6 @@ def start():
   global _g_fifo
   global _g_started
   if _g_started == False:
-    rootproxy.start(asRoot=True)
     _g_fifo = "/tmp/procexp_"+str(uuid.uuid4())
     os.mkfifo(_g_fifo)
     rootproxy.doContinuousCommand(["tcpdump", "-U" , "-l", "-q", "-nn", "-t", "-i",  "any"], _g_fifo)
@@ -85,9 +84,9 @@ def started():
 def stop():
   """stop"""
   global _g_fifo
-  rootproxy.end()
   _g_started = False
   if _g_fifo:
+    rootproxy.stopContinuousCommand(_g_fifo)
     os.remove(_g_fifo)
   
 def tick():
