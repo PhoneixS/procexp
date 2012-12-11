@@ -315,7 +315,7 @@
   </action>
   <action name="actionClear_Messages">
    <property name="text">
-    <string>Clear Messages</string>
+    <string>Clear 'do not show again' messages</string>
    </property>
   </action>
  </widget>
