@@ -169,7 +169,7 @@ class Ui_MainWindow(object):
         self.actionLog.setText(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
         self.actionLog.setObjectName(_fromUtf8("actionLog"))
         self.actionClear_Messages = QtGui.QAction(MainWindow)
-        self.actionClear_Messages.setText(QtGui.QApplication.translate("MainWindow", "Clear Messages", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClear_Messages.setText(QtGui.QApplication.translate("MainWindow", "Clear 'do not show again' messages", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClear_Messages.setObjectName(_fromUtf8("actionClear_Messages"))
         self.menuFile.addAction(self.actionClose_all_and_exit)
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
