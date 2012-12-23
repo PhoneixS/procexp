@@ -455,7 +455,10 @@ def updateUI():
       pass
 
     for proc in closedProc:
-      del treeProcesses[proc]
+      try:
+        del treeProcesses[proc]
+      except KeyError:
+        pass
 
     #color all new processes 'green'
     if firstUpdate == False:
