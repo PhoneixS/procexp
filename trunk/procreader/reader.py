@@ -24,7 +24,6 @@ import os
 import procutils
 import singleprocess
 import subprocess
-import shutil
 
 UNKNOWN = "---"
 
