@@ -53,7 +53,7 @@ class singleProcessDetailsAndHistory(object):
     self.__pathPrefix__ = self._prefixDir+"/proc/"+self.__pid__+"/"
     self.__pwd__ = UNKNOWN
     self.__exepath__ = UNKNOWN
-    self.__openFiles__ = {}
+    self.openFiles = {}
     self.__memMap__ = ""
     self.cpuUsageHistory = [0] * historyDepth
     self.cpuUsageKernelHistory = [0] * historyDepth
@@ -65,11 +65,18 @@ class singleProcessDetailsAndHistory(object):
     self.ppid = None
     self.threads = {}
 
-  def __getOpenFileNames__(self):
-    alldirs = os.listdir(self.__pathPrefix__ + "fd")
-    self.__openFiles__ = {}
-    for thedir in alldirs:
-      self.__openFiles__[thedir] = {"path":os.readlink(self.__pathPrefix__ + dir)}
+  def __getFileDetails__(self):
+    try:
+      allfds = os.listdir(self.__pathPrefix__ + "fd")
+      self.openFiles = {}
+      for fd in allfds:
+        self.openFiles[fd] = {"path":os.readlink(self.__pathPrefix__ + "fd"+"/"+fd)}
+        
+        #get fileinfo : kernel 2.6.22 and higher
+        fileInfo = procutils.readFullFile(self.__pathPrefix__ + "fdinfo/"+fd)
+        self.openFiles[fd]["fdinfo"] = fileInfo
+    except OSError:
+      pass
   
   def _getThreadsInfo__(self):
     self.threads = {}
@@ -163,6 +170,9 @@ class singleProcessDetailsAndHistory(object):
         
     #all threads
     self._getThreadsInfo__()
+    
+    #get fileInfo
+    self.__getFileDetails__()
       
       
 class singleUi(object):
@@ -544,3 +554,27 @@ class singleUi(object):
           self.__procDetails__.threadsTableWidget.setItem(row, 1, itemWchan)
           self.__procDetails__.threadsTableWidget.setItem(row, 2, itemWakeups)
           row += 1
+          
+        #show open files info
+        self.__procDetails__.filesTableWidget.clearContents()
+        fontInfo = QtGui.QFontInfo(self.__procDetails__.filesTableWidget.viewOptions().font)
+        height = int(fontInfo.pixelSize()*1.2+0.5)
+        fileInfo = self.__reader__.getFileInfo(self.__proc__)
+        row = 0
+        for fd in fileInfo:
+          if self.__procDetails__.filesTableWidget.rowCount() <= row:
+            self.__procDetails__.filesTableWidget.insertRow(row)
+          if height != -1:
+            self.__procDetails__.filesTableWidget.setRowHeight(row, height)
+          self.__procDetails__.filesTableWidget.setVerticalHeaderItem (row, QtGui.QTableWidgetItem(""))
+          
+          itemFd = QtGui.QTableWidgetItem(str(fd))
+          itemPath = QtGui.QTableWidgetItem(str(fileInfo[fd]["path"]))
+          itemPos = QtGui.QTableWidgetItem(str(fileInfo[fd]["fdinfo"].split("\n")[0].split("\t")[1]))
+          self.__procDetails__.filesTableWidget.setItem(row, 0, itemFd)
+          self.__procDetails__.filesTableWidget.setItem(row, 1, itemPath)
+          self.__procDetails__.filesTableWidget.setItem(row, 2, itemPos)
+          row += 1
+          
+        
+       

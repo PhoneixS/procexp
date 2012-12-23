@@ -159,8 +159,6 @@ class procreader(object):
     self.__noofrunningprocs__ = 0
     self.__lastpid__ = 0
     
-    
-    
     for line in cpuinfo:
       if line.startswith("processor"):
         self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__, prefixDir=prefixDir))
@@ -612,4 +610,6 @@ class procreader(object):
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
   def getThreads(self, process):
     return self.__processList__[int(process)]["history"].threads
+  def getFileInfo(self, process):
+    return self.__processList__[int(process)]["history"].openFiles
 
