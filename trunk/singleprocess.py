@@ -561,7 +561,7 @@ class singleUi(object):
         height = int(fontInfo.pixelSize()*1.2+0.5)
         fileInfo = self.__reader__.getFileInfo(self.__proc__)
         row = 0
-        for fd in fileInfo:
+        for fd in sorted([int(fd) for fd in fileInfo.keys()]):
           if self.__procDetails__.filesTableWidget.rowCount() <= row:
             self.__procDetails__.filesTableWidget.insertRow(row)
           if height != -1:
@@ -569,8 +569,8 @@ class singleUi(object):
           self.__procDetails__.filesTableWidget.setVerticalHeaderItem (row, QtGui.QTableWidgetItem(""))
           
           itemFd = QtGui.QTableWidgetItem(str(fd))
-          itemPath = QtGui.QTableWidgetItem(str(fileInfo[fd]["path"]))
-          itemPos = QtGui.QTableWidgetItem(str(fileInfo[fd]["fdinfo"].split("\n")[0].split("\t")[1]))
+          itemPath = QtGui.QTableWidgetItem(str(fileInfo[str(fd)]["path"]))
+          itemPos = QtGui.QTableWidgetItem(str(fileInfo[str(fd)]["fdinfo"].split("\n")[0].split("\t")[1]))
           self.__procDetails__.filesTableWidget.setItem(row, 0, itemFd)
           self.__procDetails__.filesTableWidget.setItem(row, 1, itemPath)
           self.__procDetails__.filesTableWidget.setItem(row, 2, itemPos)
