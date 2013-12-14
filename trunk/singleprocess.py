@@ -73,8 +73,13 @@ class singleProcessDetailsAndHistory(object):
         self.openFiles[fd] = {"path":os.readlink(self.__pathPrefix__ + "fd"+"/"+fd)}
         
         #get fileinfo : kernel 2.6.22 and higher
-        fileInfo = procutils.readFullFile(self.__pathPrefix__ + "fdinfo/"+fd)
-        self.openFiles[fd]["fdinfo"] = fileInfo
+
+        try:
+          fileInfo = procutils.readFullFile(self.__pathPrefix__ + "fdinfo/"+fd)
+          self.openFiles[fd]["fdinfo"] = fileInfo
+        except:
+          self.openFiles[fd]["fdinfo"] = "??"
+
     except OSError:
       pass
   
