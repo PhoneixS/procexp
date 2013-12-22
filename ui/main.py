@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Mon Dec 10 11:17:53 2012
-#      by: PyQt4 UI code generator 4.8.5
+# Created: Sun Dec 22 13:02:24 2013
+#      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,13 +12,21 @@ from PyQt4 import QtCore, QtGui
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
-    _fromUtf8 = lambda s: s
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(518, 358)
-        MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Linux Process Explorer", None, QtGui.QApplication.UnicodeUTF8))
+        MainWindow.resize(686, 358)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
@@ -36,9 +44,52 @@ class Ui_MainWindow(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.freezeCheckBox = QtGui.QCheckBox(self.frame)
-        self.freezeCheckBox.setText(QtGui.QApplication.translate("MainWindow", "freeze", None, QtGui.QApplication.UnicodeUTF8))
         self.freezeCheckBox.setObjectName(_fromUtf8("freezeCheckBox"))
         self.horizontalLayout.addWidget(self.freezeCheckBox)
+        self.memory = QtGui.QProgressBar(self.frame)
+        self.memory.setStyleSheet(_fromUtf8(" QProgressBar {\n"
+"     border: 2px solid grey;\n"
+"     border-radius: 3px;\n"
+" }\n"
+"\n"
+" QProgressBar::chunk {\n"
+"     background-color:rgb(32, 140, 2)\n"
+" }\n"
+"\n"
+" QProgressBar {\n"
+"     border: 2px solid grey;\n"
+"     border-radius: 3px;\n"
+"     text-align: center;\n"
+" }\n"
+"\n"
+" "))
+        self.memory.setProperty("value", 0)
+        self.memory.setTextVisible(False)
+        self.memory.setOrientation(QtCore.Qt.Vertical)
+        self.memory.setObjectName(_fromUtf8("memory"))
+        self.horizontalLayout.addWidget(self.memory)
+        self.swap = QtGui.QProgressBar(self.frame)
+        self.swap.setStyleSheet(_fromUtf8(" QProgressBar {\n"
+"     border: 2px solid grey;\n"
+"     border-radius: 3px;\n"
+" }\n"
+"\n"
+" QProgressBar::chunk {\n"
+"     background-color:rgb(185, 0, 3)\n"
+" }\n"
+"\n"
+" QProgressBar {\n"
+"     border: 2px solid grey;\n"
+"     border-radius: 3px;\n"
+"     text-align: center;\n"
+" }\n"
+"\n"
+" "))
+        self.swap.setProperty("value", 0)
+        self.swap.setTextVisible(False)
+        self.swap.setOrientation(QtCore.Qt.Vertical)
+        self.swap.setObjectName(_fromUtf8("swap"))
+        self.horizontalLayout.addWidget(self.swap)
         self.qwtPlotOverallCpuHist = QwtPlot(self.frame)
         self.qwtPlotOverallCpuHist.setMinimumSize(QtCore.QSize(150, 0))
         self.qwtPlotOverallCpuHist.setMaximumSize(QtCore.QSize(150, 50))
@@ -54,122 +105,85 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.processTreeWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 518, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 686, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
-        self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
         self.menuOptions = QtGui.QMenu(self.menubar)
-        self.menuOptions.setTitle(QtGui.QApplication.translate("MainWindow", "Options", None, QtGui.QApplication.UnicodeUTF8))
         self.menuOptions.setObjectName(_fromUtf8("menuOptions"))
         self.menuView = QtGui.QMenu(self.menubar)
-        self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.menuView.setObjectName(_fromUtf8("menuView"))
         self.menuProcess = QtGui.QMenu(self.menubar)
-        self.menuProcess.setTitle(QtGui.QApplication.translate("MainWindow", "Process", None, QtGui.QApplication.UnicodeUTF8))
         self.menuProcess.setObjectName(_fromUtf8("menuProcess"))
         self.menuSettings = QtGui.QMenu(self.menubar)
-        self.menuSettings.setTitle(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.menuSettings.setObjectName(_fromUtf8("menuSettings"))
         self.menuHelp = QtGui.QMenu(self.menubar)
-        self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
         self.actionSet_affinity = QtGui.QAction(MainWindow)
-        self.actionSet_affinity.setText(QtGui.QApplication.translate("MainWindow", "Set affinity", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_affinity.setObjectName(_fromUtf8("actionSet_affinity"))
         self.actionSet_priority = QtGui.QAction(MainWindow)
-        self.actionSet_priority.setText(QtGui.QApplication.translate("MainWindow", "Set priority", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSet_priority.setObjectName(_fromUtf8("actionSet_priority"))
         self.action = QtGui.QAction(MainWindow)
-        self.action.setText(QtGui.QApplication.translate("MainWindow", "----", None, QtGui.QApplication.UnicodeUTF8))
         self.action.setObjectName(_fromUtf8("action"))
         self.actionKill_process = QtGui.QAction(MainWindow)
-        self.actionKill_process.setText(QtGui.QApplication.translate("MainWindow", "Kill process", None, QtGui.QApplication.UnicodeUTF8))
         self.actionKill_process.setObjectName(_fromUtf8("actionKill_process"))
         self.actionKill_process_tree = QtGui.QAction(MainWindow)
-        self.actionKill_process_tree.setText(QtGui.QApplication.translate("MainWindow", "Kill process tree", None, QtGui.QApplication.UnicodeUTF8))
         self.actionKill_process_tree.setObjectName(_fromUtf8("actionKill_process_tree"))
         self.actionSuspend_process = QtGui.QAction(MainWindow)
-        self.actionSuspend_process.setText(QtGui.QApplication.translate("MainWindow", "Suspend process", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSuspend_process.setObjectName(_fromUtf8("actionSuspend_process"))
         self.actionProperties = QtGui.QAction(MainWindow)
-        self.actionProperties.setText(QtGui.QApplication.translate("MainWindow", "Properties", None, QtGui.QApplication.UnicodeUTF8))
         self.actionProperties.setObjectName(_fromUtf8("actionProperties"))
         self.actionShow_process_from_all_users = QtGui.QAction(MainWindow)
-        self.actionShow_process_from_all_users.setText(QtGui.QApplication.translate("MainWindow", "Show process from all users", None, QtGui.QApplication.UnicodeUTF8))
         self.actionShow_process_from_all_users.setObjectName(_fromUtf8("actionShow_process_from_all_users"))
         self.action8 = QtGui.QAction(MainWindow)
-        self.action8.setText(QtGui.QApplication.translate("MainWindow", "8", None, QtGui.QApplication.UnicodeUTF8))
         self.action8.setObjectName(_fromUtf8("action8"))
         self.action9 = QtGui.QAction(MainWindow)
-        self.action9.setText(QtGui.QApplication.translate("MainWindow", "9", None, QtGui.QApplication.UnicodeUTF8))
         self.action9.setObjectName(_fromUtf8("action9"))
         self.action7 = QtGui.QAction(MainWindow)
-        self.action7.setText(QtGui.QApplication.translate("MainWindow", "7", None, QtGui.QApplication.UnicodeUTF8))
         self.action7.setObjectName(_fromUtf8("action7"))
         self.action81 = QtGui.QAction(MainWindow)
-        self.action81.setText(QtGui.QApplication.translate("MainWindow", "8", None, QtGui.QApplication.UnicodeUTF8))
         self.action81.setObjectName(_fromUtf8("action81"))
         self.action10 = QtGui.QAction(MainWindow)
-        self.action10.setText(QtGui.QApplication.translate("MainWindow", "10", None, QtGui.QApplication.UnicodeUTF8))
         self.action10.setObjectName(_fromUtf8("action10"))
         self.action12 = QtGui.QAction(MainWindow)
-        self.action12.setText(QtGui.QApplication.translate("MainWindow", "12", None, QtGui.QApplication.UnicodeUTF8))
         self.action12.setObjectName(_fromUtf8("action12"))
         self.action14 = QtGui.QAction(MainWindow)
-        self.action14.setText(QtGui.QApplication.translate("MainWindow", "14", None, QtGui.QApplication.UnicodeUTF8))
         self.action14.setObjectName(_fromUtf8("action14"))
         self.actionSaveSettings = QtGui.QAction(MainWindow)
-        self.actionSaveSettings.setText(QtGui.QApplication.translate("MainWindow", "Save current settings", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSaveSettings.setObjectName(_fromUtf8("actionSaveSettings"))
         self.action10_2 = QtGui.QAction(MainWindow)
-        self.action10_2.setText(QtGui.QApplication.translate("MainWindow", "10", None, QtGui.QApplication.UnicodeUTF8))
         self.action10_2.setObjectName(_fromUtf8("action10_2"))
         self.action100 = QtGui.QAction(MainWindow)
-        self.action100.setText(QtGui.QApplication.translate("MainWindow", "100", None, QtGui.QApplication.UnicodeUTF8))
         self.action100.setObjectName(_fromUtf8("action100"))
         self.action1000 = QtGui.QAction(MainWindow)
-        self.action1000.setText(QtGui.QApplication.translate("MainWindow", "1000", None, QtGui.QApplication.UnicodeUTF8))
         self.action1000.setObjectName(_fromUtf8("action1000"))
         self.action10000 = QtGui.QAction(MainWindow)
-        self.action10000.setText(QtGui.QApplication.translate("MainWindow", "10000", None, QtGui.QApplication.UnicodeUTF8))
         self.action10000.setObjectName(_fromUtf8("action10000"))
         self.action100000 = QtGui.QAction(MainWindow)
-        self.action100000.setText(QtGui.QApplication.translate("MainWindow", "100000", None, QtGui.QApplication.UnicodeUTF8))
         self.action100000.setObjectName(_fromUtf8("action100000"))
         self.actionSettings = QtGui.QAction(MainWindow)
-        self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setObjectName(_fromUtf8("actionSettings"))
         self.actionSystem_information = QtGui.QAction(MainWindow)
-        self.actionSystem_information.setText(QtGui.QApplication.translate("MainWindow", "System Information...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSystem_information.setObjectName(_fromUtf8("actionSystem_information"))
         self.actionNetwork_Information = QtGui.QAction(MainWindow)
-        self.actionNetwork_Information.setText(QtGui.QApplication.translate("MainWindow", "Network Information...", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNetwork_Information.setObjectName(_fromUtf8("actionNetwork_Information"))
         self.actionClose_this_window = QtGui.QAction(MainWindow)
-        self.actionClose_this_window.setText(QtGui.QApplication.translate("MainWindow", "Close this window", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose_this_window.setObjectName(_fromUtf8("actionClose_this_window"))
         self.actionClose_all_and_exit = QtGui.QAction(MainWindow)
-        self.actionClose_all_and_exit.setText(QtGui.QApplication.translate("MainWindow", "Close", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClose_all_and_exit.setObjectName(_fromUtf8("actionClose_all_and_exit"))
         self.actionColor_legend = QtGui.QAction(MainWindow)
-        self.actionColor_legend.setText(QtGui.QApplication.translate("MainWindow", "Color legend", None, QtGui.QApplication.UnicodeUTF8))
         self.actionColor_legend.setObjectName(_fromUtf8("actionColor_legend"))
         self.action_2 = QtGui.QAction(MainWindow)
-        self.action_2.setText(QtGui.QApplication.translate("MainWindow", "---", None, QtGui.QApplication.UnicodeUTF8))
         self.action_2.setObjectName(_fromUtf8("action_2"))
         self.actionAbout = QtGui.QAction(MainWindow)
-        self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.actionLog = QtGui.QAction(MainWindow)
-        self.actionLog.setText(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
         self.actionLog.setObjectName(_fromUtf8("actionLog"))
         self.actionClear_Messages = QtGui.QAction(MainWindow)
-        self.actionClear_Messages.setText(QtGui.QApplication.translate("MainWindow", "Clear 'do not show again' messages", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClear_Messages.setObjectName(_fromUtf8("actionClear_Messages"))
         self.menuFile.addAction(self.actionClose_all_and_exit)
         self.menuOptions.addAction(self.actionShow_process_from_all_users)
@@ -202,7 +216,47 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        pass
+        MainWindow.setWindowTitle(_translate("MainWindow", "Linux Process Explorer", None))
+        self.freezeCheckBox.setText(_translate("MainWindow", "freeze", None))
+        self.memory.setToolTip(_translate("MainWindow", "Memory usage", None))
+        self.swap.setToolTip(_translate("MainWindow", "Swap usage", None))
+        self.menuFile.setTitle(_translate("MainWindow", "File", None))
+        self.menuOptions.setTitle(_translate("MainWindow", "Options", None))
+        self.menuView.setTitle(_translate("MainWindow", "View", None))
+        self.menuProcess.setTitle(_translate("MainWindow", "Process", None))
+        self.menuSettings.setTitle(_translate("MainWindow", "Settings", None))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
+        self.actionSet_affinity.setText(_translate("MainWindow", "Set affinity", None))
+        self.actionSet_priority.setText(_translate("MainWindow", "Set priority", None))
+        self.action.setText(_translate("MainWindow", "----", None))
+        self.actionKill_process.setText(_translate("MainWindow", "Kill process", None))
+        self.actionKill_process_tree.setText(_translate("MainWindow", "Kill process tree", None))
+        self.actionSuspend_process.setText(_translate("MainWindow", "Suspend process", None))
+        self.actionProperties.setText(_translate("MainWindow", "Properties", None))
+        self.actionShow_process_from_all_users.setText(_translate("MainWindow", "Show process from all users", None))
+        self.action8.setText(_translate("MainWindow", "8", None))
+        self.action9.setText(_translate("MainWindow", "9", None))
+        self.action7.setText(_translate("MainWindow", "7", None))
+        self.action81.setText(_translate("MainWindow", "8", None))
+        self.action10.setText(_translate("MainWindow", "10", None))
+        self.action12.setText(_translate("MainWindow", "12", None))
+        self.action14.setText(_translate("MainWindow", "14", None))
+        self.actionSaveSettings.setText(_translate("MainWindow", "Save current settings", None))
+        self.action10_2.setText(_translate("MainWindow", "10", None))
+        self.action100.setText(_translate("MainWindow", "100", None))
+        self.action1000.setText(_translate("MainWindow", "1000", None))
+        self.action10000.setText(_translate("MainWindow", "10000", None))
+        self.action100000.setText(_translate("MainWindow", "100000", None))
+        self.actionSettings.setText(_translate("MainWindow", "Settings...", None))
+        self.actionSystem_information.setText(_translate("MainWindow", "System Information...", None))
+        self.actionNetwork_Information.setText(_translate("MainWindow", "Network Information...", None))
+        self.actionClose_this_window.setText(_translate("MainWindow", "Close this window", None))
+        self.actionClose_all_and_exit.setText(_translate("MainWindow", "Close", None))
+        self.actionColor_legend.setText(_translate("MainWindow", "Color legend", None))
+        self.action_2.setText(_translate("MainWindow", "---", None))
+        self.actionAbout.setText(_translate("MainWindow", "About", None))
+        self.actionLog.setText(_translate("MainWindow", "Log", None))
+        self.actionClear_Messages.setText(_translate("MainWindow", "Clear \'do not show again\' messages", None))
 
 from PyQt4.Qwt5 import QwtPlot
 

@@ -154,10 +154,14 @@ class procreader(object):
     self.__actualMemKb  = 0
     self.__buffersMemKb = 0
     self.__cachedMemKb  = 0
+    self.__swapUsed = 0
+    self.__swapTotal = 0
     self.__loadavg__ = 0
     self.__noofprocs__ = 0
     self.__noofrunningprocs__ = 0
     self.__lastpid__ = 0
+
+
     
     for line in cpuinfo:
       if line.startswith("processor"):
@@ -481,6 +485,8 @@ class procreader(object):
     self.__actualMemKb  = int(mem[1].split()[1])
     self.__buffersMemKb = int(mem[2].split()[1])
     self.__cachedMemKb  = int(mem[3].split()[1])
+    self.__swapUsed     = int(mem[13].split()[1]) - int(mem[14].split()[1])
+    self.__swapTotal    = int(mem[13].split()[1])
   
   def __getAverageLoad(self):
     load = procutils.readFullFile(self._prefixDir + "/proc/loadavg").split()
@@ -605,7 +611,7 @@ class procreader(object):
   def getCpuCount(self):
     return self.__cpuCount__
   def getMemoryUsage(self):
-    return self.__totalMemKb, self.__actualMemKb, self.__buffersMemKb, self.__cachedMemKb
+    return self.__totalMemKb, self.__actualMemKb, self.__buffersMemKb, self.__cachedMemKb, self.__swapUsed, self.__swapTotal
   def getLoadAvg(self):
     return  self.__loadavg__, self.__noofprocs__, self.__noofrunningprocs__, self.__lastpid__
   def getThreads(self, process):

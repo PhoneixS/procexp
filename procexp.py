@@ -21,6 +21,8 @@
 #  Diaa Sami, making the GUI more usable
 #
 
+
+
 import procreader.reader
 import ui.main
 import logui
@@ -31,16 +33,21 @@ import singleprocess
 import systemoverview
 import configobj
 import settings as settingsMenu
+
 import plotobjects
 import networkoverview
 import colorlegend
 from PyQt4 import QtCore, QtGui
+
 import cpuaffinity
 import sys
 import signal
 import procreader.tcpip_stat as tcpip_stat
 import rootproxy
 import messageui
+
+
+
 
 timer = None
 reader = None
@@ -522,15 +529,29 @@ def updateUI():
     mainUi.qwtPlotOverallCpuHist.replot()
 
     logui.update()
+
+    #update memory figures
+    mem = reader.getMemoryUsage()
+    totalSwap = mem[5]
+    actualSwap = mem[4]
+    mainUi.memory.setValue(mem[0]-mem[1])
+    mainUi.memory.setMaximum(mem[0])
+    mainUi.swap.setValue(actualSwap)
+    if totalSwap > 0:
+      mainUi.swap.setMaximum(totalSwap)
+    else:
+      mainUi.swap.setMaximum(1)
+
   except:
     import traceback
     procutils.log("Unhandled exception:%s" %traceback.format_exc())
     print traceback.format_exc()
   
   firstUpdate = False
-  
+
+
+
 app = QtGui.QApplication(sys.argv)
-app.setStyle("Windows")
 MainWindow = QtGui.QMainWindow()
 mainUi = ui.main.Ui_MainWindow()
 mainUi.setupUi(MainWindow)
