@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
+    <width>686</width>
     <height>358</height>
    </rect>
   </property>
@@ -60,6 +60,74 @@
         </widget>
        </item>
        <item>
+        <widget class="QProgressBar" name="memory">
+         <property name="toolTip">
+          <string>Memory usage</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"> QProgressBar {
+     border: 2px solid grey;
+     border-radius: 3px;
+ }
+
+ QProgressBar::chunk {
+     background-color:rgb(32, 140, 2)
+ }
+
+ QProgressBar {
+     border: 2px solid grey;
+     border-radius: 3px;
+     text-align: center;
+ }
+
+ </string>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+         <property name="textVisible">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="swap">
+         <property name="toolTip">
+          <string>Swap usage</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"> QProgressBar {
+     border: 2px solid grey;
+     border-radius: 3px;
+ }
+
+ QProgressBar::chunk {
+     background-color:rgb(185, 0, 3)
+ }
+
+ QProgressBar {
+     border: 2px solid grey;
+     border-radius: 3px;
+     text-align: center;
+ }
+
+ </string>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+         <property name="textVisible">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QwtPlot" name="qwtPlotOverallCpuHist">
          <property name="minimumSize">
           <size>
@@ -101,7 +169,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>518</width>
+     <width>686</width>
      <height>25</height>
     </rect>
    </property>

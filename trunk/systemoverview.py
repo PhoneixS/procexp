@@ -20,6 +20,7 @@
 # Display system overview
 #
 
+
 from PyQt4 import QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 import ui.systeminformation
@@ -194,6 +195,7 @@ class systemOverviewUi(object):
     self.__ui__.memAvailable.setText(str(memvalues[1]))
     self.__ui__.memBuffers.setText(str(memvalues[2]))
     self.__ui__.memCached.setText(str(memvalues[3]))
+    self.__ui__.swapUsed.setText(str(memvalues[4]))
     
     avg = self.__reader__.getLoadAvg()
     self.__ui__.last1minUtil.setText(str(avg[0][0]))
