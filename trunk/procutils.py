@@ -63,12 +63,12 @@ def getLog():
 
 
 lib = ctypes.cdll.LoadLibrary("libc.so.6")
-s = ctypes.create_string_buffer('\000' * 1024)
+BLOCKSIZE=4096
+s = ctypes.create_string_buffer('\000' * BLOCKSIZE)
 
 class FileError(Exception):
   pass
-  
-  
+
 def readFullFileFast(path):
   
   try:
@@ -77,13 +77,17 @@ def readFullFileFast(path):
       
     total = ""
       
-    eof = lib.read(f, s, 1024)
-    if eof == -1: raise FileError    
+    eof = lib.read(f, s, BLOCKSIZE)
+    if eof == -1: raise FileError
     if eof > 0:
       total = total + s.raw[:eof]
-    
+      if eof < BLOCKSIZE:
+        lib.close(f)
+        return total
+
     while eof > 0:
-      eof = lib.read(f, s, 1024)
+      eof = lib.read(f, s, BLOCKSIZE)
+      print " ",eof, path
       if eof == -1: raise FileError
       if eof > 0:
         total = total + s.raw[:eof]
