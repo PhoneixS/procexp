@@ -28,6 +28,7 @@ import PyQt4.Qwt5 as Qwt
 import subprocess
 
 import procreader.tcpip_stat as tcpip_stat
+import procreader.reader
 import time
 
 UNKNOWN = "---" 
@@ -65,40 +66,42 @@ class singleProcessDetailsAndHistory(object):
     self.ppid = None
     self.threads = {}
 
-  def __getFileDetails__(self):
-    try:
-      allfds = os.listdir(self.__pathPrefix__ + "fd")
-      self.openFiles = {}
-      for fd in allfds:
-        self.openFiles[fd] = {"path":os.readlink(self.__pathPrefix__ + "fd"+"/"+fd)}
+  def __getFileDetails__(self, hasListener):
+    if hasListener:
+      try:
+        allfds = os.listdir(self.__pathPrefix__ + "fd")
+        self.openFiles = {}
+        for fd in allfds:
+          self.openFiles[fd] = {"path":os.readlink(self.__pathPrefix__ + "fd"+"/"+fd)}
         
-        #get fileinfo : kernel 2.6.22 and higher
+          #get fileinfo : kernel 2.6.22 and higher
 
-        try:
-          fileInfo = procutils.readFullFile(self.__pathPrefix__ + "fdinfo/"+fd)
-          self.openFiles[fd]["fdinfo"] = fileInfo
-        except:
-          self.openFiles[fd]["fdinfo"] = "??"
+          try:
+            fileInfo = procutils.readFullFile(self.__pathPrefix__ + "fdinfo/"+fd)
+            self.openFiles[fd]["fdinfo"] = fileInfo
+          except:
+            self.openFiles[fd]["fdinfo"] = "??"
 
-    except OSError:
-      pass
+      except OSError:
+        pass
   
-  def _getThreadsInfo__(self):
+  def _getThreadsInfo__(self, hasListener):
     self.threads = {}
-    try:
-      alldirs = os.listdir(self.__pathPrefix__ + "task/")
-      for t in alldirs:
-        try:
-          wchan = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/wchan")
-          sched = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/sched")
-          wakeupcount = int(sched.split("\n")[23].split(":")[1]) #23 is wakeupcount 
-          self.threads[t] = [wchan, wakeupcount]
-        except:
-          pass
-    except OSError:
-      pass
+    if hasListener:
+      try:
+        alldirs = os.listdir(self.__pathPrefix__ + "task/")
+        for t in alldirs:
+          try:
+            wchan = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/wchan")
+            sched = procutils.readFullFile(self.__pathPrefix__ + "task/" + str(t) + "/sched")
+            wakeupcount = int(sched.split("\n")[23].split(":")[1]) #23 is wakeupcount
+            self.threads[t] = [wchan, wakeupcount]
+          except:
+            pass
+      except OSError:
+        pass
     
-  def update(self, cpuUsage, cpuUsageKernel, totalRss, IO):
+  def update(self, cpuUsage, cpuUsageKernel, totalRss, IO, hasListener):
     if cpuUsage > 100:
       cpuUsage = 0
     if cpuUsageKernel > 100:
@@ -174,10 +177,10 @@ class singleProcessDetailsAndHistory(object):
         self.ppid = None
         
     #all threads
-    self._getThreadsInfo__()
+    self._getThreadsInfo__(hasListener)
     
     #get fileInfo
-    self.__getFileDetails__()
+    self.__getFileDetails__(hasListener)
       
       
 class singleUi(object):
@@ -197,6 +200,9 @@ class singleUi(object):
     self.__tcpStat__ = None
     self.__TCPHist__ = [0] * self.__reader__.getHistoryDepth(self.__proc__)
     self.__prevtcpipbytes__ = 0
+
+    #tell reader that a singleprocess GUI is using its data, for optimization
+    self.__reader__.setListener(self.__proc__)
 
     #-------- top plot CPU usage-------------------------------------------------------------------
     #Curves for CPU usage
@@ -323,11 +329,6 @@ class singleUi(object):
     QtCore.QObject.connect(self.__procDetails__.pushButtonOK, QtCore.SIGNAL('clicked()'), self.__onClose__)
   
     # Fill some field only at construction time
-    data = self.__reader__.getEnvironment(self.__proc__)
-    text = ""
-    for line in data:
-      text = text + line + "\n"
-    self.__procDetails__.environmentText.setPlainText(text)
     QtCore.QObject.connect(self.__procDetails__.filterEdit, QtCore.SIGNAL('textEdited(QString)'), self.__onFilterTextEdit__)
     
     self.update_sockets()
@@ -345,16 +346,23 @@ class singleUi(object):
         self.__tcpStat__.join()
     except OSError:
       pass
-    
-  def __onFilterTextEdit__(self):
+
+
+  def __updateEnvironmentDisplay(self):
     filter = str(self.__procDetails__.filterEdit.text())
     data = self.__reader__.getEnvironment(self.__proc__)
-    text = ""
-    for line in data:
-      if line.upper().find(filter.upper()) != -1:
-        text = text + line + "\n"
-    self.__procDetails__.environmentText.setText(text)
-    
+    if data != procreader.reader.UNKNOWN:
+      text = ""
+      for line in data:
+        if line.upper().find(filter.upper()) != -1:
+          text = text + line + "\n"
+      self.__procDetails__.environmentText.setText(text)
+    else:
+      self.__procDetails__.environmentText.setText("---")
+
+  def __onFilterTextEdit__(self):
+    self.__updateEnvironmentDisplay()
+
   def __onClose__(self):
     self.__dialog__.setVisible(False)
   def makeVisible(self):
@@ -449,6 +457,8 @@ class singleUi(object):
       row += 1
     
   def update(self):
+
+    self.__updateEnvironmentDisplay()
     
     if not tcpip_stat.started():
       self._availableLabel.setText("  tcpdump not running (no root privileges?).")
