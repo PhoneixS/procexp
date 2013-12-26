@@ -190,8 +190,11 @@ class procreader(object):
       
       if data[0] is not None:
         for line in data[0].split("\n"):
-          if line.find("Speed") != -1: 
-            speed = int(line.split(":")[1].split("Mb/s")[0])
+          if line.find("Speed") != -1:
+            try:
+              speed = int(line.split(":")[1].split("Mb/s")[0])
+            except:
+              speed = None
       
       if speed is not None:
         procutils.log("  ethernet device %s has speed %s Mb/s according to ethtool" %(card, speed))
@@ -292,7 +295,8 @@ class procreader(object):
         "uid":UNKNOWN, \
         "wchan":UNKNOWN, \
         "nfThreads":UNKNOWN, \
-        "history":singleprocess.singleProcessDetailsAndHistory(process,self.__historyCount__, prefixDir=self._prefixDir)}
+        "history":singleprocess.singleProcessDetailsAndHistory(process,self.__historyCount__, prefixDir=self._prefixDir),\
+        "hasListener": False}
 
   def __getUIDName__(self, uid):
     """get the users realname from the password file"""
@@ -314,12 +318,12 @@ class procreader(object):
 
   def __getProcessDetails__(self):
     for process in self.__processList__:
-      if self.__processList__[process]["env"] == UNKNOWN:
+      if self.__processList__[process]["hasListener"]:
         try:
           env = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/environ").split("\0")
+          self.__processList__[process]["env"] = env
         except: #pylint:disable=W0702
-          env = '-'
-        self.__processList__[process]["env"] = env
+          pass
       
   def __getProcessCpuDetails__(self):
     for process in self.__processList__:
@@ -349,14 +353,14 @@ class procreader(object):
             
       except: #pylint:disable=W0702
         totalRssMem = 0
-        
-      try:
-        wchan = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/wchan")
-        self.__processList__[process]["wchan"] = wchan
-      except: #pylint:disable=W0702
+      if self.__processList__[process]["hasListener"]:
+        try:
+          wchan = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/wchan")
+          self.__processList__[process]["wchan"] = wchan
+        except: #pylint:disable=W0702
+          self.__processList__[process]["wchan"] = UNKNOWN
+      else:
         self.__processList__[process]["wchan"] = UNKNOWN
-        
-          
         
       if procStat != None:
         procStatSplitted = procStat.split()
@@ -392,7 +396,7 @@ class procreader(object):
         self.__processList__[process]["name"] = procStatSplitted[1][1:].replace(")","")
         
         self.__processList__[process]["Rss"] = totalRssMem
-        self.__processList__[process]["history"].update(cpuUsage, cpuUsageKernel, totalRssMem, deltaio/1024)
+        self.__processList__[process]["history"].update(cpuUsage, cpuUsageKernel, totalRssMem, deltaio/1024,self.__processList__[process]["hasListener"])
         self.__processList__[process]["nfThreads"] = procStatSplitted[19]
       else:
         self.__processList__[process]["PPID"] = 1
@@ -512,7 +516,7 @@ class procreader(object):
     try:
       __allFds = os.listdir(self._prefixDir + "/proc/" + str(process) + "/fd")
     except OSError:
-      __allFds = ""
+     __allFds = ""
     for fd in __allFds:
       try:
         link = os.readlink(self._prefixDir + "/proc/" + str(process) + "/fd/" + fd)
@@ -586,6 +590,9 @@ class procreader(object):
 
   def hasProcess(self, process):
     return self.__processList__.has_key(int(process))
+  def setListener(self, process):
+    if self.__processList__.has_key(int(process)):
+      self.__processList__[int(process)]["hasListener"]=True
   def getProcessCpuUsageHistory(self, process):
     return self.__processList__[int(process)]["history"].cpuUsageHistory
   def getcwd(self, process):

@@ -566,10 +566,11 @@ app.processEvents()
 rootproxy.start(asRoot=True)
 if not rootproxy.isStarted():
   messageui.doMessageWindow("Process explorer has no root privileges. TCPIP traffic monitoring (using tcpdump) will not be available.")
-   
-timer.start(int(settings["updateTimer"]))  
 
 reader = procreader.reader.procreader(int(settings["updateTimer"]), int(settings["historySampleCount"]))
+
+timer.start(int(settings["updateTimer"]))
+
 if onlyUser:
   reader.setFilterUID(os.geteuid())
 
