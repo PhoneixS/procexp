@@ -485,12 +485,17 @@ class procreader(object):
 
   def __getMemoryInfo(self):
     mem = procutils.readFullFile(self._prefixDir + "/proc/meminfo").split("\n")
-    self.__totalMemKb   = int(mem[0].split()[1])
-    self.__actualMemKb  = int(mem[1].split()[1])
-    self.__buffersMemKb = int(mem[2].split()[1])
-    self.__cachedMemKb  = int(mem[3].split()[1])
-    self.__swapUsed     = int(mem[13].split()[1]) - int(mem[14].split()[1])
-    self.__swapTotal    = int(mem[13].split()[1])
+    mem = [l.replace("kB", "").split(":") for l in mem if l]
+    memDict = {}
+    for l in mem:
+      memDict[l[0].upper()] = int(l[1])
+
+    self.__totalMemKb   = memDict["MEMTOTAL"]
+    self.__actualMemKb  = memDict["MEMFREE"]
+    self.__buffersMemKb = memDict["BUFFERS"]
+    self.__cachedMemKb  = memDict["CACHED"]
+    self.__swapUsed     = memDict["SWAPTOTAL"]-memDict["SWAPFREE"]
+    self.__swapTotal    = memDict["SWAPTOTAL"]
   
   def __getAverageLoad(self):
     load = procutils.readFullFile(self._prefixDir + "/proc/loadavg").split()
