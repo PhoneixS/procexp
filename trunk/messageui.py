@@ -21,12 +21,12 @@ import os
 dialog = None
 import configobj
 
-settings = {}
+g_settings = {}
 
 
 
 def _loadMsgSettings():
-  global settings
+  global g_settings
   settingsPath = os.path.expanduser("~/.procexp/questions")
   if os.path.exists(settingsPath):
     f = file(settingsPath,"rb")
@@ -38,7 +38,7 @@ def _saveMsgSettings():
   if not(os.path.exists(settingsPath)):
     os.makedirs(settingsPath)
   f = file(settingsPath + "/questions","wb")
-  cfg = configobj.ConfigObj(settings)
+  cfg = configobj.ConfigObj(g_settings)
   cfg.write(f)
   f.close()
 
@@ -46,13 +46,13 @@ def clearAllMessages():
   settingsPath = os.path.expanduser("~/.procexp/questions")
   if os.path.exists(settingsPath):
     os.remove(settingsPath)
-  global settings
+  global g_settings
   settings = {}
   
 def doMessageWindow(msg):
   """Make a log window"""
   _loadMsgSettings()
-  if settings.has_key(msg):
+  if g_settings.has_key(msg):
     return
   global dialog
   dialog = QtGui.QDialog()
@@ -61,7 +61,7 @@ def doMessageWindow(msg):
   msgDialog.messageLabel.setText(msg)
   dialog.exec_()
   if msgDialog.showAgainCheckBox.isChecked():
-    settings[msg] = True
+    g_settings[msg] = True
     _saveMsgSettings()
   
   
