@@ -182,21 +182,24 @@ class networkOverviewUi(object):
         y += ymargin
         label.setText("0")
       
-
-      
   def show(self):
+    """ show the previous possible hidden dialog
+    """
     self.__dialog__.show()
     self.__dialog__.setVisible(True)    
  
   def close(self):
+    """close"""
     self.__dialog__.close()
 
   def setFontSize(self, fontSize):
+    """set font size of this dialog"""
     font = QtGui.QFont()
     font.setPointSize(fontSize)
     self.__dialog__.setFont(font)
 
   def update(self):
+    """update the state of this diaglog"""
     for plot in xrange(32):
       if plot+1 <= len(self.__networkCards__):
         self.__netPlotArray[plot][3].update()
