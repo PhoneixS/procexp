@@ -36,7 +36,7 @@ def _loadMsgSettings():
   if os.path.exists(settingsPath):
     f = file(settingsPath,"rb")
     settingsObj = configobj.ConfigObj(infile=f)
-    settings=settingsObj.dict()
+    g_settings=settingsObj.dict()
 
 def _saveMsgSettings():
   """ save messages we dont want to see anymore
@@ -56,7 +56,7 @@ def clearAllMessages():
   if os.path.exists(settingsPath):
     os.remove(settingsPath)
   global g_settings
-  settings = {}
+  g_settings = {}
   
 def doMessageWindow(msg):
   """Make a message window"""
