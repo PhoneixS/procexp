@@ -20,8 +20,8 @@ import ui.helplegend
 
 def doColorHelpLegend():
   """Make a color legend window"""
-  Dialog = QtGui.QDialog()
+  dialog = QtGui.QDialog()
   myui = ui.helplegend.Ui_Dialog()
-  myui.setupUi(Dialog)
-  Dialog.setModal(True)
-  Dialog.exec_()
+  myui.setupUi(dialog)
+  dialog.setModal(True)
+  dialog.exec_()
