@@ -4,10 +4,12 @@ import subprocess
 import procutils
 
 def doAffinity(cpuCount, process):
+  """ setup and handle the cpu affinity menu.
+  """
   global ui
-  Dialog = QtGui.QDialog()
+  dialog = QtGui.QDialog()
   aff = affinityDialog.Ui_affinityDialog()
-  aff.setupUi(Dialog)
+  aff.setupUi(dialog)
   
   #get affinity of process
   affinityHexStr =subprocess.Popen(["taskset", "-p", str(process)], \
@@ -15,7 +17,7 @@ def doAffinity(cpuCount, process):
   
   affinity = int(affinityHexStr, 16)
 
-  #disable cpu checkboxes we do not have..
+  #disable cpu checkboxes of the cpu's.
   for objName in aff.__dict__:
     if objName.find("checkBox_") != -1:
       cpuNr = int(objName.split("_")[1])
@@ -34,8 +36,8 @@ def doAffinity(cpuCount, process):
           aff.__dict__[objName].setChecked(False)
           
   ui = aff
-  Dialog.setModal(True) 
-  Dialog.exec_()  
+  dialog.setModal(True)
+  dialog.exec_()
 
   #apply new affinity
   newAff = 0
