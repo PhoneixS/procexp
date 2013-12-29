@@ -15,6 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
+
+#
+# implements a message UI capable of supressing messages which the user already knows
+#
+
 from PyQt4 import QtGui
 import ui.message
 import os
@@ -23,9 +28,9 @@ import configobj
 
 g_settings = {}
 
-
-
 def _loadMsgSettings():
+  """ load messages earlier shown
+  """
   global g_settings
   settingsPath = os.path.expanduser("~/.procexp/questions")
   if os.path.exists(settingsPath):
@@ -34,6 +39,8 @@ def _loadMsgSettings():
     settings=settingsObj.dict()
 
 def _saveMsgSettings():
+  """ save messages we dont want to see anymore
+  """
   settingsPath = os.path.expanduser("~/.procexp")
   if not(os.path.exists(settingsPath)):
     os.makedirs(settingsPath)
@@ -43,6 +50,8 @@ def _saveMsgSettings():
   f.close()
 
 def clearAllMessages():
+  """ clear persisted messages we dont want to see
+  """
   settingsPath = os.path.expanduser("~/.procexp/questions")
   if os.path.exists(settingsPath):
     os.remove(settingsPath)
@@ -50,7 +59,7 @@ def clearAllMessages():
   settings = {}
   
 def doMessageWindow(msg):
-  """Make a log window"""
+  """Make a message window"""
   _loadMsgSettings()
   if g_settings.has_key(msg):
     return
@@ -63,7 +72,3 @@ def doMessageWindow(msg):
   if msgDialog.showAgainCheckBox.isChecked():
     g_settings[msg] = True
     _saveMsgSettings()
-  
-  
-
-  
