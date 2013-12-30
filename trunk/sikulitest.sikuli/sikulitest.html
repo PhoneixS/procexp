@@ -72,6 +72,8 @@
 <pre class="sikuli-code">
 <span class="kw">import</span> subprocess
 
+subprocess.Popen([<span class="str">"killall"</span>, <span class="str">"python"</span>])
+
 
 <span class="kw">for</span> _ <span class="kw">in</span> range(<span class="dig">5</span>):
     p = subprocess.Popen([<span class="str">"procexp.sh"</span>])
