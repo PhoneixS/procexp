@@ -21,7 +21,7 @@
 
 import time
 import os
-import procutils
+import utils.procutils
 import singleprocess
 import subprocess
 
@@ -54,7 +54,7 @@ class cpuhistoryreader(object):
     self._prefixdir = prefixDir
     
   def update(self):
-    jiffyStr = procutils.readFullFile(self._prefixdir+'/proc/stat').split("\n")[self.__cpu__+1]
+    jiffyStr = utils.procutils.readFullFile(self._prefixdir+'/proc/stat').split("\n")[self.__cpu__+1]
     userMode = int(jiffyStr.split()[1])
     userNiceMode = int(jiffyStr.split()[2])
     systemMode = int(jiffyStr.split()[3])
@@ -142,9 +142,8 @@ class procreader(object):
     self.__prevJiffies__ = 0    
     self.__closedProcesses__ = set()
     self.__newProcesses__ = set()
-    self.__passwdfile = procutils.readFullFile("/etc/passwd").split("\n")
+    self.__passwdfile = utils.procutils.readFullFile("/etc/passwd").split("\n")
     self.__allConnections__ = {}
-    cpuinfo = procutils.readFullFile(self._prefixDir+"/proc/cpuinfo").split("\n")
     self.__cpuCount__ = 0
     self.__networkCards__= {}
     self.__cpuArray__ = []
@@ -161,23 +160,22 @@ class procreader(object):
     self.__noofrunningprocs__ = 0
     self.__lastpid__ = 0
 
-
-    
+    cpuinfo = utils.procutils.readFullFile(self._prefixDir+"/proc/cpuinfo").split("\n")
     for line in cpuinfo:
       if line.startswith("processor"):
         self.__cpuArray__.append(cpuhistoryreader(self.__cpuCount__, prefixDir=prefixDir))
         self.__cpuCount__ += 1
     
     #network cards
-    data = procutils.readFullFile(self._prefixDir+'/proc/net/dev').split("\n")[2:]
+    data = utils.procutils.readFullFile(self._prefixDir+'/proc/net/dev').split("\n")[2:]
     for line in data:
       cardName = line.split(":")[0].strip()
       if len(cardName) > 0:
         self.__networkCards__[cardName] = {"actual":[0, 0, 0, 0],  #in/s out/s previn, prevout]
                                            "speed":None}
     #try to find speeds if ethtool is available and accessible
-    procutils.log("network card speed detection results")
-    procutils.log("------------------------------------")
+    utils.procutils.log("network card speed detection results")
+    utils.procutils.log("------------------------------------")
     
     ethtoolerror = False
     for card in self.__networkCards__:
@@ -197,13 +195,13 @@ class procreader(object):
               speed = None
       
       if speed is not None:
-        procutils.log("  ethernet device %s has speed %s Mb/s according to ethtool" %(card, speed))
+        utils.procutils.log("  ethernet device %s has speed %s Mb/s according to ethtool" %(card, speed))
         self.__networkCards__[card]["speed"] = speed
       else:
-        procutils.log("  ethernet device %s has unknown speed" %card)
-        procutils.log("  network graph scaling for %s is set to autoscale" %card)
+        utils.procutils.log("  ethernet device %s has unknown speed" %card)
+        utils.procutils.log("  network graph scaling for %s is set to autoscale" %card)
     if ethtoolerror:
-      procutils.log("  ** ethtool not found, or access denied. For better results, allow access to ethtool")
+      utils.procutils.log("  ** ethtool not found, or access denied. For better results, allow access to ethtool")
 
   def __initReader__(self):
     self.__processList__ = {}
@@ -320,7 +318,7 @@ class procreader(object):
     for process in self.__processList__:
       if self.__processList__[process]["hasListener"]:
         try:
-          env = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/environ").split("\0")
+          env = utils.procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/environ").split("\0")
           self.__processList__[process]["env"] = env
         except: #pylint:disable=W0702
           pass
@@ -329,9 +327,9 @@ class procreader(object):
     for process in self.__processList__:
       procStat = None
       try:
-        procStat = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/stat")
+        procStat = utils.procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/stat")
         if self.__processList__[process]["cmdline"] == UNKNOWN:
-          cmdLine = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/cmdline")
+          cmdLine = utils.procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/cmdline")
           self.__processList__[process]["cmdline"] = cmdLine.replace("\x00"," ")
 
         #get UID of process
@@ -342,10 +340,10 @@ class procreader(object):
         pass #pylint:disable=W0702
       
       try:    
-        statm = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/statm")
+        statm = utils.procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/statm")
         totalRssMem = int(statm.split(' ')[1])*4 #in 4k pages
 
-        #smaps = procutils.readFullFile("/proc/"+str(process)+"/smaps").split("kB\nRss:")
+        #smaps = utils.procutils.readFullFile("/proc/"+str(process)+"/smaps").split("kB\nRss:")
         #totalRssMem = 0
         #for line in smaps:
           #if line.startswith(" "):
@@ -355,7 +353,7 @@ class procreader(object):
         totalRssMem = 0
       if self.__processList__[process]["hasListener"]:
         try:
-          wchan = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/wchan")
+          wchan = utils.procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/wchan")
           self.__processList__[process]["wchan"] = wchan
         except: #pylint:disable=W0702
           self.__processList__[process]["wchan"] = UNKNOWN
@@ -377,7 +375,7 @@ class procreader(object):
           cpuUsageKernel = 0
         #IO accounting
         try:
-          io = procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/io").split("\n")
+          io = utils.procutils.readFullFile(self._prefixDir + "/proc/"+str(process)+"/io").split("\n")
           iototal = int(io[0].split(": ")[1]) + int(io[1].split(": ")[1])
         except: #pylint:disable=W0702
           iototal = 0
@@ -472,19 +470,19 @@ class procreader(object):
     #~ counters, process A could see an intermediate result.    
   def __getAllSocketInfo__(self):
     self.__allConnections__ = {} #list of connections, organized by inode
-    data = procutils.readFullFile(self._prefixDir + "/proc/net/tcp").split("\n")
+    data = utils.procutils.readFullFile(self._prefixDir + "/proc/net/tcp").split("\n")
     for connection in data:
       if len(connection) > 1:
         self.__allConnections__[connection.split()[9]] = connection.split()
   def __getAllUDPInfo__(self):
     self.__allUDP__ = {} #list of connections, organized by inode
-    data = procutils.readFullFile(self._prefixDir + "/proc/net/udp").split("\n")
+    data = utils.procutils.readFullFile(self._prefixDir + "/proc/net/udp").split("\n")
     for udp in data:
       if len(udp) > 1:
         self.__allUDP__[udp.split()[9]] = udp.split()
 
   def __getMemoryInfo(self):
-    mem = procutils.readFullFile(self._prefixDir + "/proc/meminfo").split("\n")
+    mem = utils.procutils.readFullFile(self._prefixDir + "/proc/meminfo").split("\n")
     mem = [l.replace("kB", "").split(":") for l in mem if l]
     memDict = {}
     for l in mem:
@@ -498,7 +496,7 @@ class procreader(object):
     self.__swapTotal    = memDict["SWAPTOTAL"]
   
   def __getAverageLoad(self):
-    load = procutils.readFullFile(self._prefixDir + "/proc/loadavg").split()
+    load = utils.procutils.readFullFile(self._prefixDir + "/proc/loadavg").split()
     self.__loadavg__ = (load[0],load[1],load[2])
     self.__noofprocs__ = load[3].split("/")[1]
     self.__noofrunningprocs__ = load[3].split("/")[0]
@@ -540,7 +538,7 @@ class procreader(object):
     return allFds, allUDP
     
   def __getNetworkCardUsage(self):
-    data = procutils.readFullFile(self._prefixDir + '/proc/net/dev').split("\n")[2:]
+    data = utils.procutils.readFullFile(self._prefixDir + '/proc/net/dev').split("\n")[2:]
     actTime = time.time()
     for line in data:
       cardName = line.split(":")[0].strip()
