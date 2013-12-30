@@ -16,8 +16,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
 from PyQt4 import QtGui
+import utils.procutils
 import ui.log
-import procutils
 
 log_ui = None
 dialog = None

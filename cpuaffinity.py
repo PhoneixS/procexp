@@ -1,7 +1,9 @@
 from PyQt4 import QtGui
-import ui.cpuaffinity as affinityDialog
 import subprocess
-import procutils
+
+import utils.procutils
+import ui.cpuaffinity as affinityDialog
+
 
 def doAffinity(cpuCount, process):
   """ setup and handle the cpu affinity menu.

@@ -25,13 +25,14 @@
 #create qt app early, in order to show unhandled exceptions graphically.
 import sys
 from PyQt4 import QtCore, QtGui
+import utils.procutils
+
 app = QtGui.QApplication(sys.argv)
 
 import procreader.reader
 import ui.main
 import logui
-import aboutui 
-import procutils
+import aboutui
 import os
 import singleprocess
 import systemoverview
@@ -546,7 +547,7 @@ def updateUI():
 
   except:
     import traceback
-    procutils.log("Unhandled exception:%s" %traceback.format_exc())
+    utils.procutils.log("Unhandled exception:%s" %traceback.format_exc())
     print traceback.format_exc()
   
   g_firstUpdate = False
