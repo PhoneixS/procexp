@@ -1,5 +1,7 @@
 import subprocess
 
+subprocess.Popen(["killall", "python"])
+
 
 for _ in range(5):
     p = subprocess.Popen(["procexp.sh"])
