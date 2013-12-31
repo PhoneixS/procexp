@@ -1,32 +1,44 @@
+"""automatic test suite for process explorer
+   Run this on a quad cpu machine
+"""
 import subprocess
 
-subprocess.Popen(["killall", "python"])
+try:
+  subprocess.Popen(["killall", "python"])
+except: 
+  pass
 
-
-for _ in range(5):
+def start_processexplorer():
     p = subprocess.Popen(["procexp.sh"])
-    
-    
-    type("1388435202633.png", "test")
-    click("1388435311540.png")
-    
+     
+    wait("1388479204288.png", 20)  
+    type(Pattern("1388435202633.png").targetOffset(-148,72), "test")
+    click("1388435311540.png")   
     click("1388436794512.png")
     
-    
-    #test CPU affinity
-    proc = subprocess.Popen(["python", "-c", "while True:  pass"])
-    
+def startproperties_25process():
+    #process explorer full size
     type(Key.SPACE, KEY_ALT)
     type("x")
     
-    click(Pattern("1388436205289.png").targetOffset(-33,-3))
-    
+    click(Pattern("1388478858825.png").targetOffset(-40,14))
+     
     doubleClick("1388436274469.png")
     
     doubleClick("1388436357270.png")
     
+    wait("1388436426300.png", 20)
     rightClick("1388436426300.png")
     
+
+def test_cpu25percent():
+    """test a cpu bound process to take 25% CPU at a 4 core machine"""
+    #start CPU bound process
+    proc = subprocess.Popen(["python", "-c", "while True:  pass"])    
+    start_processexplorer()
+    startproperties_25process()
+     
+    #show process detail screen 
     type(Key.DOWN)
     type(Key.DOWN)
     type(Key.DOWN)
@@ -34,9 +46,40 @@ for _ in range(5):
     type(Key.DOWN)
     type(Key.DOWN)
     type(Key.ENTER)
-    
-    wait("1388437073840.png", 30)
-    
+
+    #wait until we see usage of about 25%
+    wait(Pattern("1388480252501.png").similar(0.86), 60)
     wait("1388437097963.png", 90)
-    
     p = subprocess.Popen(["killall", "python"])
+
+def test_affinity():
+    """test affinity settings of a process"""
+    #start CPU bound process
+    proc = subprocess.Popen(["python", "-c", "while True:  pass"])
+    start_processexplorer()
+    startproperties_25process()   
+    type(Key.DOWN)
+    type(Key.ENTER)
+    click("1388483186882.png")
+    click("1388483198383.png")
+    click("1388483211934.png")
+    click("1388483235141.png")
+    type(Key.F4, KEY_ALT)
+    start_processexplorer()
+    startproperties_25process()   
+    type(Key.DOWN)
+    type(Key.ENTER)
+    wait(Pattern("1388483627687.png").similar(0.86))
+    wait(Pattern("1388483637679.png").similar(0.95))
+    wait(Pattern("1388483647911.png").similar(0.98))
+    wait(Pattern("1388483656564.png").similar(0.98))
+    p = subprocess.Popen(["killall", "python"])
+    
+
+
+if __name__ == "__main__":
+   test_cpu25percent()
+   test_affinity()
+   print "************************"
+   print "* all tests succeeded  *"
+   print "************************"
