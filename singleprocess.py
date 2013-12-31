@@ -63,6 +63,7 @@ class singleUi(object):
     self.__tcpStat__ = None
     self.__TCPHist__ = [0] * self.__reader__.getHistoryDepth(self.__proc__)
     self.__prevtcpipbytes__ = 0
+    self.__envData = procreader.reader.UNKNOWN
 
     #tell reader that a singleprocess GUI is using its data, for optimization
     self.__reader__.setListener(self.__proc__)
@@ -213,10 +214,15 @@ class singleUi(object):
 
   def __updateEnvironmentDisplay(self):
     filter = str(self.__procDetails__.filterEdit.text())
-    data = self.__reader__.getEnvironment(self.__proc__)
-    if data != procreader.reader.UNKNOWN:
+    try:
+      self.__envData = self.__reader__.getEnvironment(self.__proc__)
+    except KeyError:
+      pass
+
+
+    if self.__envData != procreader.reader.UNKNOWN:
       text = ""
-      for line in data:
+      for line in self.__envData:
         if line.upper().find(filter.upper()) != -1:
           text = text + line + "\n"
       self.__procDetails__.environmentText.setText(text)
@@ -321,13 +327,13 @@ class singleUi(object):
     
   def update(self):
 
-    self.__updateEnvironmentDisplay()
+
     
     if not tcpip_stat.started():
       self._availableLabel.setText("  tcpdump not running (no root privileges?).")
     else:
       self._availableLabel.setText("")
-   
+
     if self.__processGone__ == False:
       if not(self.__reader__.hasProcess(self.__proc__)):
         self.__processGone__ = True
@@ -337,6 +343,7 @@ class singleUi(object):
           self.__tcpStat__.join()
         
       else:
+        self.__updateEnvironmentDisplay()
         data = self.__reader__.getProcessCpuUsageHistory(self.__proc__)
         actual = data[-1:][0]
         self.__curveCpuHist__.setData(self.__y__, data)

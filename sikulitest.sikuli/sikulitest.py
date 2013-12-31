@@ -9,25 +9,25 @@ except:
   pass
 
 def start_processexplorer():
-    #p = subprocess.Popen(["python","/home/cpwolff/procexp/code/trunk/procexp.py"])
-    p = subprocess.Popen("procexp.sh")
+    p = subprocess.Popen(["python","/home/cpwolff/procexp/code/trunk/procexp.py"])
+    #p = subprocess.Popen("procexp.sh")
      
     wait("1388491619153.png", 20)
     type(Pattern("1388491661459.png").targetOffset(-175,-21), "test")
     click("1388435311540.png")   
     click("1388436794512.png")
-    
-def startproperties_25process():
+
+def maximize_process_explorer():
     #process explorer full size
     type(Key.SPACE, KEY_ALT)
-    type("x")
-    
-    click(Pattern("1388478858825.png").targetOffset(-40,14))
-     
-    doubleClick("1388436274469.png")
-    
+    type("x") 
+    click(Pattern("1388478858825.png").targetOffset(-40,14)) 
+    doubleClick("1388436274469.png")    
     doubleClick("1388436357270.png")
+
+def startproperties_25process():
     
+    maximize_process_explorer()    
     wait("1388436426300.png", 20)
     rightClick("1388436426300.png")
     
@@ -76,12 +76,29 @@ def test_affinity():
     wait(Pattern("1388483656564.png").similar(0.98))
     p = subprocess.Popen(["killall", "python"])
 
-
-
-
+def testdeadprocess():
+    start_processexplorer() 
+    maximize_process_explorer() 
+    proc = subprocess.Popen(["python", "-c", "import time; time.sleep(10)"])
+    wait("1388494525665.png", 20)
+    rightClick("1388494525665.png")
+    type(Key.DOWN)
+    type(Key.DOWN)
+    type(Key.DOWN)
+    type(Key.DOWN)
+    type(Key.DOWN)
+    type(Key.DOWN)
+    type(Key.ENTER)
+    wait(Pattern("1388495924849.png").similar(0.93), 60) 
+    subprocess.Popen(["killall", "python"])    
+    
+    
+    
+    
 if __name__ == "__main__":
    test_cpu25percent()
    test_affinity()
+   testdeadprocess()
    print "************************"
    print "* all tests succeeded  *"
    print "************************"
