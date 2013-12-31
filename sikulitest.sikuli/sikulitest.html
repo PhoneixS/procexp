@@ -81,10 +81,11 @@
   <span class="kw">pass</span>
 
 <span class="kw">def</span> start_processexplorer():
-    p = subprocess.Popen([<span class="str">"procexp.sh"</span>])
-
-    <span class="skw">wait</span>(<img src="1388479204288.png" />, <span class="dig">20</span>)
-    <span class="skw">type</span>(Pattern(<img src="1388435202633.png" />).targetOffset(-<span class="dig">148</span>,<span class="dig">72</span>), <span class="str">"test"</span>)
+    p = subprocess.Popen([<span class="str">"python"</span>,<span class="str">"/home/cpwolff/procexp/code/trunk/procexp.py"</span>])
+    <span class="cmt">#p = subprocess.Popen("procexp.sh")
+</span>
+    <span class="skw">wait</span>(<img src="1388491619153.png" />, <span class="dig">20</span>)
+    <span class="skw">type</span>(Pattern(<img src="1388491661459.png" />).targetOffset(-<span class="dig">175</span>,-<span class="dig">21</span>), <span class="str">"test"</span>)
     <span class="skw">click</span>(<img src="1388435311540.png" />)
     <span class="skw">click</span>(<img src="1388436794512.png" />)
 
@@ -146,6 +147,7 @@
     <span class="skw">wait</span>(Pattern(<img src="1388483647911.png" />).similar(<span class="dig">0.98</span>))
     <span class="skw">wait</span>(Pattern(<img src="1388483656564.png" />).similar(<span class="dig">0.98</span>))
     p = subprocess.Popen([<span class="str">"killall"</span>, <span class="str">"python"</span>])
+
 
 
 
