@@ -9,8 +9,8 @@ except:
   pass
 
 def start_processexplorer():
-    p = subprocess.Popen(["python","/home/cpwolff/procexp/code/trunk/procexp.py"])
-    #p = subprocess.Popen("procexp.sh")
+    #p = subprocess.Popen(["python","/home/cpwolff/procexp/code/trunk/procexp.py"])
+    p = subprocess.Popen("procexp.sh")
      
     wait("1388491619153.png", 20)
     type(Pattern("1388491661459.png").targetOffset(-175,-21), "test")
