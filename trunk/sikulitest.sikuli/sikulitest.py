@@ -9,10 +9,11 @@ except:
   pass
 
 def start_processexplorer():
-    p = subprocess.Popen(["procexp.sh"])
+    p = subprocess.Popen(["python","/home/cpwolff/procexp/code/trunk/procexp.py"])
+    #p = subprocess.Popen("procexp.sh")
      
-    wait("1388479204288.png", 20)  
-    type(Pattern("1388435202633.png").targetOffset(-148,72), "test")
+    wait("1388491619153.png", 20)
+    type(Pattern("1388491661459.png").targetOffset(-175,-21), "test")
     click("1388435311540.png")   
     click("1388436794512.png")
     
@@ -74,7 +75,8 @@ def test_affinity():
     wait(Pattern("1388483647911.png").similar(0.98))
     wait(Pattern("1388483656564.png").similar(0.98))
     p = subprocess.Popen(["killall", "python"])
-    
+
+
 
 
 if __name__ == "__main__":
