@@ -615,7 +615,10 @@ class procreader(object):
   def getIOHistory(self, process):
     return self.__processList__[int(process)]["history"].IOHistory
   def getEnvironment(self,process):
-    return self.__processList__[int(process)]["env"]
+    try:
+      return self.__processList__[int(process)]["env"]
+    except:
+      return "---"
   def getHistoryDepth(self, process):
     return self.__processList__[int(process)]["history"].HistoryDepth
   def getCpuCount(self):
