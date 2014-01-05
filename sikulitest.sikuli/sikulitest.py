@@ -21,16 +21,15 @@ def maximize_process_explorer():
     #process explorer full size
     type(Key.SPACE, KEY_ALT)
     type("x") 
-    click(Pattern("1388478858825.png").targetOffset(-40,14)) 
-    doubleClick("1388436274469.png")    
-    doubleClick("1388436357270.png")
+    click(Pattern("1388478858825.png").similar(0.98).targetOffset(-40,14)) 
+    doubleClick(Pattern("1388436274469.png").similar(0.90))    
+    doubleClick(Pattern("1388436357270.png").similar(0.96))
 
 def startproperties_25process():
     
     maximize_process_explorer()    
     wait("1388436426300.png", 20)
     rightClick("1388436426300.png")
-    
 
 def test_cpu25percent():
     """test a cpu bound process to take 25% CPU at a 4 core machine"""
@@ -61,9 +60,9 @@ def test_affinity():
     startproperties_25process()   
     type(Key.DOWN)
     type(Key.ENTER)
-    click("1388483186882.png")
-    click("1388483198383.png")
-    click("1388483211934.png")
+    click(Pattern("1388483186882.png").exact())
+    click(Pattern("1388483198383.png").exact())
+    click(Pattern("1388483211934.png").exact())
     click("1388483235141.png")
     type(Key.F4, KEY_ALT)
     start_processexplorer()
@@ -91,9 +90,6 @@ def testdeadprocess():
     type(Key.ENTER)
     wait(Pattern("1388495924849.png").similar(0.93), 60) 
     subprocess.Popen(["killall", "python"])    
-    
-    
-    
     
 if __name__ == "__main__":
    test_cpu25percent()
