@@ -275,11 +275,11 @@ class singleUi(object):
       
       state = tcpstates[int(connections[conn][3],16)]
       
-      ipfromResolved = procutils.resolveIP(ipfromaddrdec)
-      iptoResolved = procutils.resolveIP(iptoaddrdec)
+      ipfromResolved = utils.procutils.resolveIP(ipfromaddrdec)
+      iptoResolved = utils.procutils.resolveIP(iptoaddrdec)
     
       text.append(("TCPIP", ipfromResolved, str(int(ipfromport,16)), iptoResolved, str(int(iptoport,16)), state, \
-                   procutils.humanReadable(bytesSentPerSecond)+"/s", procutils.humanReadable(bytesReceivedPerSecond)+"/s"))
+                   utils.procutils.humanReadable(bytesSentPerSecond)+"/s", utils.procutils.humanReadable(bytesReceivedPerSecond)+"/s"))
       
     if nftotalBytesPerSecond > 0:
       self._availableLabel.hide()  

@@ -99,7 +99,7 @@ def performMenuAction(action):
     except IndexError:
       return
     process = selectedItem.data(1,0).toString()
-    procutils.killProcessHard(process)
+    utils.procutils.killProcessHard(process)
   elif action is g_mainUi.actionKill_process_tree:
     try:
       selectedItem = g_mainUi.processTreeWidget.selectedItems()[0]
@@ -167,7 +167,7 @@ def performMenuAction(action):
   elif action is g_mainUi.actionClear_Messages:
     messageui.clearAllMessages()
   else:
-    procutils.log("This action (%s)is not yet supported." %action)
+    utils.procutils.log("This action (%s)is not yet supported." %action)
 
 def setFontSize(fontSize):
   global g_settings
@@ -331,7 +331,7 @@ def killProcessTree(proc, procList):
   """ Kill a tree of processes, the hard way
   """
   killChildsTree(int(str(proc)), procList)
-  procutils.killProcessHard(int(str(proc)))
+  utils.procutils.killProcessHard(int(str(proc)))
 
 def killChildsTree(proc, procList):
   """ kill all childs of given process
@@ -339,7 +339,7 @@ def killChildsTree(proc, procList):
   for aproc in procList:
     if procList[aproc]["PPID"] == proc:
       killChildsTree(aproc, procList)
-      procutils.killProcess(aproc)
+      utils.procutils.killProcess(aproc)
      
 def addProcessAndParents(proc, procList):
   """ adds a process and its parents to the tree of processes
