@@ -6,6 +6,8 @@
 import sys
 import subprocess
 import const
+import os
+import traceback
 
 ptoc_fifo = open(sys.argv[1], "r")
 ctop_fifo = open(sys.argv[2], "w")
@@ -36,6 +38,20 @@ while True:
     #start process and output to given existing fifo
     f = open(subprocesscommand[2], "w")
     processes[subprocesscommand[2]] = subprocess.Popen(subprocesscommand[1], stdout=f)
+  elif subprocesscommand[0] == const.Command.LISTDIR:
+    try:
+      result = os.listdir(subprocesscommand[1])
+      _write(ctop_fifo, repr((const.Result.OK, result)))
+    except:
+      tb = traceback.format_exc()
+      _write(ctop_fifo, repr((const.Result.FAIL, tb)))
+  elif subprocesscommand[0] == const.Command.READLINK:
+    try:
+      result = os.readlink(subprocesscommand[1])
+      _write(ctop_fifo, repr((const.Result.OK, result)))
+    except:
+      tb = traceback.format_exc()
+      _write(ctop_fifo, repr((const.Result.FAIL, tb)))
   elif subprocesscommand[0] == const.Command.STOP:
     #start process and output to given existing fifo
     processes[subprocesscommand[1]].kill()

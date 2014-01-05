@@ -67,7 +67,35 @@ def doCommand(CommandAndArgList):
       raise CommandException
     else:
       return result[1]
-  
+
+def doListDir(arg):
+  if started:
+    global ptoc_file
+    global ctop_file
+    _write(ptoc_file, (const.Command.LISTDIR, arg))
+    result = eval(ctop_file.readline())
+    if result[0] == const.Result.FAIL:
+      raise CommandException
+    else:
+      return result[1]
+  else:
+    return os.listdir(arg)
+  return
+
+def doReadlink(arg):
+  if started:
+    global ptoc_file
+    global ctop_file
+    _write(ptoc_file, (const.Command.READLINK, arg))
+    result = eval(ctop_file.readline())
+    if result[0] == const.Result.FAIL:
+      raise CommandException
+    else:
+      return result[1]
+  else:
+    return os.readlink(arg)
+  return
+
 def doContinuousCommand(CommandAndArgList, outputFifo):
   """execute command with stdout output to the outputFifo file name. 
      The given command keeps running."""

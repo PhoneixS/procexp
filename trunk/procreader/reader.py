@@ -24,6 +24,7 @@ import os
 import utils.procutils
 import singleprocess
 import subprocess
+import rootproxy
 
 UNKNOWN = "---"
 
@@ -517,12 +518,14 @@ class procreader(object):
     allFds = {}
     allUDP = {}
     try:
-      __allFds = os.listdir(self._prefixDir + "/proc/" + str(process) + "/fd")
+      __allFds = rootproxy.doListDir(self._prefixDir + "/proc/" + str(process) + "/fd")
+      #__allFds = os.listdir(self._prefixDir + "/proc/" + str(process) + "/fd")
     except OSError:
      __allFds = ""
     for fd in __allFds:
       try:
-        link = os.readlink(self._prefixDir + "/proc/" + str(process) + "/fd/" + fd)
+        link = rootproxy.doReadlink(self._prefixDir + "/proc/" + str(process) + "/fd/" + fd)
+        #link = os.readlink(self._prefixDir + "/proc/" + str(process) + "/fd/" + fd)
       except OSError:
         link = ""
       if link.startswith("socket"):
